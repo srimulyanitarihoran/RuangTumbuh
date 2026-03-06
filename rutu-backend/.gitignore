@@ -1,0 +1,13 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/prisma/migrations/
+/generated/
+
+# Logs
+*.log
+pnpm-debug.log*
+
+# Misc
+.DS_Store

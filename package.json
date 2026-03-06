@@ -1,0 +1,16 @@
+{
+  "name": "RuangTumbuh",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"cd rutu-frontend && pnpm dev\" \"cd rutu-backend && pnpm start:dev\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.29.2",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
