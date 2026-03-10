@@ -5,17 +5,31 @@ export default function Navbar() {
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
   const [hideCursor, setHideCursor] = useState(false);
 
+  // State baru untuk mendeteksi scroll
+  const [isScrolled, setIsScrolled] = useState(false);
+
   useEffect(() => {
+    // Logika kursor
     const moveCursor = (e) => {
-      setCursor({
-        x: e.clientX,
-        y: e.clientY,
-      });
+      setCursor({ x: e.clientX, y: e.clientY });
+    };
+
+    // Logika deteksi scroll
+    const handleScroll = () => {
+      if (window.scrollY > 50) {
+        setIsScrolled(true); // Jika di-scroll lebih dari 50px, status berubah
+      } else {
+        setIsScrolled(false);
+      }
     };
 
     window.addEventListener("mousemove", moveCursor);
+    window.addEventListener("scroll", handleScroll);
 
-    return () => window.removeEventListener("mousemove", moveCursor);
+    return () => {
+      window.removeEventListener("mousemove", moveCursor);
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const disableCustomCursor = () => setHideCursor(true);
@@ -25,15 +39,15 @@ export default function Navbar() {
     <>
       <div
         className={`${styles.cursor} ${hideCursor ? styles.cursorHide : ""}`}
-        style={{
-          left: cursor.x,
-          top: cursor.y,
-        }}
+        style={{ left: cursor.x, top: cursor.y }}
       >
         ✦
       </div>
 
-      <div className={styles.headerContainer}>
+      {/* Tambahkan class .scrolled saat isScrolled bernilai true */}
+      <div
+        className={`${styles.headerContainer} ${isScrolled ? styles.scrolled : ""}`}
+      >
         <nav className={styles.navbar}>
           <div className={styles.left}>
             <a
@@ -58,7 +72,7 @@ export default function Navbar() {
               CALENDAR
             </a>
             <a
-              href="#calendar"
+              href="#session"
               onMouseEnter={disableCustomCursor}
               onMouseLeave={enableCustomCursor}
             >
@@ -76,7 +90,6 @@ export default function Navbar() {
             >
               SIGN IN
             </a>
-
             <button
               className={styles.button}
               onMouseEnter={disableCustomCursor}
@@ -86,6 +99,7 @@ export default function Navbar() {
             </button>
           </div>
         </nav>
+
         <div
           className={styles.dashboard}
           onMouseEnter={disableCustomCursor}
