@@ -17,7 +17,7 @@
 
 .headerContainer.scrolled {
   gap: 0;
-  top: 15px; 
+  top: 15px;
 }
 
 .navbar {
@@ -37,7 +37,7 @@
 .headerContainer.scrolled .navbar {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
-  border-right-width: 2px; 
+  border-right-width: 2px;
 }
 
 .dashboard {
@@ -56,7 +56,7 @@
 .headerContainer.scrolled .dashboard {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  border-left-width: 2px; /* Setengah dari 4px */
+  border-left-width: 2px;
 }
 .dashboard:active {
   transform: translate(2px, 2px);
@@ -65,12 +65,12 @@
 }
 
 .dashboard img {
-  cursor: pointer !important; 
+  cursor: pointer !important;
   transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .dashboard:hover img {
-  transform: rotate(360deg) scale(1.1); 
+  transform: rotate(360deg) scale(1.1);
   transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -118,12 +118,12 @@
   text-decoration: none;
   padding: 8px 16px;
   border-radius: 12px;
-  border: 3px solid transparent; 
+  border: 3px solid transparent;
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .right a:hover {
-  background: #fff; 
+  background: #fff;
   color: #000;
   border: 3px solid #000;
   box-shadow: 4px 4px 0px #000;
@@ -152,31 +152,4 @@
 .button:active {
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0px #000;
-}
-
-.cursor {
-  position: fixed;
-  width: 45px;
-  height: 45px;
-  background: #ff5e62;
-  border: 3px solid #000;
-  box-shadow: 3px 3px 0px #000;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-weight: 900;
-  font-size: 20px;
-  pointer-events: none;
-  transform: translate(-50%, -50%) scale(1);
-  z-index: 9999;
-  transition:
-    transform 0.15s ease-out,
-    opacity 0.15s ease-out;
-}
-
-.cursorHide {
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0);
 }
