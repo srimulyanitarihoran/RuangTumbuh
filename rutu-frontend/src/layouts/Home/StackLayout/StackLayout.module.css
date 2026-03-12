@@ -4,6 +4,7 @@
   background-color: #ffd54f;
   z-index: 10;
   padding-bottom: 7rem;
+  border-bottom: 6px solid #000;
 }
 
 .stackHeader {
