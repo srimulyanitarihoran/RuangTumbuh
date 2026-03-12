@@ -1,10 +1,9 @@
 import React from "react";
-import HeroLayout from "@layouts/HeroLayout/HeroLayout";
-import MarqueeLayout from "@layouts/MarqueeLayout/MarqueeLayout";
-import StackLayout from "@layouts/StackLayout/StackLayout";
+import HeroLayout from "@/layouts/Home/HeroLayout/HeroLayout";
+import MarqueeLayout from "@/layouts/Home/MarqueeLayout/MarqueeLayout";
+import StackLayout from "@/layouts/Home/StackLayout/StackLayout";
 import styles from "./HomePage.module.css";
-import MainLayout from "@layouts/MainLayout/MainLayout";
-import FeaturesLayout from "@layouts/FeaturesLayout/FeaturesLayout";
+import MainLayout from "@/layouts/Home/MainLayout/MainLayout";
 
 export default function HomePage() {
   return (
@@ -14,8 +13,6 @@ export default function HomePage() {
       <MarqueeLayout />
 
       <StackLayout />
-
-      <FeaturesLayout />
 
       <section className={styles.dummySection}>
         <h2>Lanjutkan Perjalanan Tumbuhmu di Sini...</h2>

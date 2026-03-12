@@ -1,7 +1,6 @@
 .dummySection {
   height: 100vh;
   background-color: #f4f0ea;
-  border-top: 6px solid #000;
   display: flex;
   justify-content: center;
   align-items: center;
