@@ -1,8 +1,8 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import styles from "./LoginPage.module.css";
-import logoGede from "../../assets/logo.svg";
-import Navbar from "../../components/Navbar/Navbar";
+import logoGede from "@assets/logo.svg";
+import Navbar from "@components/Navbar/Navbar";
 
 export default function Login() {
 

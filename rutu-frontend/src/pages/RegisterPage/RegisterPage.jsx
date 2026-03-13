@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './RegisterPage.module.css';
-import logoGede from '../../assets/logo.svg';
-import Navbar from "../../components/Navbar/Navbar";
+import logoGede from '@assets/logo.svg';
+import Navbar from "@components/Navbar/Navbar";
 
 export default function Register() {
   return (
@@ -57,4 +57,4 @@ export default function Register() {
       </div>
     </>
   );
-}
+}
