@@ -1,5 +1,6 @@
 import styles from "./Navbar.module.css";
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import logo from "../../assets/logo.svg"; // Sesuaikan path jika berbeda
 
 export default function Navbar() {
@@ -54,43 +55,43 @@ export default function Navbar() {
 
         {/* --- DESKTOP MENU --- */}
         <div className={styles.left}>
-          <a href="#home">HOME</a>
-          <a href="#find_tutor">LEARN & TEACH</a>
-          <a href="#calendar">CALENDAR</a>
-          <a href="#session">SESSION</a>
+          <Link to="/">HOME</Link>
+          <Link to="/">LEARN</Link>
+          <Link to="/">CALENDAR</Link>
+          <Link to="/">SESSION</Link>
         </div>
 
         <div className={styles.divider}></div>
 
         <div className={styles.right}>
-          <a href="#signin">SIGN IN</a>
-          <button className={styles.button}>GET STARTED</button>
+          <Link to="/login">SIGN IN</Link>
+          <Link to="/register"className={styles.button}>GET STARTED</Link>
         </div>
 
         <div
           className={`${styles.mobileMenu} ${isMenuOpen ? styles.mobileMenuOpen : ""}`}
         >
-          <a href="#home" onClick={closeMenu}>
+          <Link to="/" onClick={closeMenu}>
             HOME
-          </a>
-          <a href="#find_tutor" onClick={closeMenu}>
-            LEARN & TEACH
-          </a>
-          <a href="#calendar" onClick={closeMenu}>
+          </Link>
+          <Link to="/" onClick={closeMenu}>
+            Learn
+          </Link>
+          <Link to="/" onClick={closeMenu}>
             CALENDAR
-          </a>
-          <a href="#session" onClick={closeMenu}>
+          </Link>
+          <Link to="/" onClick={closeMenu}>
             SESSION
-          </a>
+          </Link>
 
           <div className={styles.mobileMenuDivider}></div>
 
-          <a href="#signin" onClick={closeMenu}>
+          <Link to="/login" onClick={closeMenu}>
             SIGN IN
-          </a>
-          <button className={styles.button} onClick={closeMenu}>
+          </Link>
+          <Link to="/register" className={styles.button} onClick={closeMenu}>
             GET STARTED
-          </button>
+          </Link>
         </div>
       </nav>
 
