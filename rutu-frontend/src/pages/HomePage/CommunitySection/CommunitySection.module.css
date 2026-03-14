@@ -1,7 +1,6 @@
 .main {
   display: flex;
   flex-direction: column-reverse;
-  gap: 64px;
   margin-top: 8rem;
   margin-bottom: 8rem;
   width: 100%;
@@ -11,18 +10,18 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 40px;
   height: fit-content;
 }
 
 .rightSection {
-  width: 100%;
+  flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
+  position: relative;
 }
 
-/* --- KIRI: HEADER --- */
 .headerArea {
   display: flex;
   flex-direction: column;
@@ -30,7 +29,7 @@
 }
 
 .tag {
-  background: #ffd54f;
+  background: #ffd400;
   border: 2px solid black;
   padding: 6px 16px;
   font-weight: 900;
@@ -54,7 +53,6 @@
   line-height: 1.5;
 }
 
-/* --- KIRI: FEATURE CARDS --- */
 .featureList {
   display: flex;
   flex-direction: column;
@@ -68,13 +66,14 @@
   padding: 24px;
   display: flex;
   gap: 20px;
+  cursor: default;
   box-shadow: 6px 6px 0px #000;
-  transition: transform 0.2s ease;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .featureCard:hover {
-  transform: translate(-4px, -4px);
-  box-shadow: 10px 10px 0px #000;
+  transform: translate(-6px, -6px);
+  box-shadow: 12px 12px 0px #000;
 }
 
 .cardIndicator {
@@ -84,6 +83,13 @@
   border: 3px solid #000;
   flex-shrink: 0;
   margin-top: 5px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.featureCard:hover .cardIndicator {
+  transform: scale(1.2) rotate(45deg);
+  border-radius: 6px;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.6);
 }
 
 .cardContent h3 {
@@ -91,6 +97,13 @@
   font-weight: 900;
   margin-bottom: 8px;
   text-transform: uppercase;
+  transition:
+    transform 0.3s ease,
+    color 0.3s ease;
+}
+
+.featureCard:hover .cardContent h3 {
+  transform: translateX(8px);
 }
 
 .cardContent p {
@@ -100,46 +113,45 @@
   line-height: 1.5;
 }
 
-/* ==========================================
-   RESPONSIVE BREAKPOINTS
-   ========================================== */
 @media (min-width: 1024px) {
   .main {
-    flex-direction: row; /* Desktop: Teks kiri, Mockup kanan */
+    flex-direction: row;
     justify-content: center;
-    align-items: flex-start;
+    align-items: stretch;
     padding: 48px 80px 0px 80px;
-    gap: 80px;
+    gap: 60px;
   }
 
   .rightSection {
-    width: 500px;
-    position: relative;
-    height: 100%; /* Penting untuk ruang lari sticky */
+    max-width: 550px;
+    height: auto;
   }
 
-  /* Kunci elemen Mockup agar ikut menscroll layar */
   .stickyWrapper {
     position: sticky;
-    top: 12rem;
+    top: 11rem;
     height: fit-content;
     z-index: 10;
+    width: 100%;
   }
 }
 
 @media (max-width: 768px) {
   .heroTitle {
-    font-size: 2.8rem;
+    font-size: 3.5rem;
   }
   .featureCard {
     flex-direction: column;
     gap: 15px;
   }
+  .main {
+    padding: 20px;
+  }
 }
 
 @media (max-width: 480px) {
   .heroTitle {
-    font-size: 2.2rem;
+    font-size: 2.5rem;
   }
   .heroDesc {
     font-size: 1rem;
