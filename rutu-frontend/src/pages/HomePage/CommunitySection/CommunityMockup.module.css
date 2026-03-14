@@ -1,0 +1,135 @@
+.mockupContainer {
+  background: #fff;
+  border: 4px solid #000;
+  border-radius: 20px;
+  box-shadow: 12px 12px 0px #000;
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  z-index: 5;
+}
+
+.chatHeader {
+  background: #ff5e62;
+  padding: 16px 20px;
+  border-bottom: 4px solid #000;
+}
+
+.groupInfo {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.groupAvatar {
+  width: 50px;
+  height: 50px;
+  background: #ffd54f;
+  border: 3px solid #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: 2px 2px 0px #000;
+}
+
+.groupName {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #000;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.onlineStatus {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  margin: 0;
+  text-shadow: 1px 1px 0px #000;
+}
+
+.chatBody {
+  background: #fdfaf5;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 350px;
+}
+
+.bubble {
+  padding: 12px 16px;
+  border: 3px solid #000;
+  border-radius: 16px;
+  max-width: 85%;
+  position: relative;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.sender {
+  font-size: 0.8rem;
+  font-weight: 900;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.bubble p {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.leftBubble {
+  align-self: flex-start;
+  background: #fff;
+  border-bottom-left-radius: 0;
+}
+
+.rightBubble {
+  align-self: flex-end;
+  background: #bdf4c8;
+  border-bottom-right-radius: 0;
+}
+
+.chatInput {
+  background: #fff;
+  padding: 16px;
+  border-top: 4px solid #000;
+  display: flex;
+  gap: 10px;
+}
+
+.inputBox {
+  flex: 1;
+  border: 3px solid #000;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-weight: 600;
+  color: #999;
+  background: #f4f4f4;
+}
+
+.sendBtn {
+  background: #ffd54f;
+  border: 3px solid #000;
+  border-radius: 12px;
+  width: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 900;
+  box-shadow: 3px 3px 0px #000;
+  transition: transform 0.1s;
+}
+
+.sendBtn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0px #000;
+}

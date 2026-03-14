@@ -1,0 +1,147 @@
+.main {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 64px;
+  margin-top: 8rem;
+  margin-bottom: 8rem;
+  width: 100%;
+}
+
+.leftSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  height: fit-content;
+}
+
+.rightSection {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* --- KIRI: HEADER --- */
+.headerArea {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.tag {
+  background: #ffd54f;
+  border: 2px solid black;
+  padding: 6px 16px;
+  font-weight: 900;
+  border-radius: 99px;
+  text-transform: uppercase;
+  align-self: flex-start;
+  box-shadow: 2px 2px 0px black;
+}
+
+.heroTitle {
+  font-size: 4rem;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.heroDesc {
+  font-size: 1.25rem;
+  max-width: 600px;
+  color: #222;
+  line-height: 1.5;
+}
+
+/* --- KIRI: FEATURE CARDS --- */
+.featureList {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.featureCard {
+  background: #fff;
+  border: 3px solid #000;
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+  box-shadow: 6px 6px 0px #000;
+  transition: transform 0.2s ease;
+}
+
+.featureCard:hover {
+  transform: translate(-4px, -4px);
+  box-shadow: 10px 10px 0px #000;
+}
+
+.cardIndicator {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 3px solid #000;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+
+.cardContent h3 {
+  font-size: 1.5rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.cardContent p {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #444;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   RESPONSIVE BREAKPOINTS
+   ========================================== */
+@media (min-width: 1024px) {
+  .main {
+    flex-direction: row; /* Desktop: Teks kiri, Mockup kanan */
+    justify-content: center;
+    align-items: flex-start;
+    padding: 48px 80px 0px 80px;
+    gap: 80px;
+  }
+
+  .rightSection {
+    width: 500px;
+    position: relative;
+    height: 100%; /* Penting untuk ruang lari sticky */
+  }
+
+  /* Kunci elemen Mockup agar ikut menscroll layar */
+  .stickyWrapper {
+    position: sticky;
+    top: 12rem;
+    height: fit-content;
+    z-index: 10;
+  }
+}
+
+@media (max-width: 768px) {
+  .heroTitle {
+    font-size: 2.8rem;
+  }
+  .featureCard {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroTitle {
+    font-size: 2.2rem;
+  }
+  .heroDesc {
+    font-size: 1rem;
+  }
+}
