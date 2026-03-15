@@ -6,6 +6,10 @@ import CustomCursor from "@components/CustomCursor/CustomCursor";
 const HomePage = lazy(() => import("@pages/HomePage/HomePage"));
 const Login = lazy(() => import("@pages/LoginPage/LoginPage"));
 const Register = lazy(() => import("@pages/RegisterPage/RegisterPage"));
+const DashboardPage = lazy(() => import("@pages/DashboardPage/DashboardPage");
+const SearchPage = lazy(() => import("@pages/SearchPage/SearchPage");
+const BookmarksPage = lazy(() => import("@pages/BookmarksPage/BookmarksPage");
+const MessagesPage = lazy(() => import("@pages/DashboardPage/DashboardPage");
 
 const PageLoader = () => (
   <div
@@ -31,6 +35,10 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/bookmarks" element={<BookmarksPage />} />
+            <Route path="/messages" element={<MessagesPage />} />
           </Routes>
         </Suspense>
       </BrowserRouter>
