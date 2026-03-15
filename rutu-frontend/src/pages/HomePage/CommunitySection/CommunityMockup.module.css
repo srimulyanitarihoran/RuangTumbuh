@@ -2,7 +2,7 @@
   position: relative;
   width: 100%;
   max-width: 500px;
-  height: 600px;
+  height: 610px;
   margin: 0 auto;
 }
 
@@ -249,7 +249,7 @@
 }
 
 .chatBody {
-  padding: 30px;
+  padding: 25px;
   display: flex;
   flex-direction: column;
   gap: 18px;
