@@ -22,37 +22,6 @@
   position: relative;
 }
 
-.headerArea {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.tag {
-  background: #ffd400;
-  border: 2px solid black;
-  padding: 6px 16px;
-  font-weight: 900;
-  border-radius: 99px;
-  text-transform: uppercase;
-  align-self: flex-start;
-  box-shadow: 2px 2px 0px black;
-}
-
-.heroTitle {
-  font-size: 4rem;
-  font-weight: 900;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
-.heroDesc {
-  font-size: 1.25rem;
-  max-width: 600px;
-  color: #222;
-  line-height: 1.5;
-}
-
 .featureList {
   display: flex;
   flex-direction: column;
@@ -67,13 +36,13 @@
   display: flex;
   gap: 20px;
   cursor: default;
-  box-shadow: 6px 6px 0px #000;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: var(--shadow-neo);
+  transition: var(--transition-bouncy);
 }
 
 .featureCard:hover {
   transform: translate(-6px, -6px);
-  box-shadow: 12px 12px 0px #000;
+  box-shadow: 11px 11px 0px #000;
 }
 
 .cardIndicator {
@@ -83,7 +52,7 @@
   border: 3px solid #000;
   flex-shrink: 0;
   margin-top: 5px;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: var(--transition-bouncy);
 }
 
 .featureCard:hover .cardIndicator {
@@ -123,7 +92,7 @@
   }
 
   .rightSection {
-    max-width: 550px;
+    max-width: 600px;
     height: auto;
   }
 

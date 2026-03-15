@@ -1,52 +1,66 @@
 import styles from "./Navbar.module.css";
-import { useEffect, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom"; // <-- IMPORT ROUTER HOOKS
-import logo from "../../assets/logo.svg";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import logo from "@assets/logo.svg";
+import { useScroll, useMotionValueEvent, motion } from "framer-motion";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Hook dari React Router untuk navigasi dan mengecek halaman saat ini
+  // 1. STATE BARU: Untuk melacak apakah halaman baru saja dimuat
+  const [isStartup, setIsStartup] = useState(true);
+
   const location = useLocation();
   const navigate = useNavigate();
+  const { scrollY } = useScroll();
 
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setIsScrolled(latest > 50);
+  });
+
+  // 2. EFEK STARTUP: Matikan status 'menyatu' setelah 800ms
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const timer = setTimeout(() => {
+      setIsStartup(false);
+    }, 600); // 800ms adalah waktu tunggu sebelum navbar membelah (bisa Anda sesuaikan)
+
+    return () => clearTimeout(timer);
   }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
 
-  // Fungsi pintar untuk Scroll ke ID Section tertentu
   const handleScrollTo = (e, targetId) => {
     e.preventDefault();
     closeMenu();
 
     if (location.pathname !== "/") {
-      // Jika user sedang di halaman Login/Register, lempar ke Home dulu
       navigate("/");
       setTimeout(() => {
         document
           .getElementById(targetId)
           ?.scrollIntoView({ behavior: "smooth" });
-      }, 300); // Beri jeda sedikit agar Home selesai di-render
+      }, 300);
     } else {
-      // Jika sudah di Home, langsung meluncur!
       document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth" });
     }
   };
 
+  // 3. KONDISI GABUNGAN: Navbar akan menyatu jika sedang Startup ATAU sedang di-scroll
+  const isMerged = isStartup || isScrolled;
+
   return (
-    <div
-      className={`${styles.headerContainer} ${isScrolled ? styles.scrolled : ""}`}
+    <motion.div
+      // Masukkan kondisi isMerged ke dalam class
+      className={`${styles.headerContainer} ${isMerged ? styles.scrolled : ""}`}
+      // Animasi turun dari atap tetap dipertahankan
+      initial={{ y: -100, x: "-50%", opacity: 0 }}
+      animate={{ y: 0, x: "-50%", opacity: 1 }}
+      transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
     >
+      {/* Kita kembalikan ke tag <nav> biasa karena animasi belahnya sudah diurus oleh CSS murni Anda! */}
       <nav className={styles.navbar}>
-        {/* Hamburger Button */}
         <button
           className={styles.hamburger}
           onClick={toggleMenu}
@@ -63,7 +77,6 @@ export default function Navbar() {
           ></span>
         </button>
 
-        {/* --- DESKTOP MENU --- */}
         <div className={styles.left}>
           <a href="#beranda" onClick={(e) => handleScrollTo(e, "beranda")}>
             HOME
@@ -82,7 +95,6 @@ export default function Navbar() {
         <div className={styles.divider}></div>
 
         <div className={styles.right}>
-          {/* Tombol Sign In & Get Started menggunakan navigasi halaman */}
           <Link to="/login" className={styles.navLink}>
             SIGN IN
           </Link>
@@ -94,7 +106,6 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* --- MOBILE MENU --- */}
         <div
           className={`${styles.mobileMenu} ${isMenuOpen ? styles.mobileMenuOpen : ""}`}
         >
@@ -128,13 +139,13 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Logo klik untuk kembali ke atas */}
+      {/* Sama seperti nav, ini dikembalikan ke div biasa */}
       <div
         className={`${styles.dashboard}`}
         onClick={(e) => handleScrollTo(e, "beranda")}
       >
         <img src={logo} alt="Logo RuangTumbuh" />
       </div>
-    </div>
+    </motion.div>
   );
 }
