@@ -15,8 +15,9 @@ export default function DashboardTopbar({ title, onMenuClick }) {
       </div>
       <div className={styles.topBarRight}>
         <Link to="/notifications" className={styles.iconBtn} aria-label="Notifications">🔔</Link>
-        <div className={styles.avatar}>AJ</div>
+        <Link to="/profile" className={styles.avatar}>AJ</Link>
       </div>
+
     </header>
   );
 }

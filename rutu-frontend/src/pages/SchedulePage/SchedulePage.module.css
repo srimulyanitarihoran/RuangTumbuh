@@ -1,16 +1,12 @@
 .scheduleContainer {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px; /* Increased width */
   margin: 0 auto;
   position: relative;
   overflow: hidden;
-  background-color: #fdfaf5; /* Cream contrast background */
-  min-height: calc(100vh - 80px); /* Fill most of the screen */
-  border-radius: 40px;
-  border: 4px solid #000;
-  box-shadow: 10px 10px 0px #000;
-  margin-top: 10px;
+  min-height: calc(100vh - 80px); /* Fill screen */
 }
+
 
 .decorShape1 {
   position: absolute;
