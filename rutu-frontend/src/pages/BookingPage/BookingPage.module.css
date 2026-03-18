@@ -1,0 +1,132 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 10px;
+}
+
+.statusCard {
+  background-color: #f7ede2;
+  border: 4px solid #000;
+  border-radius: 40px;
+  padding: 30px;
+  box-shadow: 8px 8px 0px #000;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+.cardTitle {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0;
+  color: #000;
+}
+
+.trackerContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 2;
+}
+
+.iconCircle {
+  width: 60px;
+  height: 60px;
+  background-color: #fff;
+  border: 4px solid #000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  box-shadow: 4px 4px 0px #000;
+}
+
+.submit { background-color: #10b981; }
+.onView { background-color: #fbbf24; }
+.reject { background-color: #ef4444; }
+
+.stepLabel {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #000;
+}
+
+.line {
+  height: 10px;
+  flex: 1;
+  max-width: 150px;
+  border: 3px solid #000;
+  border-radius: 10px;
+  margin-top: -30px;
+}
+
+.lineGreen {
+  background-color: #10b981;
+}
+
+.lineRed {
+  background-color: #ef4444;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.backBtn {
+  padding: 10px 40px;
+  background-color: #fff;
+  color: #000;
+  border: 4px solid #000;
+  border-radius: 40px;
+  font-weight: 800;
+  font-size: 1.1rem;
+  cursor: pointer;
+  box-shadow: 4px 4px 0px #000;
+  transition: all 0.2s;
+}
+
+.backBtn:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #000;
+}
+
+.courseGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+}
+
+@media (max-width: 768px) {
+  .trackerContainer {
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .line {
+    width: 10px;
+    height: 50px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+  
+  .cardFooter {
+    justify-content: center;
+  }
+  
+  .backBtn {
+    width: 100%;
+  }
+}

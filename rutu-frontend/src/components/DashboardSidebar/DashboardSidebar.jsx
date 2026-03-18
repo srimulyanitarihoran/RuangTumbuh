@@ -5,10 +5,12 @@ import styles from "./DashboardSidebar.module.css";
 import logo from "@/assets/logo.svg";
 
 const navItems = [
-  { id: "dashboard", icon: "⊞", path: "/dashboard" },
-  { id: "search", icon: "🔍", path: "/search" },
-  { id: "messages", icon: "💬", path: "/messages" },
+  { id: "dashboard", icon: "⊞", label: "Dashboard", path: "/dashboard" },
+  { id: "search", icon: "🔍", label: "Search", path: "/search" },
+  { id: "booking", icon: "📅", label: "Booking", path: "/booking" },
+  { id: "messages", icon: "💬", label: "Messages", path: "/messages" },
 ];
+
 
 export default function DashboardSidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
@@ -31,7 +33,9 @@ export default function DashboardSidebar({ isOpen, onClose }) {
               if (onClose) onClose();
             }}
           >
-            {item.icon}
+            <span className={styles.icon}>{item.icon}</span>
+            <span className={styles.label}>{item.label}</span>
+
           </motion.div>
         ))}
       </nav>

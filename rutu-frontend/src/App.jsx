@@ -11,6 +11,8 @@ const SearchPage = lazy(() => import("@pages/SearchPage/SearchPage"));
 const BookmarksPage = lazy(() => import("@pages/BookmarksPage/BookmarksPage"));
 const MessagesPage = lazy(() => import("@pages/MessagesPage/MessagesPage"));
 const NotificationPage = lazy(() => import("@pages/NotificationPage/NotificationPage"));
+const BookingPage = lazy(() => import("@pages/BookingPage/BookingPage"));
+
 
 const PageLoader = () => (
   <div
@@ -41,6 +43,8 @@ export default function App() {
             <Route path="/bookmarks" element={<BookmarksPage />} />
             <Route path="/messages" element={<MessagesPage />} />
             <Route path="/notifications" element={<NotificationPage />} />
+            <Route path="/booking" element={<BookingPage />} />
+
           </Routes>
         </Suspense>
       </BrowserRouter>

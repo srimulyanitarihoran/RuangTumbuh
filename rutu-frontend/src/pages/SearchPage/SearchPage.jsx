@@ -1,7 +1,8 @@
 import React from "react";
-import { motion } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./SearchPage.module.css";
+import CourseCard from "@/components/CourseCard/CourseCard";
+
 
 // Assuming we might have some course card images later, but for now using colored placeholders
 export default function SearchPage() {
@@ -25,7 +26,7 @@ export default function SearchPage() {
   });
 
   return (
-    <DashboardLayout title="Product">
+    <DashboardLayout title="Courses">
       <div className={styles.container}>
         <div className={styles.header}>
           <p className={styles.date}>{currentDate}</p>
@@ -46,30 +47,11 @@ export default function SearchPage() {
 
         <div className={styles.courseGrid}>
           {courses.map((course, idx) => (
-            <motion.div
-              key={course.id}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: idx * 0.05 }}
-              className={styles.courseCard}
-              style={{ backgroundColor: course.color }}
-            >
-              <div className={styles.cardHeader}>
-                 <div className={styles.imagePlaceholder}></div>
-                 <div className={styles.cardInfo}>
-                    <h3 className={styles.courseTitle}>{course.title}</h3>
-                    <p className={styles.courseAuthor}>{course.author}</p>
-                    <p className={styles.courseDuration}>{course.duration}</p>
-                    <div className={styles.rating}>
-                        {"★".repeat(course.rating)}
-                    </div>
-                    <button className={styles.seeMoreBtn}>See More</button>
-                 </div>
-              </div>
-            </motion.div>
+            <CourseCard key={course.id} course={course} index={idx} />
           ))}
         </div>
       </div>
     </DashboardLayout>
   );
 }
+
