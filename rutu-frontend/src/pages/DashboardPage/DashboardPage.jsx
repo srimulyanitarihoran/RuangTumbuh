@@ -9,7 +9,10 @@ import shape11 from "@/assets/shape11.svg";
 import shape12 from "@/assets/shape12.svg";
 import shape13 from "@/assets/shape13.svg";
 
+import { useNavigate } from "react-router-dom";
+
 export default function DashboardPage() {
+  const navigate = useNavigate();
   const statCards = [
     { label: "Point", value: "300", color: "#38BDF8" },
     { label: "Durasi Belajar", value: "4 jam", color: "#FB923C" },
@@ -51,7 +54,7 @@ export default function DashboardPage() {
     <DashboardLayout title="Dashboard">
       <div className={styles.contentFlex}>
         {/* Welcome Banner */}
-        <motion.section 
+        <motion.section
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           className={styles.banner}
@@ -62,29 +65,32 @@ export default function DashboardPage() {
             </h2>
             <p className={styles.bannerSub}>ready to learn, grow, and explore more</p>
             <div className={styles.bannerButtons}>
-              <motion.button 
+              <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={styles.bannerBtn}
+                onClick={() => navigate("/search")}
               >
                 Learn <div className={styles.bannerBtnArrow}>˃</div>
               </motion.button>
-              <motion.button 
+              <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className={styles.bannerBtn}
+                onClick={() => navigate("/add-course")}
               >
                 Teach <div className={styles.bannerBtnArrow}>˃</div>
               </motion.button>
+
             </div>
           </div>
           <div className={styles.bannerDecor}>
             {[shape10, shape11, shape12, shape13].map((shape, i) => (
-              <motion.img 
+              <motion.img
                 key={i}
                 animate={{ y: [0, -(10 + i * 2), 0] }}
                 transition={{ duration: 3 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
-                src={shape} alt="mascot" className={styles.mascot} 
+                src={shape} alt="mascot" className={styles.mascot}
               />
             ))}
           </div>
@@ -132,7 +138,7 @@ export default function DashboardPage() {
                     </a>
                   </div>
                 </div>
-                <div 
+                <div
                   className={styles.statusBadge}
                   style={{ backgroundColor: session.badgeColor }}
                 >

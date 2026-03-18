@@ -9,7 +9,10 @@ const navItems = [
   { id: "search", icon: "🔍", label: "Search", path: "/search" },
   { id: "booking", icon: "📅", label: "Booking", path: "/booking" },
   { id: "messages", icon: "💬", label: "Messages", path: "/messages" },
+  { id: "schedule", icon: "🗓️", label: "Schedule", path: "/schedule" },
+
 ];
+
 
 
 export default function DashboardSidebar({ isOpen, onClose }) {

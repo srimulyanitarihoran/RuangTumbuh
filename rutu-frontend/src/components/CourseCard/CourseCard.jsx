@@ -20,6 +20,8 @@ export default function CourseCard({ course, index }) {
           <h3 className={styles.courseTitle}>{course.title}</h3>
           <p className={styles.courseAuthor}>{course.author}</p>
           <p className={styles.courseDuration}>{course.duration}</p>
+          <p className={styles.courseDate}>📅 {course.date || "TBA"}</p>
+
           <div className={styles.rating}>
             {"★".repeat(course.rating)}
           </div>

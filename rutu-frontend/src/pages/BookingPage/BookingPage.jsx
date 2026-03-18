@@ -1,16 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
-import CourseCard from "@/components/CourseCard/CourseCard";
+
 import styles from "./BookingPage.module.css";
 
-const bookingClasses = [
-  { id: 1, title: "Frontend Basic", author: "Grace ashcroft", duration: "1 - 3h", rating: 5, color: "#38BDF8" },
-  { id: 2, title: "Frontend Basic", author: "Grace ashcroft", duration: "1 - 3h", rating: 5, color: "#FB923C" },
-  { id: 3, title: "Frontend Basic", author: "Grace ashcroft", duration: "1 - 3h", rating: 5, color: "#F472B6" },
-  { id: 4, title: "Frontend Basic", author: "Grace ashcroft", duration: "1 - 3h", rating: 5, color: "#38BDF8" },
-  { id: 5, title: "Frontend Basic", author: "Grace ashcroft", duration: "1 - 3h", rating: 5, color: "#FB923C" },
-  { id: 6, title: "Frontend Basic", author: "Grace ashcroft", duration: "1 - 3h", rating: 5, color: "#F472B6" },
+const mentorRequests = [
+  { id: 1, name: "Alexander Pierce", topic: "UI/UX Design", time: "2 hours ago", emoji: "👨‍💻", color: "#38BDF8" },
+  { id: 2, name: "Sarah Jenkins", topic: "React Development", time: "5 hours ago", emoji: "👩‍🏫", color: "#FB923C" },
+  { id: 3, name: "Michael Chen", topic: "Backend Node.js", time: "1 day ago", emoji: "🧔", color: "#F472B6" },
 ];
 
 export default function BookingPage() {
@@ -59,13 +56,37 @@ export default function BookingPage() {
           </div>
         </motion.div>
 
-        {/* Classes Grid */}
-        <div className={styles.courseGrid}>
-          {bookingClasses.map((course, idx) => (
-            <CourseCard key={course.id} course={course} index={idx} />
-          ))}
+        {/* Mentor Request Section */}
+        <div className={styles.mentorRequestSection}>
+          <h2 className={styles.sectionTitle}>Mentor Requests</h2>
+          <div className={styles.mentorGrid}>
+            {mentorRequests.map((request, idx) => (
+              <motion.div
+                key={request.id}
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.1 * idx }}
+                className={styles.mentorCard}
+                style={{ backgroundColor: request.color + "22" }}
+              >
+                <div className={styles.mentorAvatar} style={{ border: `4px solid ${request.color}`, boxShadow: `4px 4px 0px #000` }}>
+                  {request.emoji}
+                </div>
+                <div className={styles.mentorInfo}>
+                  <h3 className={styles.mentorName}>{request.name}</h3>
+                  <p className={styles.mentorTopic}>{request.topic}</p>
+                  <span className={styles.requestTime}>🕒 {request.time}</span>
+                </div>
+                <div className={styles.actionButtons}>
+                  <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className={styles.acceptBtn}>Accept</motion.button>
+                  <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className={styles.declineBtn}>Decline</motion.button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </div>
     </DashboardLayout>
   );
 }
+
