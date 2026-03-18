@@ -68,11 +68,6 @@
   z-index: 1;
 }
 
-@media (max-width: 1100px) {
-  .contentGrid {
-    grid-template-columns: 1fr;
-  }
-}
 
 .calendarCard {
   background: white;
@@ -302,6 +297,56 @@
 }
 
 
+@media (max-width: 1200px) {
+  .contentGrid {
+    grid-template-columns: 320px 1fr;
+    gap: 1.5rem;
+  }
+  
+  .mainTitle {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 1100px) {
+  .contentGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .calendarCard {
+    max-width: 500px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  .scheduleContainer {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .scheduleContainer {
+    border-radius: 20px;
+    padding: 1rem;
+    margin-top: 0;
+  }
+
+  .mainTitle {
+    font-size: 1.75rem;
+  }
+
+  .subTitle {
+    font-size: 1rem;
+  }
+
+  .meetingItem {
+    padding: 1.25rem;
+    gap: 1rem;
+    border-left-width: 8px;
+  }
+}
+
 @media (max-width: 640px) {
   .meetingItem {
     flex-direction: column;
@@ -310,11 +355,63 @@
   }
 
   .meetingDate {
-    width: 60px;
-    height: 60px;
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 0.5rem 1rem;
+    min-width: auto;
+  }
+
+  .dateNum {
+    font-size: 1.25rem;
+  }
+
+  .dateMonth {
+    font-size: 0.9rem;
+  }
+
+  .meetingTitle {
+    font-size: 1.2rem;
+  }
+
+  .meetingMeta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
   }
 
   .joinBtn {
     width: 100%;
+    padding: 0.75rem;
+  }
+
+  .calendarGrid {
+    gap: 0.3rem;
+  }
+
+  .day {
+    font-size: 0.8rem;
+    border-width: 1px;
+  }
+
+  .dayLabel {
+    font-size: 0.7rem;
+  }
+  
+  .legend {
+    gap: 0.8rem;
+    padding: 0.75rem;
   }
 }
+
+@media (max-width: 480px) {
+  .mainTitle {
+    font-size: 1.5rem;
+  }
+  
+  .decorShape1, .decorShape2, .decorShape3 {
+    display: none;
+  }
+}
+
