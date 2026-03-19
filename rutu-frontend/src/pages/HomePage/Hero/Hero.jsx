@@ -16,6 +16,7 @@ export default function HeroSection() {
             style={{
               y: motionValues[shape.moveY],
               x: motionValues[shape.moveX],
+              willChange: "transform",
             }}
             // 1. ANIMASI SHAPE: Muncul dari titik pusat (scale 0) ke ukuran asli (scale 1)
             initial={{ scale: 0, opacity: 0 }}
