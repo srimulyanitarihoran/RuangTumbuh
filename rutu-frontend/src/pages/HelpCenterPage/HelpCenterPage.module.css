@@ -1,0 +1,141 @@
+/* === GLOBAL (optional, kalau mau tetap global pindahin ke index.css) === */
+:global(body) {
+  background-color: #f3f3f3;
+}
+
+/* === HEADER === */
+.helpTitle {
+  color: #000;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.helpSubtitle {
+  color: #444;
+}
+
+/* === SEARCH BAR === */
+.searchBar :global(.input-group-text) {
+  background-color: #facc15;
+  border: 3px solid #000;
+  border-radius: 50px;
+  /* border-right: none; */
+  color: black;
+}
+
+.searchBar :global(input) {
+  border: 3px solid #000;
+  border-radius: 50px;
+  border-left: none;
+}
+
+.searchBar :global(input:focus) {
+  box-shadow: none;
+}
+
+/* === CARD BASE === */
+.helpCard,
+.sectionCard {
+  border-radius: 20px;
+  border: 3px solid #000;
+  background-color: #ffffff;
+  box-shadow: 6px 6px 0px #000;
+  transition: all 0.2s ease;
+}
+
+/* === HOVER === */
+.helpCard:hover,
+.sectionCard:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 9px 9px 0px #000;
+}
+
+/* === COLOR VARIANTS (WAJIB DIPANGGIL DI JSX) === */
+.helpGreen {
+  background-color: #4ade80;
+}
+
+.helpBlue {
+  background-color: #3b82f6;
+}
+
+.sectionPink {
+  background-color: #ff66aa;
+}
+
+.sectionOrange {
+  background-color: #fdba74;
+}
+
+.sectionYellow {
+  background-color: #ffcc33;
+}
+.helpGreen,
+.helpBlue,
+.sectionPink,
+.sectionOrange,
+.sectionYellow {
+  color: #000;
+}
+
+/* biar text-muted gak terlalu abu di background terang */
+.helpCard :global(.text-muted),
+.sectionCard :global(.text-muted) {
+  color: #111 !important;
+}
+
+.helpCard:hover,
+.sectionCard:hover {
+  transform: translate(-4px, -4px) rotate(-0.5deg);
+  box-shadow: 10px 10px 0px #000;
+}
+/* === ICON === */
+.icon {
+  color: black;
+  background-color: #f97316;
+  padding: 6px;
+  border-radius: 8px;
+  border: 2px solid black;
+}
+
+/* === TITLE === */
+.sectionTitle {
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+/* === LIST === */
+.helpList li {
+  margin-bottom: 6px;
+}
+
+/* === ACCORDION (karena bootstrap, pakai :global) === */
+:global(.accordion-item) {
+  border: 3px solid #000;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: 4px 4px 0px #000;
+}
+
+:global(.accordion-button) {
+  font-weight: 600;
+  background-color: #fff;
+  border: none;
+}
+
+:global(.accordion-button:not(.collapsed)) {
+  background-color: #facc15;
+  color: black;
+}
+
+:global(.accordion-button:focus) {
+  box-shadow: none;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .searchBar {
+    width: 100% !important;
+  }
+}
