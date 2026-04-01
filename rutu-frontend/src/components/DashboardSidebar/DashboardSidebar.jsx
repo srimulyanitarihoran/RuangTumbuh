@@ -103,7 +103,7 @@ export default function DashboardSidebar({ isOpen, toggleSidebar }) {
 
           <div className={styles.section}>
             <h4 className={styles.sectionTitle}>SETTING</h4>
-            <Link to="/support" className={styles.linkItem}>
+            <Link to="/help" className={styles.linkItem}>
               <div className={styles.linkContent}>
                 <FiLifeBuoy className={styles.linkIcon} />
                 <span className={styles.linkLabel}>Pusat Bantuan</span>
