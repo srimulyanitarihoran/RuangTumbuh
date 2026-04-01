@@ -181,7 +181,7 @@ export default function BookingPage() {
         {/* --- BANNER --- */}
         <motion.div variants={itemVariants} className={styles.bookingBanner}>
           <div className={styles.bannerText}>
-            <h2>Manajemen Kursus 🚀</h2>
+            <h2>Manajemen Kursus 👨🏻‍💻</h2>
             <p>
               Kelola semua pengajuan belajarmu, permintaan mengajar, jadwal
               aktif, dan riwayat di satu tempat.

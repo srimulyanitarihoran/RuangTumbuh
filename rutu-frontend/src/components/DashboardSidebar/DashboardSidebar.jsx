@@ -32,7 +32,7 @@ const mainMenu = [
   },
   {
     id: 4,
-    label: "Jadwal",
+    label: "Jadwal Belajar",
     link: "/schedule",
     icon: FiCalendar,
   },

@@ -1,417 +1,545 @@
-.scheduleContainer {
-  padding: 2rem;
-  max-width: 1400px; /* Increased width */
-  margin: 0 auto;
-  position: relative;
-  overflow: hidden;
-  min-height: calc(100vh - 80px); /* Fill screen */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  padding-bottom: 40px;
 }
 
-
-.decorShape1 {
-  position: absolute;
-  top: 10%;
-  left: -20px;
-  width: 80px;
-  opacity: 0.3;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.decorShape2 {
-  position: absolute;
-  top: 50%;
-  right: -30px;
-  width: 120px;
-  opacity: 0.25;
-  pointer-events: none;
-  z-index: 0;
-  transform: rotate(45deg);
-}
-
-.decorShape3 {
-  position: absolute;
-  bottom: 50px;
-  left: 20%;
-  width: 60px;
-  opacity: 0.2;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.header {
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 4px solid #000;
-}
-
-.mainTitle {
-  font-size: 2.5rem;
-  font-weight: 900;
-  color: #000;
-  margin-bottom: 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: -1px;
-}
-
-.subTitle {
-  font-size: 1.1rem;
-  color: #333;
-  font-weight: 600;
-}
-
-.contentGrid {
-  display: grid;
-  grid-template-columns: 380px 1fr;
-  gap: 2.5rem;
-  position: relative;
-  z-index: 1;
-}
-
-
-.calendarCard {
-  background: white;
+/* =========================================
+   HERO BANNER
+========================================= */
+.scheduleBanner {
+  background-color: var(--primary-green);
   border: 4px solid #000;
-  box-shadow: 10px 10px 0px #000;
-  padding: 1.5rem;
-  border-radius: 20px;
-}
-
-.calendarHeader {
+  border-radius: 25px;
+  padding: 40px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 3px solid #000;
+  box-shadow: 6px 6px 0px #000;
+  flex-wrap: wrap;
+  gap: 20px;
 }
 
-.calendarHeader h3 {
-  font-size: 1.4rem;
-  font-weight: 900;
-  text-transform: uppercase;
+.bannerText h2 {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #000;
+  margin: 0 0 10px 0;
+}
+.bannerText p {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #222;
+  margin: 0;
+  max-width: 600px;
 }
 
-.calendarNav {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.navBtn {
-  background: #fff;
+.addBtn {
+  background-color: #facc15;
+  color: #000;
   border: 3px solid #000;
-  padding: 0.4rem 0.8rem;
-  font-weight: 900;
+  border-radius: 15px;
+  padding: 12px 25px;
+  font-family: "plus-jakarta", sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 4px 4px 0px #000;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+.addBtn:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 7px 7px 0px #000;
+}
+.addBtn:active {
+  transform: translate(3px, 3px);
+  box-shadow: 0px 0px 0px #000;
+}
+
+/* =========================================
+   50:50 SPLIT LAYOUT 
+========================================= */
+.splitLayout {
+  display: flex;
+  gap: 30px;
+}
+
+.leftColumn {
+  width: 45%;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  position: sticky;
+  top: 20px;
+}
+
+/* =========================================
+   DESAIN KALENDER (DARI HOMEPAGE)
+========================================= */
+.calendarCard {
+  background: white;
+  border: 4px solid black;
+  border-radius: 25px;
+  box-shadow: 6px 6px 0 black;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid black;
+  padding-bottom: 16px;
+}
+.navBtn {
+  width: 40px;
+  height: 40px;
+  border: 2px solid black;
+  border-radius: 10px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 4px 4px 0px #000;
-  border-radius: 8px;
 }
-
 .navBtn:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px #000;
-  background: #ffcc00;
+  box-shadow: 3px 3px 0px black;
 }
-
+.navBtn:active {
+  transform: translate(0px, 0px);
+  box-shadow: 0px 0px 0px black;
+}
+.monthTitle {
+  font-size: 20px;
+  font-weight: 900;
+  text-transform: uppercase;
+  margin: 0;
+}
 .calendarGrid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  gap: 0.6rem;
-  text-align: center;
+  gap: 8px;
 }
-
 .dayLabel {
-  font-size: 0.85rem;
+  text-align: center;
   font-weight: 900;
+  font-size: 12px;
+  padding: 4px;
   text-transform: uppercase;
-  color: #000;
-  margin-bottom: 0.5rem;
 }
-
+.dateCellEmpty {
+  min-height: 40px;
+}
 .day {
-  aspect-ratio: 1;
-  background: #fff;
-  border: 2px solid #000;
+  aspect-ratio: 1/1;
+  border: 2px solid black;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 1rem;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.2s;
-  border-radius: 4px;
-}
-
-.day:hover {
-  background: #ffe6e6;
-  transform: translate(-1px, -1px);
-  box-shadow: 3px 3px 0px #000;
-}
-
-.hasMeeting {
-  background: #fff;
-  border-width: 3px;
-}
-
-.eventDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  position: absolute;
-  bottom: 0.4rem;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 1px solid #000;
-}
-
-.legend {
-  margin-top: 2rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.2rem;
-  font-size: 0.85rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  padding: 1rem;
-  background: #eee;
-  border: 3px solid #000;
-  border-radius: 12px;
-}
-
-.legendItem {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 2px solid #000;
-}
-
-.meetingList {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.meetingItem {
+  font-weight: bold;
+  font-family: "plus-jakarta", sans-serif;
   background: white;
-  border: 4px solid #000;
-  box-shadow: 10px 10px 0px #000;
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  border-left-width: 15px;
-  border-radius: 20px;
+  position: relative;
+  cursor: pointer !important;
   transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
-.meetingItem:hover {
+.day:hover {
   transform: translate(-3px, -3px);
-  box-shadow: 13px 13px 0px #000;
+  box-shadow: 3px 3px 0px black;
+  background: #f4f0ea;
+  z-index: 10;
 }
-
-.meetingDate {
+.day:active {
+  transform: translate(0px, 0px);
+  box-shadow: 0px 0px 0px black;
+  z-index: 10;
+}
+.secondaryDay {
+  background: #bdf4c8;
+}
+.secondaryDay:hover {
+  background: #9be9a8;
+}
+.primaryDay {
+  background: var(--primary-yellow) !important;
+}
+.primaryDay:hover {
+  background: #e6bf00 !important;
+}
+.eventDot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 12px;
+  height: 12px;
+  background: black;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+.events {
   display: flex;
   flex-direction: column;
+  gap: 12px;
+  margin-top: 5px;
+}
+.eventItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 2px solid black;
+  border-radius: 12px;
+}
+.bgSecondary {
+  background: rgba(0, 200, 0, 0.1);
+}
+.bgPrimary {
+  background: rgba(255, 213, 79, 0.2);
+}
+.eventText {
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+.colorBox {
+  width: 14px;
+  height: 14px;
+  border: 2px solid black;
+  border-radius: 4px;
+}
+.colorSecondary {
+  background: var(--primary-green);
+}
+.colorPrimary {
+  background: var(--primary-yellow);
+}
+
+/* =========================================
+   BOX FILTER KATEGORI (REDESIGNED TAB STYLE)
+========================================= */
+.neoBox {
+  background-color: #fff;
+  border: 4px solid #000;
+  border-radius: 25px;
+  padding: 25px;
+  box-shadow: 6px 6px 0px #000;
+}
+.boxTitle {
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.2rem;
+  margin: 0 0 15px 0;
+}
+
+.categoryWrap {
+  display: flex;
+  flex-wrap: wrap; 
+  gap: 12px;
+  padding-bottom: 5px;
+}
+
+.catPill {
+  flex: 1 1 calc(25% - 1px);
+  display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 80px;
+  padding: 10px 14px;
+  background-color: #fff;
   border: 3px solid #000;
-  padding: 0.75rem;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 4px 4px 0px #000;
+  border-radius: 20px;
+  font-family: "plus-jakarta", sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #555;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #000;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
-.dateNum {
-  font-size: 1.8rem;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.dateMonth {
-  font-size: 0.8rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.meetingInfo {
-  flex: 1;
-}
-
-.meetingTitle {
-  font-size: 1.5rem;
-  font-weight: 900;
-  margin-bottom: 0.5rem;
+.catPill:hover {
+  transform: translateY(-2px);
   color: #000;
+  box-shadow: 5px 5px 0px #000;
 }
 
-.meetingMeta {
+.catActive {
+  background-color: var(--primary-yellow); 
+  color: #000;
+  box-shadow: 5px 5px 0px #000;
+  transform: translateY(-2px);
+  border-color: #000;
+}
+
+/* =========================================
+   KOLOM KANAN (Timeline Agenda)
+========================================= */
+.rightColumn {
+  flex: 1;
   display: flex;
-  gap: 1.2rem;
+  flex-direction: column;
+}
+
+.agendaBox {
+  background-color: #fff;
+  border: 4px solid #000;
+  border-radius: 30px;
+  padding: 30px;
+  box-shadow: 8px 8px 0px #000;
+  height: 100%; 
+  display: flex; 
+  flex-direction: column;
+}
+
+.timelineHeader {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 25px;
+  border-bottom: 3px dashed #000;
+}
+.timelineHeader h3 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin: 0;
 }
 
-.meetingTime {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #444;
-}
-
-.meetingType {
-  font-size: 0.8rem;
-  font-weight: 900;
-  padding: 0.3rem 0.8rem;
-  border: 3px solid #000;
-  text-transform: uppercase;
-  border-radius: 8px;
-  background: #fff;
+.eventCount {
+  background-color: var(--primary-yellow);
+  border: 2px solid #000;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 800;
   box-shadow: 2px 2px 0px #000;
 }
 
-.joinBtn {
-  background: #000;
-  color: white;
-  border: 3px solid #000;
-  padding: 1rem 2rem;
-  font-weight: 900;
-  text-transform: uppercase;
-  cursor: pointer;
+.timelineList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.timelineItem {
+  display: flex;
+  gap: 20px;
+  position: relative;
+}
+
+/* --- Kartu Jadwal --- */
+.cardCol {
+  flex: 1;
+  padding-bottom: 25px;
+}
+
+.scheduleCard {
+  background-color: #fff;
+  border: 4px solid #000;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 5px 5px 0px #000;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
   transition: all 0.2s;
+}
+.scheduleCard:hover {
+  transform: translate(-3px, -3px);
+  box-shadow: 8px 8px 0px #000;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  border-bottom: 2px dashed #f3f4f6;
+  padding-bottom: 15px;
+}
+
+.timeBadgeInside {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #fff;
+  border: 2px solid #000;
+  padding: 8px 14px;
   border-radius: 12px;
-  box-shadow: 5px 5px 0px #555;
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #000;
+  box-shadow: 3px 3px 0px #000;
+}
+.timeIcon {
+  font-size: 1.1rem;
+  color: var(--primary-red, #ef4444);
 }
 
-.joinBtn:hover {
-  background: #333;
+.statusBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 2px solid #000;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  box-shadow: 3px 3px 0px #000;
+  flex-shrink: 0;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.catLabel {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #10b981;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.courseTitle {
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #000;
+  margin: 0 0 5px 0;
+  line-height: 1.3;
+}
+
+.metaGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.metaBadge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f8f9fa;
+  border: 2px solid #000;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #333;
+}
+.metaBadge small {
+  font-weight: 600;
+  color: #666;
+  font-size: 0.75rem;
+}
+
+.cardFooter {
+  display: flex;
+  gap: 12px;
+  margin-top: 5px;
+}
+.actionBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 3px solid #000;
+  border-radius: 12px;
+  padding: 10px;
+  font-family: "plus-jakarta", sans-serif;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 3px 3px 0px #000;
+  transition: all 0.2s;
+}
+.actionBtn:hover {
   transform: translate(-2px, -2px);
-  box-shadow: 7px 7px 0px #555;
+  box-shadow: 5px 5px 0px #000;
+}
+.actionBtn:active {
+  transform: translate(2px, 2px);
+  box-shadow: 0px 0px 0px #000;
+}
+.btnDetail {
+  background-color: #fff;
+  color: #000;
+}
+.btnPrimary {
+  background-color: var(--primary-yellow);
+  color: #000;
 }
 
-
-@media (max-width: 1200px) {
-  .contentGrid {
-    grid-template-columns: 320px 1fr;
-    gap: 1.5rem;
-  }
-  
-  .mainTitle {
-    font-size: 2rem;
-  }
+.emptyState {
+  background-color: #f9fafb;
+  border: 4px dashed #ccc;
+  border-radius: 20px;
+  padding: 50px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 10px;
+  color: #666;
+}
+.emptyState h4 {
+  font-family: "Fredoka", sans-serif;
+  font-size: 1.5rem;
+  color: #000;
+  margin: 10px 0 0 0;
 }
 
-@media (max-width: 1100px) {
-  .contentGrid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+/* =========================================
+   RESPONSIVE MOBILE
+========================================= */
+@media (max-width: 1024px) {
+  .splitLayout {
+    flex-direction: column;
   }
-  
-  .calendarCard {
-    max-width: 500px;
-    margin: 0 auto;
+  .leftColumn {
     width: 100%;
+    position: relative;
+    top: 0;
   }
-
-  .scheduleContainer {
-    padding: 1.5rem;
+  .rightColumn {
+    width: 100%;
+    margin-top: 20px;
   }
 }
 
 @media (max-width: 768px) {
-  .scheduleContainer {
+  .scheduleBanner {
+    flex-direction: column;
+    text-align: center;
+  }
+  .addBtn {
+    width: 100%;
+    justify-content: center;
+  }
+  .agendaBox {
+    padding: 20px;
     border-radius: 20px;
-    padding: 1rem;
-    margin-top: 0;
   }
-
-  .mainTitle {
-    font-size: 1.75rem;
-  }
-
-  .subTitle {
-    font-size: 1rem;
-  }
-
-  .meetingItem {
-    padding: 1.25rem;
-    gap: 1rem;
-    border-left-width: 8px;
-  }
-}
-
-@media (max-width: 640px) {
-  .meetingItem {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .meetingDate {
-    flex-direction: row;
-    width: 100%;
-    justify-content: flex-start;
+  .timelineItem {
     gap: 10px;
-    padding: 0.5rem 1rem;
-    min-width: auto;
   }
-
-  .dateNum {
-    font-size: 1.25rem;
-  }
-
-  .dateMonth {
-    font-size: 0.9rem;
-  }
-
-  .meetingTitle {
-    font-size: 1.2rem;
-  }
-
-  .meetingMeta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-  }
-
-  .joinBtn {
-    width: 100%;
-    padding: 0.75rem;
-  }
-
-  .calendarGrid {
-    gap: 0.3rem;
-  }
-
-  .day {
-    font-size: 0.8rem;
-    border-width: 1px;
-  }
-
-  .dayLabel {
-    font-size: 0.7rem;
-  }
-  
-  .legend {
-    gap: 0.8rem;
-    padding: 0.75rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .mainTitle {
-    font-size: 1.5rem;
-  }
-  
-  .decorShape1, .decorShape2, .decorShape3 {
+  .timelineTrack {
     display: none;
   }
+  .cardCol {
+    padding-bottom: 20px;
+  }
+  .cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
-
