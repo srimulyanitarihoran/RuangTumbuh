@@ -5,12 +5,13 @@ import styles from "./SearchPage.module.css";
 import CourseCard from "@/components/CourseCard/CourseCard";
 import { FiSearch, FiSliders } from "react-icons/fi";
 
-// Data Dummy
+// Data Dummy yang Diperkaya dengan Emoji Avatar
 const allCourses = [
   {
     id: 1,
     title: "Frontend Basic: HTML, CSS, JS",
     author: "Grace Ashcroft",
+    emoji: "👩‍💻",
     duration: "3h 30m",
     rating: 5,
     color: "#38BDF8",
@@ -23,6 +24,7 @@ const allCourses = [
     id: 2,
     title: "Mastering React & Framer Motion",
     author: "Grace Ashcroft",
+    emoji: "👩‍🎨",
     duration: "5h 15m",
     rating: 5,
     color: "#FB923C",
@@ -35,6 +37,7 @@ const allCourses = [
     id: 3,
     title: "Backend Node.js & Express API",
     author: "Harvey Specter",
+    emoji: "🧔",
     duration: "6h 00m",
     rating: 4,
     color: "#F472B6",
@@ -47,6 +50,7 @@ const allCourses = [
     id: 4,
     title: "UI/UX Design Fundamental",
     author: "John Doe",
+    emoji: "👦",
     duration: "4h 20m",
     rating: 5,
     color: "#FACC15",
@@ -59,6 +63,7 @@ const allCourses = [
     id: 5,
     title: "Advanced Laravel 11",
     author: "Jane Smith",
+    emoji: "👩‍🏫",
     duration: "8h 45m",
     rating: 5,
     color: "#10B981",
@@ -71,6 +76,7 @@ const allCourses = [
     id: 6,
     title: "Python for Data Science",
     author: "Mike Ross",
+    emoji: "👨‍🔬",
     duration: "10h 10m",
     rating: 3,
     color: "#A78BFA",
@@ -83,6 +89,7 @@ const allCourses = [
     id: 7,
     title: "Flutter Mobile Development",
     author: "Louis Litt",
+    emoji: "👱‍♂️",
     duration: "7h 00m",
     rating: 5,
     color: "#38BDF8",
@@ -95,6 +102,7 @@ const allCourses = [
     id: 8,
     title: "CSS Mastery & Animations",
     author: "Donna Paulsen",
+    emoji: "👩‍🦰",
     duration: "2h 50m",
     rating: 4,
     color: "#F472B6",
@@ -113,11 +121,9 @@ const categories = [
   "Mobile Dev",
   "Data Science",
   "Matematika",
-  "Fisika",
-  "Bahasa Inggris",
   "Bahasa Indonesia",
-  "Sejarah",
-  "Pengembangan Diri",
+  "Bahasa Inggris",
+  "Fisika"
 ];
 
 export default function SearchPage() {
@@ -167,9 +173,8 @@ export default function SearchPage() {
           </div>
         </motion.div>
 
-        {/* --- SEARCH BAR & FILTER SECTION (Tanpa Background) --- */}
+        {/* --- SEARCH BAR & FILTER SECTION --- */}
         <div className={styles.searchControlArea}>
-          {/* Baris Pencarian (Search Input + Button Filter) */}
           <div className={styles.searchBarRow}>
             <div className={styles.searchContainer}>
               <FiSearch className={styles.searchIcon} />
@@ -186,7 +191,7 @@ export default function SearchPage() {
             </button>
           </div>
 
-          {/* Baris Kategori (Style mirip Tab Booking Page) */}
+          {/* Baris Kategori */}
           <div className={styles.categoriesWrapper}>
             {categories.map((cat) => (
               <button

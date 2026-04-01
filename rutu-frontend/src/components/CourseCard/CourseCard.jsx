@@ -51,17 +51,28 @@ export default function CourseCard({ course, index }) {
         </span>
       </div>
 
+      {/* --- BODY KARTU --- */}
       <div className={styles.cardBody}>
+        {/* Judul Kursus */}
         <h3 className={styles.courseTitle}>{course.title}</h3>
+
+        {/* Info Mentor & Rating (Gaya Avatar Kotak Membulat) */}
         <div className={styles.mentorInfo}>
-          <div className={styles.mentorAvatar}>{course.author.charAt(0)}</div>
+          <div
+            className={styles.mentorAvatar}
+            style={{ backgroundColor: course.color }}
+          >
+            {course.emoji || "👤"}
+          </div>
           <div className={styles.mentorText}>
             <span className={styles.mentorName}>{course.author}</span>
             <span className={styles.mentorRole}>Mentor</span>
           </div>
+
+          {/* Rating di pojok kanan */}
           <div className={styles.ratingBadge}>
             <FiStar className={styles.starIcon} />
-            <span>{course.rating}.0</span>
+            <span>{course.rating ? `${course.rating}.0` : "5.0"}</span>
           </div>
         </div>
       </div>
@@ -76,7 +87,7 @@ export default function CourseCard({ course, index }) {
         </button>
         <button
           className={`${styles.actionBtn} ${styles.btnBooking}`}
-          onClick={() => navigate(`/booking`)} /* Sesuaikan rute booking Anda */
+          onClick={() => navigate(`/booking`)}
         >
           Booking
         </button>

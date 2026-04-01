@@ -1,135 +1,335 @@
 import React, { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./SchedulePage.module.css";
-import shape4 from "@assets/shape4.svg";
-import shape9 from "@assets/shape9.svg";
-import shape7 from "@assets/shape7.svg";
+import { useNavigate } from "react-router-dom";
 
-const DUMMY_MEETINGS = [
-  { id: 1, date: 20, month: "March", year: 2026, time: "10:00 - 11:30", title: "Introduction to React", type: "Webinar", color: "#ffd54f" },
-  { id: 2, date: 22, month: "March", year: 2026, time: "14:00 - 15:30", title: "UI Design Principles", type: "Workshop", color: "#60a5fa" },
-  { id: 3, date: 25, month: "March", year: 2026, time: "19:00 - 20:30", title: "Backend Essentials", type: "Mentorship", color: "#fb7185" },
-  { id: 4, date: 28, month: "March", year: 2026, time: "16:00 - 17:30", title: "Community Meetup", type: "Group Sync", color: "#4ade80" },
+// Icons
+import {
+  FiCalendar,
+  FiClock,
+  FiVideo,
+  FiUser,
+  FiCheckCircle,
+  FiPlayCircle,
+  FiPlus,
+  FiChevronLeft,
+  FiChevronRight,
+} from "react-icons/fi";
+
+// --- DUMMY DATA JADWAL ---
+const allSchedules = [
+  {
+    id: 1,
+    dateId: "12",
+    time: "10:00",
+    endTime: "12:00",
+    title: "Review UI/UX",
+    partner: "Siti Aminah",
+    role: "Siswa",
+    platform: "Google Meet",
+    status: "Selesai",
+    color: "#e5e7eb",
+    dotColor: "#000",
+    category: "Mentoring",
+  },
+  {
+    id: 2,
+    dateId: "14",
+    time: "13:00",
+    endTime: "15:00",
+    title: "Live Class: React Fundamental",
+    partner: "Budi Santoso",
+    role: "Mentor",
+    platform: "Zoom",
+    status: "Berlangsung",
+    color: "var(--primary-green)",
+    dotColor: "var(--primary-green)",
+    category: "Kelas",
+  },
+  {
+    id: 3,
+    dateId: "14",
+    time: "19:30",
+    endTime: "21:00",
+    title: "Diskusi Proyek: Backend API",
+    partner: "Tim Alpha",
+    role: "Grup",
+    platform: "Discord",
+    status: "Akan Datang",
+    color: "var(--primary-yellow)",
+    dotColor: "var(--primary-yellow)",
+    category: "Diskusi",
+  },
+  {
+    id: 4,
+    dateId: "22",
+    time: "09:00",
+    endTime: "11:00",
+    title: "Workshop Tailwind",
+    partner: "Dian Sastro",
+    role: "Mentor",
+    platform: "Google Meet",
+    status: "Akan Datang",
+    color: "var(--primary-blue)",
+    dotColor: "var(--primary-blue)",
+    category: "Workshop",
+  },
 ];
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const categories = ["Semua", "Mentoring", "Kelas", "Diskusi", "Workshop"];
 
 export default function SchedulePage() {
-  const [currentMonth, setCurrentMonth] = useState("March 2026");
+  const navigate = useNavigate();
+  const [activeDate, setActiveDate] = useState("14");
+  const [activeCategory, setActiveCategory] = useState("Semua");
 
-  const getDayColor = (day) => {
-    const meeting = DUMMY_MEETINGS.find((m) => m.date === day);
-    return meeting ? meeting.color : "transparent";
+  // Filter jadwal
+  const currentSchedules = allSchedules.filter((s) => {
+    const matchDate = s.dateId === activeDate;
+    const matchCat =
+      activeCategory === "Semua" || s.category === activeCategory;
+    return matchDate && matchCat;
+  });
+
+  // Generator Kalender (November 2026 dimulai di hari Minggu)
+  const daysInMonth = Array.from({ length: 30 }, (_, i) => (i + 1).toString());
+  const emptyDaysStart = [];
+  const datesWithSchedules = allSchedules.map((s) => s.dateId);
+
+  // Animasi Framer Motion
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  };
+  const itemVariants = {
+    hidden: { x: 20, opacity: 0 },
+    show: { x: 0, opacity: 1, transition: { type: "spring", bounce: 0.4 } },
   };
 
   return (
-    <DashboardLayout title="Schedule Kelas">
-      <div className={styles.scheduleContainer}>
-        <img src={shape4} className={styles.decorShape1} alt="" />
-        <img src={shape9} className={styles.decorShape2} alt="" />
-        <img src={shape7} className={styles.decorShape3} alt="" />
-
-        <div className={styles.header}>
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className={styles.titleSection}
+    <DashboardLayout title="Jadwal Belajar">
+      <div className={styles.container}>
+        {/* --- BANNER --- */}
+        <motion.div
+          className={styles.scheduleBanner}
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+        >
+          <div className={styles.bannerText}>
+            <h2>Atur Kegiatan Kamu 📅</h2>
+            <p>
+              Atur waktumu, jangan sampai ada sesi berharga yang terlewatkan.
+              Semua jadwal pentingmu ada di sini!
+            </p>
+          </div>
+          <button
+            className={styles.addBtn}
+            onClick={() => navigate("/add-course")}
           >
-            <h1 className={styles.mainTitle}>Next Meetings</h1>
-            <p className={styles.subTitle}>Jangan lewatkan jadwal belajar seru kamu!</p>
-          </motion.div>
-        </div>
+            <FiPlus size={20} strokeWidth={3} /> Jadwal Baru
+          </button>
+        </motion.div>
 
-        <div className={styles.contentGrid}>
-          {/* Calendar Section */}
-          <motion.div
-            initial={{ opacity: 0, y: 20, rotate: -2 }}
-            animate={{ opacity: 1, y: 0, rotate: 0 }}
-            transition={{ delay: 0.1, duration: 0.5, type: "spring" }}
-            className={styles.calendarCard}
-          >
-
-            <div className={styles.calendarHeader}>
-              <h3>{currentMonth}</h3>
-              <div className={styles.calendarNav}>
-                <button className={styles.navBtn}>{"<"}</button>
-                <button className={styles.navBtn}>{">"}</button>
+        {/* --- 50:50 LAYOUT GRID --- */}
+        <div className={styles.splitLayout}>
+          {/* ========================================================= */}
+          {/* KOLOM KIRI: KALENDER & KATEGORI                             */}
+          {/* ========================================================= */}
+          <div className={styles.leftColumn}>
+            {/* BOX KALENDER */}
+            <div className={styles.calendarCard}>
+              <div className={styles.calendarHeader}>
+                <button className={styles.navBtn}>
+                  <FiChevronLeft size={20} />
+                </button>
+                <h3 className={styles.monthTitle}>November 2026</h3>
+                <button className={styles.navBtn}>
+                  <FiChevronRight size={20} />
+                </button>
               </div>
-            </div>
 
-            <div className={styles.calendarGrid}>
-              {DAYS.map((day) => (
-                <div key={day} className={styles.dayLabel}>
-                  {day}
-                </div>
-              ))}
-              {[...Array(31)].map((_, i) => {
-                const day = i + 1;
-                const meetingColor = getDayColor(day);
-                return (
-                  <motion.button
-                    key={day}
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                    className={`${styles.day} ${meetingColor !== "transparent" ? styles.hasMeeting : ""}`}
-                    style={meetingColor !== "transparent" ? { borderColor: meetingColor } : {}}
-                  >
-                    {day}
-                    {meetingColor !== "transparent" && (
-                      <div
-                        className={styles.eventDot}
-                        style={{ backgroundColor: meetingColor }}
-                      />
-                    )}
-                  </motion.button>
-                );
-              })}
-            </div>
+              <div className={styles.calendarGrid}>
+                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(
+                  (day) => (
+                    <div key={day} className={styles.dayLabel}>
+                      {day}
+                    </div>
+                  ),
+                )}
 
-            <div className={styles.legend}>
-              <div className={styles.legendItem}>
-                <span className={styles.dot} style={{ backgroundColor: "#ffd54f" }} /> Webinar
-              </div>
-              <div className={styles.legendItem}>
-                <span className={styles.dot} style={{ backgroundColor: "#60a5fa" }} /> Workshop
-              </div>
-              <div className={styles.legendItem}>
-                <span className={styles.dot} style={{ backgroundColor: "#fb7185" }} /> Mentorship
-              </div>
-            </div>
-          </motion.div>
+                {emptyDaysStart.map((id) => (
+                  <div key={id} className={styles.dateCellEmpty}></div>
+                ))}
 
-          {/* Meeting List Section */}
-          <div className={styles.meetingList}>
-            {DUMMY_MEETINGS.map((meeting, index) => (
-              <motion.div
-                key={meeting.id}
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 + index * 0.1 }}
-                className={styles.meetingItem}
-                style={{ borderLeftColor: meeting.color }}
-              >
-                <div className={styles.meetingDate}>
-                  <span className={styles.dateNum}>{meeting.date}</span>
-                  <span className={styles.dateMonth}>{meeting.month}</span>
-                </div>
-                <div className={styles.meetingInfo}>
-                  <h4 className={styles.meetingTitle}>{meeting.title}</h4>
-                  <div className={styles.meetingMeta}>
-                    <span className={styles.meetingTime}>🕒 {meeting.time}</span>
-                    <span
-                      className={styles.meetingType}
-                      style={{ backgroundColor: meeting.color + "44", color: meeting.color }}
+                {daysInMonth.map((day) => {
+                  const hasSchedule = datesWithSchedules.includes(day);
+                  const isActive = activeDate === day;
+
+                  let classList = `${styles.day}`;
+                  if (isActive) classList += ` ${styles.primaryDay}`;
+                  else if (hasSchedule) classList += ` ${styles.secondaryDay}`;
+
+                  return (
+                    <button
+                      key={day}
+                      className={classList}
+                      onClick={() => setActiveDate(day)}
                     >
-                      {meeting.type}
-                    </span>
-                  </div>
+                      {day}
+                      {hasSchedule && <div className={styles.eventDot}></div>}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className={styles.events}>
+                <div className={`${styles.eventItem} ${styles.bgPrimary}`}>
+                  <div
+                    className={`${styles.colorBox} ${styles.colorPrimary}`}
+                  ></div>
+                  <span className={styles.eventText}>Tanggal Terpilih</span>
                 </div>
-                <button className={styles.joinBtn}>Join</button>
-              </motion.div>
-            ))}
+                <div className={`${styles.eventItem} ${styles.bgSecondary}`}>
+                  <div
+                    className={`${styles.colorBox} ${styles.colorSecondary}`}
+                  ></div>
+                  <span className={styles.eventText}>Ada Jadwal Tersedia</span>
+                </div>
+              </div>
+            </div>
+
+            {/* BOX KATEGORI FILTER (Sudah Diperbarui Style Tab-nya) */}
+            <div className={styles.neoBox}>
+              <h4 className={styles.boxTitle}>Filter Kategori Sesi</h4>
+              <div className={styles.categoryWrap}>
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`${styles.catPill} ${activeCategory === cat ? styles.catActive : ""}`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* ========================================================= */}
+          {/* KOLOM KANAN: TIMELINE AGENDA                                */}
+          {/* ========================================================= */}
+          <div className={styles.rightColumn}>
+            <div className={styles.agendaBox}>
+              <div className={styles.timelineHeader}>
+                <h3>Agenda: {activeDate} Nov 2026</h3>
+                <span className={styles.eventCount}>
+                  {currentSchedules.length} Sesi
+                </span>
+              </div>
+
+              <div className={styles.timelineWrapper}>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`${activeDate}-${activeCategory}`}
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="show"
+                    exit={{ opacity: 0, y: -10 }}
+                    className={styles.timelineList}
+                  >
+                    {currentSchedules.length === 0 ? (
+                      <div className={styles.emptyState}>
+                        <FiCalendar size={50} color="#999" />
+                        <h4>Hari yang tenang!</h4>
+                        <p>
+                          Tidak ada jadwal{" "}
+                          {activeCategory !== "Semua"
+                            ? `untuk ${activeCategory}`
+                            : ""}{" "}
+                          di tanggal ini.
+                        </p>
+                      </div>
+                    ) : (
+                      currentSchedules.map((item, index) => (
+                        <motion.div
+                          key={item.id}
+                          variants={itemVariants}
+                          className={styles.timelineItem}
+                        >
+                          {/* Kartu Jadwal */}
+                          <div className={styles.cardCol}>
+                            <div className={styles.scheduleCard}>
+                              <div className={styles.cardHeader}>
+                                <div className={styles.timeBadgeInside}>
+                                  <FiClock className={styles.timeIcon} />
+                                  <span>
+                                    {item.time} - {item.endTime}
+                                  </span>
+                                </div>
+
+                                <div
+                                  className={styles.statusBadge}
+                                  style={{
+                                    backgroundColor: item.color,
+                                    color:
+                                      "#000",
+                                  }}
+                                >
+                                  {item.status === "Selesai" && (
+                                    <FiCheckCircle />
+                                  )}
+                                  {item.status === "Berlangsung" && (
+                                    <FiPlayCircle />
+                                  )}
+                                  {item.status}
+                                </div>
+                              </div>
+
+                              <div className={styles.cardBody}>
+                                <span className={styles.catLabel}>
+                                  {item.category}
+                                </span>
+                                <h3 className={styles.courseTitle}>
+                                  {item.title}
+                                </h3>
+                                <div className={styles.metaGrid}>
+                                  <div className={styles.metaBadge}>
+                                    <FiUser />{" "}
+                                    <span>
+                                      {item.partner}{" "}
+                                      <small>({item.role})</small>
+                                    </span>
+                                  </div>
+                                  <div className={styles.metaBadge}>
+                                    <FiVideo /> <span>{item.platform}</span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className={styles.cardFooter}>
+                                <button
+                                  className={`${styles.actionBtn} ${styles.btnDetail}`}
+                                >
+                                  Detail
+                                </button>
+                                {item.status !== "Selesai" && (
+                                  <button
+                                    className={`${styles.actionBtn} ${styles.btnPrimary}`}
+                                  >
+                                    Masuk Ruangan
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))
+                    )}
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -5,7 +5,14 @@ import styles from "./DashboardPage.module.css";
 import { useNavigate } from "react-router-dom";
 
 // Ikon tambahan untuk UI yang lebih mewah
-import { FiClock, FiVideo, FiStar, FiBook, FiAward, FiCalendar } from "react-icons/fi";
+import {
+  FiClock,
+  FiVideo,
+  FiStar,
+  FiBook,
+  FiAward,
+  FiCalendar,
+} from "react-icons/fi";
 
 // Assets
 import shape10 from "@/assets/shape10.svg";
@@ -23,10 +30,30 @@ export default function DashboardPage() {
   const userName = user ? user.name.split(" ")[0] : "Sobat";
 
   const statCards = [
-    { label: "Poin Aktif", value: "300", color: "var(--primary-blue)", icon: <FiStar /> },
-    { label: "Durasi Belajar", value: "4 Jam", color: "var(--primary-red)", icon: <FiClock /> },
-    { label: "Sesi Mendatang", value: "2", color: "#ff90e8", icon: <FiCalendar /> },
-    { label: "Kursus Selesai", value: "5", color: "var(--primary-yellow)", icon: <FiAward /> },
+    {
+      label: "Poin Aktif",
+      value: "300",
+      color: "var(--primary-blue)",
+      icon: <FiStar />,
+    },
+    {
+      label: "Durasi Belajar",
+      value: "4 Jam",
+      color: "var(--primary-red)",
+      icon: <FiClock />,
+    },
+    {
+      label: "Sesi Mendatang",
+      value: "2",
+      color: "#ff90e8",
+      icon: <FiCalendar />,
+    },
+    {
+      label: "Kursus Selesai",
+      value: "5",
+      color: "var(--primary-yellow)",
+      icon: <FiAward />,
+    },
   ];
 
   const mentoringSessions = [
@@ -64,18 +91,18 @@ export default function DashboardPage() {
     hidden: { opacity: 0 },
     show: {
       opacity: 1,
-      transition: { staggerChildren: 0.15 }
-    }
+      transition: { staggerChildren: 0.15 },
+    },
   };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    show: { y: 0, opacity: 1, transition: { type: "spring", bounce: 0.4 } }
+    show: { y: 0, opacity: 1, transition: { type: "spring", bounce: 0.4 } },
   };
 
   return (
     <DashboardLayout title="Dashboard">
-      <motion.div 
+      <motion.div
         className={styles.contentFlex}
         variants={containerVariants}
         initial="hidden"
@@ -85,15 +112,28 @@ export default function DashboardPage() {
         <motion.section variants={itemVariants} className={styles.banner}>
           <div className={styles.bannerContent}>
             <h2 className={styles.bannerTitle}>
-              Halo, {userName} <span className={styles.waveEmoji} role="img" aria-label="wave">👋</span>
+              Halo, {userName}{" "}
+              <span className={styles.waveEmoji} role="img" aria-label="wave">
+                👋
+              </span>
             </h2>
-            <p className={styles.bannerSub}>Siap untuk belajar, berkembang, dan menjelajah hari ini?</p>
+            <p className={styles.bannerSub}>
+              Siap untuk belajar, berkembang, dan menjelajah hari ini?
+            </p>
             <div className={styles.bannerButtons}>
-              <button className={styles.bannerBtn} onClick={() => navigate("/search")}>
-                <FiBook /> Mulai Belajar <div className={styles.bannerBtnArrow}>˃</div>
+              <button
+                className={styles.bannerBtn}
+                onClick={() => navigate("/search")}
+              >
+                <FiBook /> Mulai Belajar{" "}
+                <div className={styles.bannerBtnArrow}>˃</div>
               </button>
-              <button className={`${styles.bannerBtn} ${styles.btnSecondary}`} onClick={() => navigate("/add-course")}>
-                <FiVideo /> Buka Sesi Mengajar <div className={styles.bannerBtnArrow}>˃</div>
+              <button
+                className={`${styles.bannerBtn} ${styles.btnSecondary}`}
+                onClick={() => navigate("/add-course")}
+              >
+                <FiVideo /> Buka Sesi Mengajar{" "}
+                <div className={styles.bannerBtnArrow}>˃</div>
               </button>
             </div>
           </div>
@@ -102,8 +142,15 @@ export default function DashboardPage() {
               <motion.img
                 key={i}
                 animate={{ y: [0, -(10 + i * 3), 0], rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 4 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.2 }}
-                src={shape} alt="Dekorasi" className={styles.mascot}
+                transition={{
+                  duration: 4 + i * 0.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: i * 0.2,
+                }}
+                src={shape}
+                alt="Dekorasi"
+                className={styles.mascot}
               />
             ))}
           </div>
@@ -127,10 +174,18 @@ export default function DashboardPage() {
         </motion.section>
 
         {/* --- SESI MENTORING --- */}
-        <motion.section variants={itemVariants} className={styles.mentoringSection}>
+        <motion.section
+          variants={itemVariants}
+          className={styles.mentoringSection}
+        >
           <div className={styles.sectionHeader}>
             <h2>Sesi Mentoring Anda</h2>
-            <span className={styles.seeAll} onClick={() => navigate("/schedule")}>Lihat Semua</span>
+            <span
+              className={styles.seeAll}
+              onClick={() => navigate("/schedule")}
+            >
+              Lihat Semua
+            </span>
           </div>
           <div className={styles.mentoringList}>
             {mentoringSessions.map((session) => (
@@ -146,8 +201,15 @@ export default function DashboardPage() {
                   <div className={styles.itemText}>
                     <span className={styles.itemTitle}>{session.title}</span>
                     <div className={styles.itemMeta}>
-                      <span className={styles.itemTime}><FiClock /> {session.time}</span>
-                      <a href={session.url} className={styles.itemUrl} target="_blank" rel="noreferrer">
+                      <span className={styles.itemTime}>
+                        <FiClock /> {session.time}
+                      </span>
+                      <a
+                        href={session.url}
+                        className={styles.itemUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
                         Ikuti Tautan
                       </a>
                     </div>
