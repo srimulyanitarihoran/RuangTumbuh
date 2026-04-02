@@ -13,6 +13,7 @@ import {
   FiCheckCircle,
   FiUserPlus,
   FiInfo,
+  FiMenu,
 } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -94,6 +95,9 @@ export default function DashboardTopbar({ title, onMenuClick }) {
   return (
     <header className={styles.topBar}>
       <div className={styles.topBarLeft}>
+        <button className={styles.menuBtn} onClick={onMenuClick}>
+          <FiMenu />
+        </button>
         <div className={styles.titleGroup}>
           <h1>{title}</h1>
         </div>

@@ -39,7 +39,7 @@ const mainMenu = [
   { id: 5, label: "Komunitas", link: "/messages", icon: FiUsers },
 ];
 
-export default function DashboardSidebar({ isOpen, toggleSidebar }) {
+export default function DashboardSidebar({ isOpen, onClose }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -59,7 +59,7 @@ export default function DashboardSidebar({ isOpen, toggleSidebar }) {
     <>
       <div
         className={`${styles.overlay} ${isOpen ? styles.overlayOpen : ""}`}
-        onClick={toggleSidebar}
+        onClick={onClose}
       ></div>
 
       <div className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ""}`}>
@@ -72,7 +72,7 @@ export default function DashboardSidebar({ isOpen, toggleSidebar }) {
               <span className={styles.logoTumbuh}>TUMBUH</span>
             </div>
           </Link>
-          <button className={styles.closeBtn} onClick={toggleSidebar}>
+          <button className={styles.closeBtn} onClick={onClose}>
             ✕
           </button>
         </div>
@@ -89,7 +89,7 @@ export default function DashboardSidebar({ isOpen, toggleSidebar }) {
                   key={item.id}
                   to={item.link}
                   className={`${styles.linkItem} ${isActive ? styles.linkActive : ""}`}
-                  onClick={() => window.innerWidth < 1024 && toggleSidebar()}
+                  onClick={() => window.innerWidth < 1024 && onClose()}
                 >
                   <div className={styles.linkContent}>
                     <Icon className={styles.linkIcon} />
@@ -100,6 +100,7 @@ export default function DashboardSidebar({ isOpen, toggleSidebar }) {
               );
             })}
           </div>
+
 
           <div className={styles.section}>
             <h4 className={styles.sectionTitle}>SETTING</h4>
