@@ -145,3 +145,27 @@
     font-size: 2rem;
   }
 }
+
+.loadingContainer, .errorContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  text-align: center;
+}
+
+.loadingContainer p, .errorContainer p {
+  padding: 20px 40px;
+  background: #ffcc00;
+  border: 4px solid #000;
+  font-weight: 900;
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  box-shadow: 10px 10px 0px #000;
+}
+
+.errorContainer p {
+  background: #ff5e62;
+  color: #fff;
+}
+

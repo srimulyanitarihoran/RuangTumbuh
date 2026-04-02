@@ -8,6 +8,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const app = express();
+const userRoutes = require("./User");
 
 // Konfigurasi Adapter PostgreSQL untuk Prisma v7
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -19,6 +20,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "rahasia-ruang-tumbuh-super-aman";
 
 app.use(cors());
 app.use(express.json());
+app.use("/api/user", userRoutes);
 
 // Endpoint Test
 app.get("/api/test", (req, res) => {

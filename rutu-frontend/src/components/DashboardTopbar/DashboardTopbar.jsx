@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import styles from "./DashboardTopbar.module.css";
 import { BsCheckAll } from "react-icons/bs";
 import { CiLight } from "react-icons/ci";
+import { Link } from "react-router-dom";
 import {
   IoIosAddCircleOutline,
   IoIosNotificationsOutline,
@@ -186,12 +187,12 @@ export default function DashboardTopbar({ title, onMenuClick }) {
           />
         </div>
 
-        <button className={styles.profileBtn}>
+        <Link to="/profile" className={styles.profileBtn}>
           <div className={styles.avatar}>
             <FaUser className={styles.guestIcon} />
           </div>
           <span className={styles.userName}>{userName}</span>
-        </button>
+        </Link>
       </div>
     </header>
   );
