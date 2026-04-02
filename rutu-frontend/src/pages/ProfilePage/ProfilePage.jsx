@@ -86,7 +86,7 @@ export default function ProfilePage() {
             <div className={styles.sideStat}>
               <div
                 className={styles.statBox}
-                style={{ backgroundColor: "#facc15" }}
+                style={{ backgroundColor: "var(--primary-blue)" }}
               >
                 <span className={styles.statNumber}>
                   {user.stats.learningHours}
@@ -123,7 +123,7 @@ export default function ProfilePage() {
             <div className={styles.sideStat}>
               <div
                 className={styles.statBox}
-                style={{ backgroundColor: "#4ade80" }}
+                style={{ backgroundColor: "var(--primary-green)" }}
               >
                 <span className={styles.statNumber}>
                   {user.stats.teachingSessions}
