@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ReactLenis } from "lenis/react";
 import CustomCursor from "@components/CustomCursor/CustomCursor";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicRoute from "./routes/PublicRoute"; // <--- Jangan lupa import ini!
 
 const HomePage = lazy(() => import("@pages/HomePage/HomePage"));
 const Login = lazy(() => import("@pages/LoginPage/LoginPage"));
@@ -44,10 +45,14 @@ export default function App() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
 
-            {/* Protected routes */}
+            {/* --- Public Routes (User sudah login dilarang masuk sini) --- */}
+            <Route element={<PublicRoute />}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+            </Route>
+
+            {/* --- Protected routes (User belum login dilarang masuk sini) --- */}
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/search" element={<SearchPage />} />
