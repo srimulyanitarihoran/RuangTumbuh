@@ -22,7 +22,7 @@
 .inputForm {
   width: 100%;
   padding: 1rem 3rem 1rem 1rem;
-  border: 1px solid #e1e5ee;
+  border: 1px solid #000;
   border-radius: 10px;
   background-color: #fffffb;
   font-size: 0.9rem;
@@ -39,7 +39,7 @@
   background-color: #fbfcff;
   padding: 0 0.2rem;
   padding-bottom: -2rem;
-  color: #b0b7c3;
+  color: #aeaeae;
   font-size: 0.95rem;
   font-weight: 400;
   transition: all 0.2s ease-in-out;
