@@ -4,7 +4,6 @@ import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./DashboardPage.module.css";
 import { useNavigate } from "react-router-dom";
 
-// Ikon tambahan untuk UI yang lebih mewah
 import {
   FiClock,
   FiVideo,
@@ -14,7 +13,6 @@ import {
   FiCalendar,
 } from "react-icons/fi";
 
-// Assets
 import shape10 from "@/assets/shape10.svg";
 import shape11 from "@/assets/shape11.svg";
 import shape12 from "@/assets/shape12.svg";
@@ -23,10 +21,8 @@ import shape13 from "@/assets/shape13.svg";
 export default function DashboardPage() {
   const navigate = useNavigate();
 
-  // Mengambil nama user dari localStorage (seperti di Topbar)
   const userString = localStorage.getItem("user");
   const user = userString ? JSON.parse(userString) : null;
-  // Ambil nama depan saja agar lebih akrab
   const userName = user ? user.name.split(" ")[0] : "Sobat";
 
   const statCards = [
@@ -64,7 +60,7 @@ export default function DashboardPage() {
       url: "https://zoom.us/j/123456789",
       status: "Berlangsung",
       color: "#FACC15",
-      badgeColor: "#10B981", // Hijau
+      badgeColor: "#10B981", 
     },
     {
       id: 2,
@@ -73,7 +69,7 @@ export default function DashboardPage() {
       url: "https://meet.google.com/abc-defg-hij",
       status: "Besok",
       color: "#38BDF8",
-      badgeColor: "#3B82F6", // Biru
+      badgeColor: "#3B82F6", 
     },
     {
       id: 3,
@@ -82,11 +78,10 @@ export default function DashboardPage() {
       url: "https://discord.gg/ruangtumbuh",
       status: "Dibatalkan",
       color: "#ff66aa",
-      badgeColor: "#EF4444", // Merah
+      badgeColor: "#EF4444", 
     },
   ];
 
-  // Konfigurasi animasi Framer Motion (Stagger Children)
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -108,7 +103,6 @@ export default function DashboardPage() {
         initial="hidden"
         animate="show"
       >
-        {/* --- BANNER SELAMAT DATANG --- */}
         <motion.section variants={itemVariants} className={styles.banner}>
           <div className={styles.bannerContent}>
             <h2 className={styles.bannerTitle}>
@@ -156,7 +150,6 @@ export default function DashboardPage() {
           </div>
         </motion.section>
 
-        {/* --- STATISTIK GRID --- */}
         <motion.section variants={itemVariants} className={styles.statsGrid}>
           {statCards.map((card, idx) => (
             <div
@@ -173,7 +166,6 @@ export default function DashboardPage() {
           ))}
         </motion.section>
 
-        {/* --- SESI MENTORING --- */}
         <motion.section
           variants={itemVariants}
           className={styles.mentoringSection}
