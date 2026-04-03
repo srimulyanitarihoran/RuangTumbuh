@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
@@ -26,9 +27,19 @@ export default function AddCoursePage() {
   const [formData, setFormData] = useState({
     title: "",
     category: "",
-    price: "",
+    duration: "", // Diubah dari price ke duration agar sesuai input
     description: "",
+    tutorId: "", // Otomatis dari ID user yang login
   });
+
+  // Get current user as tutor
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+    if (user.id) {
+      setFormData((prev) => ({ ...prev, tutorId: user.id }));
+    }
+  }, []);
+
 
   const [modules, setModules] = useState([
     { id: Date.now(), title: "", duration: "" },
@@ -55,12 +66,60 @@ export default function AddCoursePage() {
     );
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Data Kursus:", { ...formData, modules });
-    alert("Kursus berhasil disimpan!");
-    navigate("/dashboard");
+
+    // --- Simple Form Validation ---
+    if (
+      !formData.title ||
+      !formData.category ||
+      !formData.duration ||
+      !formData.description
+    ) {
+      alert("Harap isi semua form informasi utama!");
+      return;
+    }
+
+    // Pastikan setidaknya ada data di modul
+    if (modules.some((m) => !m.title || !m.duration)) {
+      alert("Harap lengkapi semua data modul materi!");
+      return;
+    }
+
+    try {
+      // Mapping ke model backend "Course"
+      const courseData = {
+        name: formData.title,
+        tutorId: formData.tutorId,
+        kategori: formData.category,
+        durasi: formData.duration,
+        deskripsi: formData.description,
+        modules: modules.map((m) => ({ title: m.title, duration: m.duration })),
+      };
+
+      const response = await fetch("http://localhost:5001/api/course", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(courseData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert("Kursus baru berhasil ditambahkan ke Pusat Course! 🚀");
+        console.log("Response:", result);
+        navigate("/dashboard");
+      } else {
+        alert(`Gagal: ${result.message}`);
+      }
+    } catch (error) {
+      console.error("Submit error:", error);
+      alert("Terjadi kesalahan koneksi ke server.");
+    }
   };
+
 
   return (
     <DashboardLayout title="Tambah Kursus Baru">
@@ -168,16 +227,7 @@ export default function AddCoursePage() {
             </div>
 
             {/* Thumbnail Upload */}
-            <div className={styles.uploadContainer}>
-              <label className={styles.uploadLabel}>Thumbnail Kursus</label>
-              <div className={styles.uploadArea}>
-                <FiUploadCloud className={styles.uploadIcon} />
-                <div className={styles.uploadText}>
-                  <h4>Klik atau Drag & Drop gambar di sini</h4>
-                  <p>Format yang didukung: JPG, PNG, WEBP (Max 2MB)</p>
-                </div>
-              </div>
-            </div>
+            
           </div>
 
           {/* KOLOM KANAN: Modul / Silabus */}

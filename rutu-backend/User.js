@@ -1,13 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { PrismaClient } = require("@prisma/client");
-const { Pool } = require("pg");
-const { PrismaPg } = require("@prisma/adapter-pg");
-
-// Re-using initialization pattern from index.js
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const prisma = require("./prismaClient");
 
 // GET: profile user by ID
 router.get("/:id", async (req, res) => {
@@ -36,4 +29,4 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router;
