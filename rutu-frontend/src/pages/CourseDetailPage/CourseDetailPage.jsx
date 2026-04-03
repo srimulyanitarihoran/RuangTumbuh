@@ -272,6 +272,19 @@ export default function CourseDetailPage() {
                           {courseData.timePrice}
                         </h2>
                       </div>
+                      <div className={styles.ctaActionContainer}>
+                        <motion.button
+                          whileHover={{ y: -4, boxShadow: "8px 8px 0px #000" }}
+                          whileTap={{ y: 2, boxShadow: "0px 0px 0px #000" }}
+                          className={styles.enrollBtn}
+                          onClick={() => navigate(`/course-booking/${id}`)}
+                        >
+                          Booking Sekarang 🔥
+                        </motion.button>
+                        <p className={styles.moneyBack}>
+                          100% Kepuasan Belajar Terjamin
+                        </p>
+                      </div>
                     </div>
                   </motion.div>
                 )}

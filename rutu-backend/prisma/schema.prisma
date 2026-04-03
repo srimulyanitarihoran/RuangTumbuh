@@ -25,8 +25,8 @@ model User {
 
   // Relasi
   skillsOffered   UserSkill[]
-  sessionsAsTutor Session[]   @relation("TutorSessions")
-  sessionsAsSiswa Session[]   @relation("StudentSessions")
+  bookingsAsTutor Booking[]   @relation("TutorSessions")
+  bookingsAsSiswa Booking[]   @relation("StudentSessions")
   sentMessages    Message[]   @relation("SentMessages")
   recvMessages    Message[]   @relation("ReceivedMessages")
   forumPosts      ForumPost[]
@@ -41,7 +41,7 @@ model Skill {
 
   // Relasi
   users       UserSkill[]
-  sessions    Session[]
+  bookings    Booking[]
 }
 
 // TABEL PENGHUBUNG (Siswa Mana Yang Menawarkan Skill Apa)
@@ -56,8 +56,8 @@ model UserSkill {
   @@unique([userId, skillId]) // 1 user tidak bisa input skill yang sama 2 kali
 }
 
-// TABEL SESSION BOOKING (Pemesanan Sesi Belajar)
-model Session {
+// TABEL Course BOOKING (Pemesanan Sesi Belajar)
+model Booking {
   id              String   @id @default(uuid())
   tutorId         String   // Yang mengajar
   studentId       String   // Yang belajar (membayar dengan waktu)
@@ -86,12 +86,12 @@ model Session {
 // TABEL REVIEW (Ulasan & Rating setelah sesi terverifikasi)
 model Review {
   id          String   @id @default(uuid())
-  sessionId   String   @unique
+  bookingId   String   @unique
   rating      Int      // Contoh: 1 sampai 5 bintang
   feedback    String?  // Komentar dari siswa untuk tutor
   createdAt   DateTime @default(now())
 
-  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
 }
 
 enum Status {
@@ -139,13 +139,36 @@ model ForumComment {
 
 // TABEL PUSAT COURSE
 model Course {
-  id          Int      @id @default(autoincrement())
+  id          Int             @id @default(autoincrement())
   name        String
   tutor       String
-  tutorId     String   @default("") // ID user yang membuat kursus
+  tutorId     String          @default("") // ID user yang membuat kursus
   kategori    String
   durasi      String
   deskripsi   String
-  modules     Json?    // Daftar modul (title & duration)
-  createdAt   DateTime @default(now())
+  modules     Json?           // Daftar modul (title & duration)
+  createdAt   DateTime        @default(now())
+
+  bookings    CourseBooking[]
+}
+
+// TABEL BOOKING KURSUS (Siswa -> Course yang dibuat Mentor)
+model CourseBooking {
+  id          String              @id @default(uuid())
+  courseId    Int                 // Kursus yang dibooking
+  studentId   String              // User yang melakukan booking
+  studentName String              // Nama siswa (snapshot)
+  scheduledAt DateTime            // Jadwal yang diinginkan
+  note        String?             // Catatan/pertanyaan dari siswa
+  status      CourseBookingStatus @default(PENDING)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  course  Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+}
+
+enum CourseBookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
 }

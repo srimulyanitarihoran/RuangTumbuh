@@ -118,7 +118,7 @@ export default function CourseCard({ course, index }) {
           ) : (
             <button
               className={`${styles.actionBtn} ${styles.btnBooking}`}
-              onClick={() => navigate(`/booking`)}
+              onClick={() => navigate(`/course-booking/${course.id}`)}
             >
               Booking <FiArrowRight />
             </button>
