@@ -42,13 +42,28 @@ export default function CourseCard({ course, index }) {
         className={styles.cardBanner}
         style={{ backgroundColor: course.color }}
       >
-        {/* Panggil fungsi ikon dinamis */}
-        {getCategoryIcon(course.category)}
+        {/* Background Image / Placeholder */}
+        <img
+          src={course.image}
+          alt={course.title}
+          className={styles.bannerImage}
+        />
+
+        {/* Overlay Ikon Dinamis */}
+        <div className={styles.bannerOverlay}>
+          {getCategoryIcon(course.category)}
+        </div>
 
         {/* Lencana Kategori di pojok */}
         <span className={styles.categoryBadge}>
           {course.category || "General"}
         </span>
+
+        {/* Durasi di pojok bawah banner */}
+        <div className={styles.durationBadge}>
+          <FiClock />
+          <span>{course.duration || "1 Jam"}</span>
+        </div>
       </div>
 
       {/* --- BODY KARTU --- */}
@@ -65,7 +80,9 @@ export default function CourseCard({ course, index }) {
             {course.emoji || "👤"}
           </div>
           <div className={styles.mentorText}>
-            <span className={styles.mentorName}>{course.author}</span>
+            <span className={styles.mentorName} title={course.author}>
+              {course.author}
+            </span>
             <span className={styles.mentorRole}>Mentor</span>
           </div>
 
@@ -89,7 +106,7 @@ export default function CourseCard({ course, index }) {
           className={`${styles.actionBtn} ${styles.btnBooking}`}
           onClick={() => navigate(`/booking`)}
         >
-          Booking
+          Booking <FiArrowRight />
         </button>
       </div>
     </div>

@@ -540,3 +540,19 @@
     grid-template-columns: 1fr;
   }
 }
+.loadingWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 100px 20px;
+  background-color: #fff;
+  border: 4px dashed #000;
+  border-radius: 25px;
+  font-family: "plus-jakarta", sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: #555;
+  text-align: center;
+  gap: 20px;
+}

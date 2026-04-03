@@ -1,117 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./SearchPage.module.css";
 import CourseCard from "@/components/CourseCard/CourseCard";
 import { FiSearch, FiSliders } from "react-icons/fi";
-
-// Data Dummy yang Diperkaya dengan Emoji Avatar
-const allCourses = [
-  {
-    id: 1,
-    title: "Frontend Basic: HTML, CSS, JS",
-    author: "Grace Ashcroft",
-    emoji: "👩‍💻",
-    duration: "3h 30m",
-    rating: 5,
-    color: "#38BDF8",
-    date: "20 Mar 2026",
-    category: "Frontend",
-    level: "Beginner",
-    price: "Gratis",
-  },
-  {
-    id: 2,
-    title: "Mastering React & Framer Motion",
-    author: "Grace Ashcroft",
-    emoji: "👩‍🎨",
-    duration: "5h 15m",
-    rating: 5,
-    color: "#FB923C",
-    date: "22 Mar 2026",
-    category: "Frontend",
-    level: "Intermediate",
-    price: "Premium",
-  },
-  {
-    id: 3,
-    title: "Backend Node.js & Express API",
-    author: "Harvey Specter",
-    emoji: "🧔",
-    duration: "6h 00m",
-    rating: 4,
-    color: "#F472B6",
-    date: "25 Mar 2026",
-    category: "Backend",
-    level: "Intermediate",
-    price: "Premium",
-  },
-  {
-    id: 4,
-    title: "UI/UX Design Fundamental",
-    author: "John Doe",
-    emoji: "👦",
-    duration: "4h 20m",
-    rating: 5,
-    color: "#FACC15",
-    date: "28 Mar 2026",
-    category: "UI/UX Design",
-    level: "Beginner",
-    price: "Gratis",
-  },
-  {
-    id: 5,
-    title: "Advanced Laravel 11",
-    author: "Jane Smith",
-    emoji: "👩‍🏫",
-    duration: "8h 45m",
-    rating: 5,
-    color: "#10B981",
-    date: "30 Mar 2026",
-    category: "Backend",
-    level: "Advanced",
-    price: "Premium",
-  },
-  {
-    id: 6,
-    title: "Python for Data Science",
-    author: "Mike Ross",
-    emoji: "👨‍🔬",
-    duration: "10h 10m",
-    rating: 3,
-    color: "#A78BFA",
-    date: "02 Apr 2026",
-    category: "Data Science",
-    level: "Beginner",
-    price: "Premium",
-  },
-  {
-    id: 7,
-    title: "Flutter Mobile Development",
-    author: "Louis Litt",
-    emoji: "👱‍♂️",
-    duration: "7h 00m",
-    rating: 5,
-    color: "#38BDF8",
-    date: "15 Apr 2026",
-    category: "Mobile Dev",
-    level: "Beginner",
-    price: "Premium",
-  },
-  {
-    id: 8,
-    title: "CSS Mastery & Animations",
-    author: "Donna Paulsen",
-    emoji: "👩‍🦰",
-    duration: "2h 50m",
-    rating: 4,
-    color: "#F472B6",
-    date: "10 Apr 2026",
-    category: "Frontend",
-    level: "Advanced",
-    price: "Gratis",
-  },
-];
 
 const categories = [
   "Semua",
@@ -126,9 +18,100 @@ const categories = [
   "Fisika"
 ];
 
+// Helper untuk memberikan warna, emoji, dan gambar acak/berdasarkan kategori agar tampilan tetap premium
+const getCourseExtras = (category) => {
+  const mapping = {
+    "Frontend": {
+      color: "#38BDF8",
+      emoji: "👩‍💻",
+      image: "https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&q=80&w=600"
+    },
+    "Backend": {
+      color: "#F472B6",
+      emoji: "⚙️",
+      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&q=80&w=600"
+    },
+    "UI/UX Design": {
+      color: "#FACC15",
+      emoji: "🎨",
+      image: "https://images.unsplash.com/photo-1586717791821-3f44a563cc4c?auto=format&fit=crop&q=80&w=600"
+    },
+    "Mobile Dev": {
+      color: "#10B981",
+      emoji: "📱",
+      image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=600"
+    },
+    "Data Science": {
+      color: "#A78BFA",
+      emoji: "📊",
+      image: "https://images.unsplash.com/photo-1551288049-bbbda536339a?auto=format&fit=crop&q=80&w=600"
+    },
+    "Matematika": {
+      color: "#FB923C",
+      emoji: "📐",
+      image: "https://images.unsplash.com/photo-1509228468518-180dd482270b?auto=format&fit=crop&q=80&w=600"
+    },
+    "Bahasa Inggris": {
+      color: "#6366F1",
+      emoji: "🇬🇧",
+      image: "https://images.unsplash.com/photo-1543165796-5426273eaab3?auto=format&fit=crop&q=80&w=600"
+    },
+    "Bahasa Indonesia": {
+      color: "#EF4444",
+      emoji: "🇮🇩",
+      image: "https://images.unsplash.com/photo-1518173946687-a4c8a9b746f4?auto=format&fit=crop&q=80&w=600"
+    },
+    "Fisika": {
+      color: "#14B8A6",
+      emoji: "⚛️",
+      image: "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&q=80&w=600"
+    },
+  };
+  return mapping[category] || {
+    color: "#94A3B8",
+    emoji: "📚",
+    image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=600"
+  };
+};
+
 export default function SearchPage() {
+  const [allCourses, setAllCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const response = await fetch("http://localhost:5001/api/course");
+        const data = await response.json();
+
+        // Map backend fields to frontend expected fields
+        const formattedData = data.map(item => {
+          const extras = getCourseExtras(item.kategori);
+          return {
+            id: item.id,
+            title: item.name,
+            author: item.tutor,
+            category: item.kategori,
+            duration: item.durasi,
+            description: item.deskripsi,
+            date: new Date(item.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+            rating: 5, // Default rating as DB doesn't have it
+            ...extras
+          };
+        });
+
+        setAllCourses(formattedData);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   const filteredCourses = allCourses.filter((course) => {
     const matchCategory =
@@ -206,7 +189,11 @@ export default function SearchPage() {
         </div>
 
         {/* --- KURSUS GRID --- */}
-        {filteredCourses.length > 0 ? (
+        {loading ? (
+          <div className={styles.loadingWrapper}>
+            <p>Memuat kursus...</p>
+          </div>
+        ) : filteredCourses.length > 0 ? (
           <motion.div
             className={styles.courseGrid}
             variants={containerVariants}

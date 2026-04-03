@@ -38,7 +38,7 @@ model Skill {
   id          String      @id @default(uuid())
   name        String      @unique // Contoh: "Matematika", "Desain Grafis", "Inggris"
   description String?
-  
+
   // Relasi
   users       UserSkill[]
   sessions    Session[]
@@ -71,7 +71,7 @@ model Session {
   // --- FITUR VERIFIKASI ---
   verificationToken String?  // Token PIN untuk Tutor
   isVerified        Boolean  @default(false)
-  
+
   // --- FITUR BANDING (DISPUTE) ---
   disputeReason     String?  // Alasan Tutor melaporkan Siswa (misal: "Siswa kabur")
 
@@ -135,4 +135,16 @@ model ForumComment {
 
   post   ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
   author User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+// TABEL PUSAT COURSE
+model Course {
+  id          Int      @id @default(autoincrement())
+  name        String
+  tutor       String
+  kategori    String
+  durasi      String
+  deskripsi   String
+  modules     Json?    // Daftar modul (title & duration)
+  createdAt   DateTime @default(now())
 }

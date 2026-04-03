@@ -1,19 +1,14 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const { PrismaClient } = require("@prisma/client");
-const { Pool } = require("pg");
-const { PrismaPg } = require("@prisma/adapter-pg");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const prisma = require("./prismaClient");
 
 const app = express();
 const userRoutes = require("./User");
+const courseRoutes = require("./Course.js");
 
-// Konfigurasi Adapter PostgreSQL untuk Prisma v7
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
 
 const PORT = process.env.PORT || 5001;
 const JWT_SECRET = process.env.JWT_SECRET || "rahasia-ruang-tumbuh-super-aman";
@@ -21,6 +16,8 @@ const JWT_SECRET = process.env.JWT_SECRET || "rahasia-ruang-tumbuh-super-aman";
 app.use(cors());
 app.use(express.json());
 app.use("/api/user", userRoutes);
+app.use("/api/course", courseRoutes);
+
 
 // Endpoint Test
 app.get("/api/test", (req, res) => {

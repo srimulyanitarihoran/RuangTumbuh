@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
@@ -13,60 +13,144 @@ import {
   FiUser,
 } from "react-icons/fi";
 
-// --- DUMMY DATA ---
-const courseData = {
-  id: 1,
-  title: "Masterclass React JS & Next JS",
-  category: "Programming",
-  instructor: "Grace Hopper",
-  instructorRole: "Senior Software Engineer",
-  rating: 4.8,
-  reviews: 124,
-  timePrice: "120 Menit",
-  color: "#38BDF8",
-  description:
-    "Pelajari React JS dari dasar hingga mahir, lengkap dengan implementasi Next.js untuk membuat aplikasi web modern yang cepat dan SEO friendly.",
-  thumbnail:
-    "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=1000&auto=format&fit=crop",
-  details: {
-    duration: "12 Jam",
-    modules: 24,
-    level: "Pemula - Menengah",
-    certificate: true,
-  },
-  syllabus: [
-    { id: 1, title: "Pengenalan React", duration: "45 Mnt", isFree: true },
-    {
-      id: 2,
-      title: "State & Props dalam React",
-      duration: "1 Jam 10 Mnt",
-      isFree: false,
+// --- HELPER UNTUK EXTRAS (Sama dengan SearchPage) ---
+const getCourseExtras = (category) => {
+  const mapping = {
+    "Frontend": {
+      color: "#38BDF8",
+      emoji: "👩‍💻",
+      image: "https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&q=80&w=600"
     },
-    {
-      id: 3,
-      title: "React Hooks (useState, useEffect)",
-      duration: "2 Jam",
-      isFree: false,
+    "Backend": {
+      color: "#F472B6",
+      emoji: "⚙️",
+      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&q=80&w=600"
     },
-    {
-      id: 4,
-      title: "Routing dengan React Router",
-      duration: "1 Jam 30 Mnt",
-      isFree: false,
+    "UI/UX Design": {
+      color: "#FACC15",
+      emoji: "🎨",
+      image: "https://images.unsplash.com/photo-1586717791821-3f44a563cc4c?auto=format&fit=crop&q=80&w=600"
     },
-    {
-      id: 5,
-      title: "Pengenalan Next.js & SSR",
-      duration: "2 Jam 15 Mnt",
-      isFree: false,
+    "Mobile Dev": {
+      color: "#10B981",
+      emoji: "📱",
+      image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=600"
     },
-  ],
+    "Data Science": {
+      color: "#A78BFA",
+      emoji: "📊",
+      image: "https://images.unsplash.com/photo-1551288049-bbbda536339a?auto=format&fit=crop&q=80&w=600"
+    },
+    "Matematika": {
+      color: "#FB923C",
+      emoji: "📐",
+      image: "https://images.unsplash.com/photo-1509228468518-180dd482270b?auto=format&fit=crop&q=80&w=600"
+    },
+    "Bahasa Inggris": {
+      color: "#6366F1",
+      emoji: "🇬🇧",
+      image: "https://images.unsplash.com/photo-1543165796-5426273eaab3?auto=format&fit=crop&q=80&w=600"
+    },
+    "Bahasa Indonesia": {
+      color: "#EF4444",
+      emoji: "🇮🇩",
+      image: "https://images.unsplash.com/photo-1518173946687-a4c8a9b746f4?auto=format&fit=crop&q=80&w=600"
+    },
+    "Fisika": {
+      color: "#14B8A6",
+      emoji: "⚛️",
+      image: "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&q=80&w=600"
+    },
+  };
+  return mapping[category] || {
+    color: "#94A3B8",
+    emoji: "📚",
+    image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=600"
+  };
 };
 
 export default function CourseDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("about");
+  const [courseData, setCourseData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourseDetail = async () => {
+      try {
+        const response = await fetch(`http://localhost:5001/api/course/${id}`);
+        const data = await response.json();
+
+        if (response.ok) {
+          const extras = getCourseExtras(data.kategori);
+          setCourseData({
+            id: data.id,
+            title: data.name,
+            category: data.kategori,
+            instructor: data.tutor,
+            instructorRole: "Expert Mentor",
+            rating: 5.0,
+            reviews: 0,
+            timePrice: data.durasi + " Menit",
+            color: extras.color,
+            description: data.deskripsi,
+            thumbnail: extras.image,
+            details: {
+              duration: data.durasi + " Menit",
+              modules: 5,
+              level: "Semua Level",
+              certificate: true,
+            },
+            syllabus:
+              data.modules && data.modules.length > 0
+                ? data.modules.map((m, idx) => ({
+                    id: idx + 1,
+                    title: m.title,
+                    duration: m.duration + " Menit",
+                    isFree: idx === 0, // Modul pertama kita buat gratis sebagai preview
+                  }))
+                : [
+                    { id: 1, title: "Pembukaan & Overview", duration: "10 Mnt", isFree: true },
+                    { id: 2, title: "Materi Utama Bagian 1", duration: "30 Mnt", isFree: false },
+                    { id: 3, title: "Materi Utama Bagian 2", duration: "45 Mnt", isFree: false },
+                    { id: 4, title: "Sesi Diskusi & Tanya Jawab", duration: "25 Mnt", isFree: false },
+                    { id: 5, title: "Penutup & Kesimpulan", duration: "10 Mnt", isFree: false },
+                  ],
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching course detail:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourseDetail();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <DashboardLayout title="Memuat...">
+        <div className={styles.loadingWrapper}>
+          <p>Sedang mengambil data kursus...</p>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!courseData) {
+    return (
+      <DashboardLayout title="Error">
+        <div className={styles.loadingWrapper}>
+          <p>Kursus tidak ditemukan atau terjadi kesalahan.</p>
+          <button onClick={() => navigate(-1)} className={styles.secondaryBtn}>
+            Kembali
+          </button>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout title="Detail Kursus">
