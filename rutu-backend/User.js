@@ -154,4 +154,103 @@ router.put("/profile/:id", upload.single("avatar"), async (req, res) => {
   }
 });
 
+// GET: Ambil Statistik untuk Dashboard
+router.get("/dashboard-stats/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const now = new Date();
+
+    // 1. Ambil Saldo Waktu (Dompet Waktu)
+    const user = await prisma.user.findUnique({
+      where: { id },
+      select: { timeBalance: true },
+    });
+
+    if (!user) return res.status(404).json({ message: "User tidak ditemukan" });
+
+    // 2. Hitung Durasi Belajar
+    const completed1on1 = await prisma.booking.findMany({
+      where: { studentId: id, status: "COMPLETED" }, // Booking boleh COMPLETED
+    });
+    const acceptedCourses = await prisma.courseBooking.findMany({
+      // PERBAIKAN: Ubah COMPLETED jadi ACCEPTED
+      where: { studentId: id, status: "ACCEPTED" },
+      include: { course: true },
+    });
+
+    let learningMinutes = 0;
+    completed1on1.forEach((b) => (learningMinutes += b.durationMinutes || 0));
+    acceptedCourses.forEach((b) => {
+      if (b.course && b.course.durasi) {
+        learningMinutes += parseInt(b.course.durasi.replace(/\D/g, "")) || 0;
+      }
+    });
+
+    // 3. Hitung Sesi Mendatang (Count / Jumlah Saja)
+    const upcoming1on1 = await prisma.booking.count({
+      where: { studentId: id, status: "ACCEPTED", scheduledAt: { gt: now } },
+    });
+    const upcomingCourses = await prisma.courseBooking.count({
+      where: { studentId: id, status: "ACCEPTED", scheduledAt: { gt: now } },
+    });
+
+    // 4. Hitung Sesi Selesai (Count / Jumlah Saja)
+    const finished1on1 = await prisma.booking.count({
+      where: { studentId: id, status: "COMPLETED" }, // Booking boleh COMPLETED
+    });
+    const finishedCourses = await prisma.courseBooking.count({
+      // PERBAIKAN: Ubah COMPLETED jadi ACCEPTED (karena CourseBooking tidak punya COMPLETED)
+      where: { studentId: id, status: "ACCEPTED", scheduledAt: { lt: now } },
+    });
+
+    // Ambil maksimal 3 jadwal terdekat dari tabel Booking (1-on-1)
+    const upcoming1on1List = await prisma.booking.findMany({
+      where: { studentId: id, status: "ACCEPTED", scheduledAt: { gt: now } },
+      include: { skill: true },
+      orderBy: { scheduledAt: "asc" },
+    });
+
+    // Ambil maksimal 3 jadwal terdekat dari tabel CourseBooking (Kelas)
+    const upcomingCourseList = await prisma.courseBooking.findMany({
+      where: { studentId: id, status: "ACCEPTED", scheduledAt: { gt: now } },
+      include: { course: true },
+      orderBy: { scheduledAt: "asc" },
+    });
+
+    // Gabungkan kedua list menjadi format seragam untuk Frontend
+    const rawSessions = [
+      ...upcoming1on1List.map((b) => ({
+        id: b.id,
+        title: b.skill ? `1-on-1: ${b.skill.name}` : "Sesi Mentoring 1-on-1",
+        time: b.scheduledAt,
+        url: b.meetingLink || "#",
+        status: "Akan Datang",
+      })),
+      ...upcomingCourseList.map((b) => ({
+        id: b.id,
+        title: b.course ? `Kelas: ${b.course.name}` : "Sesi Kelas",
+        time: b.scheduledAt,
+        url: "#",
+        status: "Akan Datang",
+      })),
+    ];
+
+    // Urutkan berdasarkan waktu paling dekat dan ambil maksimal 3 sesi
+    const mentoringSessions = rawSessions
+      .sort((a, b) => new Date(a.time) - new Date(b.time))
+
+    // Kirim seluruh data ke frontend
+    res.json({
+      timeBalance: user.timeBalance,
+      learningMinutes: learningMinutes,
+      upcomingSessions: upcoming1on1 + upcomingCourses,
+      completedSessions: finished1on1 + finishedCourses,
+      mentoringSessions: mentoringSessions,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetch dashboard stats" });
+  }
+});
+
 module.exports = router;

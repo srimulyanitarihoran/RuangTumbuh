@@ -56,12 +56,6 @@ export default function ProfilePage() {
     navigate("/login");
   };
 
-  if (loading)
-    return (
-      <DashboardLayout title="Profil Saya">
-        <p style={{ padding: "20px" }}>Memuat Profil...</p>
-      </DashboardLayout>
-    );
   if (!userProfile)
     return (
       <DashboardLayout title="Profil Saya">
