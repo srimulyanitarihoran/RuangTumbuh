@@ -3,6 +3,65 @@ const prisma = require("../config/db");
 const createCourse = async (req, res) => {
   try {
     const { name, tutorId, kategori, durasi, deskripsi, modules } = req.body;
+
+    if (!name || name.length < 5 || name.length > 100) {
+      return res
+        .status(400)
+        .json({ message: "Judul kursus harus antara 5 hingga 100 karakter." });
+    }
+    if (!kategori) {
+      return res
+        .status(400)
+        .json({ message: "Kategori kursus wajib dipilih." });
+    }
+    if (!durasi || isNaN(durasi) || parseInt(durasi) <= 0) {
+      return res
+        .status(400)
+        .json({
+          message: "Durasi kursus harus berupa angka lebih dari 0 menit.",
+        });
+    }
+    if (!deskripsi || deskripsi.length < 20 || deskripsi.length > 1000) {
+      return res
+        .status(400)
+        .json({
+          message: "Deskripsi kursus harus antara 20 hingga 1000 karakter.",
+        });
+    }
+
+    // Validasi Array Modul
+    if (!modules || !Array.isArray(modules) || modules.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Kursus harus memiliki minimal 1 modul materi." });
+    }
+    if (modules.length > 20) {
+      return res
+        .status(400)
+        .json({
+          message: "Maksimal hanya diperbolehkan membuat 20 modul per kursus.",
+        });
+    }
+
+    // Validasi isi masing-masing modul
+    for (let i = 0; i < modules.length; i++) {
+      const m = modules[i];
+      if (!m.title || m.title.trim() === "") {
+        return res
+          .status(400)
+          .json({
+            message: `Judul materi pada modul ke-${i + 1} tidak boleh kosong.`,
+          });
+      }
+      if (!m.duration || isNaN(m.duration) || parseInt(m.duration) <= 0) {
+        return res
+          .status(400)
+          .json({
+            message: `Durasi materi pada modul ke-${i + 1} harus lebih dari 0 menit.`,
+          });
+      }
+    }
+
     const user = await prisma.user.findUnique({ where: { id: tutorId } });
     if (!user)
       return res.status(404).json({ message: "Tutor tidak ditemukan!" });

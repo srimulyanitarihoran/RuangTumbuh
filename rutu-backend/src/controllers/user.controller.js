@@ -66,22 +66,98 @@ const updateProfile = async (req, res) => {
   try {
     const { id } = req.params;
     let { name, location, birthday, school, description, passions } = req.body;
-    if (typeof passions === "string") {
-      try {
-        passions = JSON.parse(passions);
-      } catch (e) {
-        passions = [];
+
+    // 1. Validasi Nama
+    if (name) {
+      const nameRegex = /^[a-zA-Z\s]*$/;
+      const nameWords = name.trim().split(/\s+/);
+      if (
+        !nameRegex.test(name) ||
+        nameWords.length < 2 ||
+        nameWords.length > 5
+      ) {
+        return res
+          .status(400)
+          .json({
+            message:
+              "Nama lengkap harus berisi huruf saja, terdiri dari 2 hingga 5 kata.",
+          });
       }
     }
+
+    // 2. Validasi Tanggal Lahir (Tidak boleh di masa depan)
+    if (birthday) {
+      const selectedDate = new Date(birthday);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Reset jam agar adil
+      if (selectedDate > today) {
+        return res
+          .status(400)
+          .json({
+            message: "Tanggal lahir tidak valid (tidak boleh di masa depan).",
+          });
+      }
+    }
+
+    // 3. Validasi Panjang Teks (Mencegah Database Overload / Spam Text)
+    if (description && description.length > 500) {
+      return res
+        .status(400)
+        .json({
+          message: "Deskripsi diri terlalu panjang (Maksimal 500 karakter).",
+        });
+    }
+    if (location && location.length > 100) {
+      return res
+        .status(400)
+        .json({ message: "Lokasi terlalu panjang (Maksimal 100 karakter)." });
+    }
+    if (school && school.length > 100) {
+      return res
+        .status(400)
+        .json({
+          message:
+            "Nama institusi/sekolah terlalu panjang (Maksimal 100 karakter).",
+        });
+    }
+
+    // 4. Validasi Array Passions (Mencegah Spam Tag)
+    let parsedPassions = [];
+    if (typeof passions === "string") {
+      try {
+        parsedPassions = JSON.parse(passions);
+      } catch (e) {
+        parsedPassions = [];
+      }
+    } else if (Array.isArray(passions)) {
+      parsedPassions = passions;
+    }
+
+    if (parsedPassions.length > 10) {
+      return res
+        .status(400)
+        .json({
+          message: "Maksimal hanya boleh menambahkan 10 keahlian/passion.",
+        });
+    }
+
+    // Susun data yang sudah divalidasi
     const updateData = {
       name,
       location,
       birthday,
       school,
       description,
-      passions: passions || [],
+      passions: parsedPassions,
     };
-    if (req.file) updateData.profilePicture = `/uploads/${req.file.filename}`;
+
+    // Jika ada file foto yang diupload, simpan path-nya
+    if (req.file) {
+      // Catatan: Validasi ukuran file 2MB dan format gambar sudah di-handle oleh Multer di upload.middleware.js
+      updateData.profilePicture = `/uploads/${req.file.filename}`;
+    }
+
+    // Simpan ke database
     const updatedUser = await prisma.user.update({
       where: { id },
       data: updateData,
@@ -90,6 +166,7 @@ const updateProfile = async (req, res) => {
       .status(200)
       .json({ message: "Profil berhasil diperbarui!", user: updatedUser });
   } catch (error) {
+    console.error("❌ Update Profile Error:", error);
     res
       .status(500)
       .json({ message: "Terjadi kesalahan server", error: error.message });

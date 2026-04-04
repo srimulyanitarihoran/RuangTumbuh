@@ -1,5 +1,22 @@
 const prisma = require("../config/db");
 
+// --- FUNGSI HELPER VALIDASI ---
+const validateScheduleInput = (title, platform, partner, date, time) => {
+  if (!title || title.length < 3 || title.length > 50) {
+    return "Nama kegiatan harus antara 3 hingga 50 karakter.";
+  }
+  if (!platform || platform.length < 3 || platform.length > 50) {
+    return "Platform / Lokasi harus antara 3 hingga 50 karakter.";
+  }
+  if (!partner || partner.length < 3 || partner.length > 50) {
+    return "Nama partisipan/rekan harus antara 3 hingga 50 karakter.";
+  }
+  if (!date || !time) {
+    return "Tanggal dan Waktu tidak boleh kosong.";
+  }
+  return null; // Lolos validasi
+};
+
 const addSchedule = async (req, res) => {
   try {
     const {
@@ -12,8 +29,27 @@ const addSchedule = async (req, res) => {
       platform,
       partner,
     } = req.body;
+
+    // 🛡️ PROTEKSI INPUT
+    const validationError = validateScheduleInput(
+      title,
+      platform,
+      partner,
+      date,
+      time,
+    );
+    if (validationError)
+      return res.status(400).json({ message: validationError });
+
     const safeTime = time.replace(".", ":");
     const scheduledAt = new Date(`${date}T${safeTime}:00`);
+
+    if (isNaN(scheduledAt.getTime())) {
+      return res
+        .status(400)
+        .json({ message: "Format tanggal atau waktu tidak valid." });
+    }
+
     const customData = JSON.stringify({ title, category, platform, partner });
 
     const newSchedule = await prisma.booking.create({
@@ -139,8 +175,27 @@ const editSchedule = async (req, res) => {
     const actualId = id.substring(type.length + 1);
     const { title, date, time, durationMinutes, category, platform, partner } =
       req.body;
+
+    // 🛡️ PROTEKSI INPUT
+    const validationError = validateScheduleInput(
+      title,
+      platform,
+      partner,
+      date,
+      time,
+    );
+    if (validationError)
+      return res.status(400).json({ message: validationError });
+
     const safeTime = time.replace(".", ":");
     const scheduledAt = new Date(`${date}T${safeTime}:00`);
+
+    if (isNaN(scheduledAt.getTime())) {
+      return res
+        .status(400)
+        .json({ message: "Format tanggal atau waktu tidak valid." });
+    }
+
     const customData = JSON.stringify({ title, category, platform, partner });
 
     if (type === "booking") {

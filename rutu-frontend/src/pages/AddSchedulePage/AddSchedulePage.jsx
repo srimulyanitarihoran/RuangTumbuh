@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useNavigate, useLocation } from "react-router-dom"; // Tambah useLocation
+import { useNavigate, useLocation } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./AddSchedulePage.module.css";
 import { Popup } from "@/components/Popup/Popup";
@@ -17,20 +17,20 @@ import {
   FiX,
   FiArrowLeft,
   FiCheckCircle,
-  FiAlertCircle,
   FiChevronDown,
   FiInfo,
 } from "react-icons/fi";
 
 export default function AddSchedulePage() {
   const navigate = useNavigate();
-  const location = useLocation(); // Untuk menangkap data yang dilempar
+  const location = useLocation();
 
   // Deteksi apakah sedang dalam Mode Edit
   const editData = location.state?.editData;
   const isEdit = !!editData;
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(""); // <-- Kotak Error Merah
   const [popup, setPopup] = useState({
     isOpen: false,
     type: "success",
@@ -71,21 +71,50 @@ export default function AddSchedulePage() {
   }, [isEdit, editData]);
 
   const handleChange = (e) => {
+    if (error) setError(""); // Hilangkan error saat mengetik ulang
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
 
-    if (!formData.title || !formData.date || !formData.time) {
-      setPopup({
-        isOpen: true,
-        type: "danger",
-        title: "Form Tidak Lengkap",
-        description: "Harap isi Nama Kegiatan, Tanggal, dan Waktu!",
-      });
+    // ==========================================
+    // 🛡️ FRONTEND FORM VALIDATION
+    // ==========================================
+    const { title, date, time, platform, partner } = formData;
+
+    if (!title || title.length < 3 || title.length > 50) {
+      setError("Nama Kegiatan harus diisi antara 3 hingga 50 karakter.");
       return;
     }
+    if (!platform || platform.length < 3 || platform.length > 50) {
+      setError("Platform / Lokasi harus diisi antara 3 hingga 50 karakter.");
+      return;
+    }
+    if (!partner || partner.length < 3 || partner.length > 50) {
+      setError(
+        "Nama Partisipan / Rekan harus diisi antara 3 hingga 50 karakter.",
+      );
+      return;
+    }
+    if (!date || !time) {
+      setError("Harap isi Tanggal Pelaksanaan dan Waktu Mulai!");
+      return;
+    }
+
+    // Validasi Waktu Masa Lalu
+    const safeTime = time.replace(".", ":");
+    const scheduledAt = new Date(`${date}T${safeTime}:00`);
+    const now = new Date();
+
+    if (scheduledAt < now) {
+      setError(
+        "Pilihan tidak valid! Anda tidak bisa menjadwalkan kegiatan di waktu yang sudah lewat.",
+      );
+      return;
+    }
+    // ==========================================
 
     setLoading(true);
 
@@ -93,7 +122,6 @@ export default function AddSchedulePage() {
       const localUser = JSON.parse(localStorage.getItem("user") || "{}");
       if (!localUser.id) return;
 
-      // Logika Endpoint Dinamis (POST untuk Baru, PUT untuk Edit)
       const endpoint = isEdit
         ? `http://localhost:5001/api/schedules/${editData.id}`
         : `http://localhost:5001/api/schedules`;
@@ -123,27 +151,16 @@ export default function AddSchedulePage() {
           navigate("/schedule");
         }, 2000);
       } else {
-        setPopup({
-          isOpen: true,
-          type: "danger",
-          title: "Gagal Menyimpan",
-          description: result.message,
-        });
+        setError(result.message || "Gagal menyimpan jadwal.");
       }
     } catch (error) {
       console.error("Error submit schedule:", error);
-      setPopup({
-        isOpen: true,
-        type: "danger",
-        title: "Kesalahan Koneksi",
-        description: "Tidak dapat terhubung ke server.",
-      });
+      setError("Tidak dapat terhubung ke server. Periksa koneksi Anda.");
     } finally {
       setLoading(false);
     }
   };
 
-  // (SISA KODE JSX RENDER SAMA SEPERTI SEBELUMNYA, HANYA UBAH TEXT DINAMIS)
   const containerVariants = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.1 } },
@@ -169,7 +186,6 @@ export default function AddSchedulePage() {
         animate="show"
       >
         <div className={styles.pageHeader}>
-          {/* Judul berubah otomatis */}
           <h1 className={styles.pageTitle}>
             {isEdit ? "Reschedule Jadwal" : "Buat Jadwal Baru"}
           </h1>
@@ -194,6 +210,19 @@ export default function AddSchedulePage() {
               </div>
               <h3>Waktu & Kegiatan</h3>
             </div>
+
+            {error && (
+              <p
+                style={{
+                  color: "red",
+                  fontWeight: "bold",
+                  marginBottom: "0px",
+                  marginTop: "-10px",
+                }}
+              >
+                {error}
+              </p>
+            )}
 
             <Input
               type="text"
@@ -383,13 +412,14 @@ export default function AddSchedulePage() {
         </motion.div>
       </motion.form>
 
+      {/* POPUP HANYA UNTUK SUKSES */}
       <Popup
         isOpen={popup.isOpen}
         type={popup.type}
-        icon={popup.type === "success" ? <FiCheckCircle /> : <FiAlertCircle />}
+        icon={<FiCheckCircle />}
         title={popup.title}
         description={popup.description}
-        buttonText={popup.type === "success" ? "OK" : "Tutup"}
+        buttonText="Tutup"
         onAction={() => setPopup((p) => ({ ...p, isOpen: false }))}
       />
     </DashboardLayout>
