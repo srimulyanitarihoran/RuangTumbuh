@@ -236,8 +236,9 @@ router.get("/dashboard-stats/:id", async (req, res) => {
     ];
 
     // Urutkan berdasarkan waktu paling dekat dan ambil maksimal 3 sesi
-    const mentoringSessions = rawSessions
-      .sort((a, b) => new Date(a.time) - new Date(b.time))
+    const mentoringSessions = rawSessions.sort(
+      (a, b) => new Date(a.time) - new Date(b.time),
+    );
 
     // Kirim seluruh data ke frontend
     res.json({
@@ -250,6 +251,224 @@ router.get("/dashboard-stats/:id", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error fetch dashboard stats" });
+  }
+});
+
+// POST: Tambah Jadwal Mandiri (Sesi Buatan Sendiri)
+router.post("/schedule/add", async (req, res) => {
+  try {
+    const {
+      studentId,
+      title,
+      date,
+      time,
+      durationMinutes,
+      category,
+      platform,
+      partner,
+    } = req.body;
+
+    if (!studentId || !date || !time) {
+      return res.status(400).json({ message: "Data tidak lengkap" });
+    }
+
+    // Gabungkan Tanggal dan Waktu
+    const scheduledAt = new Date(`${date}T${time}:00`);
+
+    // Karena ini jadwal mandiri, kita simpan data custom (title, dll) ke dalam kolom 'notes'
+    // Format JSON stringified agar bisa dibaca nanti
+    const customData = JSON.stringify({ title, category, platform, partner });
+
+    const newSchedule = await prisma.booking.create({
+      data: {
+        studentId: studentId,
+        tutorId: studentId, // Jadwal mandiri ditautkan ke diri sendiri
+        status: "ACCEPTED", // Langsung masuk ke kalender
+        scheduledAt: scheduledAt,
+        durationMinutes: parseInt(durationMinutes) || 60,
+        meetingLink: platform,
+        notes: customData, // <--- Metadata form disimpan di sini
+      },
+    });
+
+    res
+      .status(201)
+      .json({ message: "Jadwal berhasil ditambahkan!", schedule: newSchedule });
+  } catch (error) {
+    console.error("❌ Add Schedule Error:", error);
+    res
+      .status(500)
+      .json({ message: "Terjadi kesalahan server", error: error.message });
+  }
+});
+
+// GET: Ambil Semua Jadwal Untuk Kalender
+router.get("/schedule/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const my1on1Bookings = await prisma.booking.findMany({
+      where: { studentId: id },
+      include: { skill: true },
+    });
+
+    const myCourseBookings = await prisma.courseBooking.findMany({
+      where: { studentId: id },
+      include: { course: true },
+    });
+
+    const allSchedules = [
+      ...my1on1Bookings.map((b) => {
+        const startDate = new Date(b.scheduledAt);
+        const duration = b.durationMinutes || 60;
+        const endDate = new Date(startDate.getTime() + duration * 60000);
+
+        // --- UPDATE PENTING: Mengecek apakah ini jadwal buatan sendiri (punya notes) ---
+        let meta = {};
+        try {
+          if (b.notes) meta = JSON.parse(b.notes);
+        } catch (e) {}
+
+        return {
+          id: `booking-${b.id}`,
+          date: startDate.toISOString(),
+          time: startDate.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          endTime: endDate.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          // Jika meta.title ada, pakai itu. Jika tidak, pakai bawaan database.
+          title:
+            meta.title ||
+            (b.skill ? `Mentoring: ${b.skill.name}` : "Sesi 1-on-1"),
+          partner: meta.partner || "Tutor Ahli",
+          role: "Sesi",
+          platform:
+            meta.platform || (b.meetingLink ? "Google Meet" : "Belum Tersedia"),
+          status:
+            b.status === "COMPLETED"
+              ? "Selesai"
+              : b.status === "ACCEPTED"
+                ? "Akan Datang"
+                : "Menunggu Konfirmasi",
+          color: b.status === "COMPLETED" ? "#e5e7eb" : "var(--primary-yellow)",
+          category: meta.category || "Mentoring",
+        };
+      }),
+      ...myCourseBookings.map((b) => {
+        // ... (Logika myCourseBookings TEPAT SAMA SEPERTI SEBELUMNYA) ...
+        const startDate = new Date(b.scheduledAt);
+        const durationStr =
+          b.course && b.course.durasi
+            ? b.course.durasi.replace(/\D/g, "")
+            : "60";
+        const duration = parseInt(durationStr) || 60;
+        const endDate = new Date(startDate.getTime() + duration * 60000);
+
+        return {
+          id: `course-${b.id}`,
+          date: startDate.toISOString(),
+          time: startDate.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          endTime: endDate.toLocaleTimeString("id-ID", {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          title: b.course ? `Kelas: ${b.course.name}` : "Sesi Kelas",
+          partner: b.course ? b.course.tutor : "Tutor Ahli",
+          role: "Mentor",
+          platform: "Zoom Meeting",
+          status:
+            b.status === "COMPLETED"
+              ? "Selesai"
+              : b.status === "ACCEPTED"
+                ? "Akan Datang"
+                : "Menunggu Konfirmasi",
+          color: b.status === "COMPLETED" ? "#e5e7eb" : "var(--primary-green)",
+          category: "Kelas",
+        };
+      }),
+    ];
+
+    res.status(200).json(allSchedules);
+  } catch (error) {
+    console.error("Error fetch schedule:", error);
+    res.status(500).json({ message: "Gagal mengambil data jadwal" });
+  }
+});
+
+// PUT: Edit Jadwal Mandiri (Reschedule)
+router.put("/schedule/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // PERBAIKAN: Ambil kata pertama (booking/course), lalu ambil sisa string sebagai UUID asli
+    const type = id.split("-")[0];
+    const actualId = id.substring(type.length + 1);
+
+    const { title, date, time, durationMinutes, category, platform, partner } =
+      req.body;
+
+    const safeTime = time.replace(".", ":");
+    const scheduledAt = new Date(`${date}T${safeTime}:00`);
+
+    const customData = JSON.stringify({ title, category, platform, partner });
+
+    if (type === "booking") {
+      await prisma.booking.update({
+        where: { id: actualId }, // <--- Sekarang UUID-nya utuh
+        data: {
+          scheduledAt,
+          durationMinutes: parseInt(durationMinutes) || 60,
+          meetingLink: platform,
+          notes: customData,
+        },
+      });
+    } else if (type === "course") {
+      await prisma.courseBooking.update({
+        where: { id: actualId }, // <--- Sekarang UUID-nya utuh
+        data: {
+          scheduledAt,
+          note: customData,
+        },
+      });
+    }
+
+    res.status(200).json({ message: "Jadwal berhasil di-reschedule!" });
+  } catch (error) {
+    console.error("❌ Edit Schedule Error:", error);
+    res
+      .status(500)
+      .json({ message: "Terjadi kesalahan server", error: error.message });
+  }
+});
+
+// DELETE: Hapus Jadwal dari Kalender
+router.delete("/schedule/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // PERBAIKAN: Lakukan pemisahan string yang aman untuk UUID
+    const type = id.split("-")[0];
+    const actualId = id.substring(type.length + 1);
+
+    if (type === "booking") {
+      await prisma.booking.delete({ where: { id: actualId } });
+    } else if (type === "course") {
+      await prisma.courseBooking.delete({ where: { id: actualId } });
+    }
+
+    res.status(200).json({ message: "Jadwal berhasil dihapus dari kalender!" });
+  } catch (error) {
+    console.error("❌ Delete Schedule Error:", error);
+    res
+      .status(500)
+      .json({ message: "Terjadi kesalahan server", error: error.message });
   }
 });
 
