@@ -154,7 +154,7 @@ export default function DashboardPage() {
                 onClick={() => navigate("/search")}
               >
                 <FiBook /> Mulai Belajar{" "}
-                <div className={styles.bannerBtnArrow}>˃</div>
+                <div className={styles.bannerBtnArrow}></div>
               </button>
               <button
                 className={`${styles.bannerBtn} ${styles.btnSecondary}`}
