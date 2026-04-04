@@ -141,7 +141,7 @@ export default function EditProfilePage() {
       }
 
       const response = await fetch(
-        `http://localhost:5001/api/user/profile/${userId}`,
+        `http://localhost:5001/api/users/${userId}`,
         {
           method: "PUT",
           body: formDataToSend,

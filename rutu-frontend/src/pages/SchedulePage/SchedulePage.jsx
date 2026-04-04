@@ -141,7 +141,7 @@ export default function SchedulePage() {
     ) {
       try {
         const response = await fetch(
-          `http://localhost:5001/api/user/schedule/${itemId}`,
+          `http://localhost:5001/api/schedules/${itemId}`,
           {
             method: "DELETE",
           },
