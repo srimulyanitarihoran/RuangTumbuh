@@ -1,20 +1,13 @@
-# Dependency directories
-node_modules/
-jspm_packages/
+node_modules
+# Keep environment variables out of version control
+.env
 
-# Package manager logs
+/prisma/migrations/
+/generated/
+
+# Logs
+*.log
 pnpm-debug.log*
-pnpm-error.log*
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
-# Operating System files
+# Misc
 .DS_Store
-Thumbs.db
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
