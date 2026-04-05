@@ -44,4 +44,7 @@ app.use((req, res) => {
   res.status(404).json({ message: "API Endpoint tidak ditemukan." });
 });
 
+const errorHandler = require("./middlewares/error.middleware");
+app.use(errorHandler);
+
 module.exports = app;
