@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+echo "🕵️‍♂️ [Husky] Memeriksa kualitas kode sebelum di-commit..."
+npx lint-staged

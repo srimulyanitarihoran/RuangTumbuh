@@ -3,9 +3,21 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"pnpm --filter rutu-frontend dev\" \"pnpm --filter rutu-backend dev\""
+    "dev": "concurrently \"pnpm --filter rutu-frontend dev\" \"pnpm --filter rutu-backend dev\"",
+    "prepare": "husky"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0"
+  },
+  "lint-staged": {
+    "rutu-frontend/**/*.{js,jsx}": [
+      "pnpm --filter rutu-frontend exec eslint --fix",
+      "pnpm --filter rutu-frontend exec vitest related --run"
+    ],
+    "rutu-backend/**/*.js": [
+      "pnpm --filter rutu-backend exec jest --findRelatedTests --passWithNoTests"
+    ]
   }
 }
