@@ -3,7 +3,6 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginPayloadSchema } from "../../../../packages/shared/validations/auth.schema";
 import api from "@/utils/api";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./LoginForm.module.css";
@@ -12,6 +11,9 @@ import { MdCheckCircle } from "react-icons/md";
 import { Button } from "@components/Button/Button";
 import { Input } from "@components/Input/Input";
 import { Popup } from "@components/Popup/Popup";
+
+import * as authSchemas from "@rutu/shared/validations/auth.schema";
+const { loginPayloadSchema } = authSchemas;
 
 export const LoginForm = () => {
   const navigate = useNavigate();

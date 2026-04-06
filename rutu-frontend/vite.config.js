@@ -23,4 +23,16 @@ export default defineConfig({
   esbuild: {
     drop: ["console", "debugger"],
   },
+
+  // Memaksa Vite mem-bundle package lokal yang menggunakan CommonJS (saat development)
+  optimizeDeps: {
+    include: ["@rutu/shared"],
+  },
+
+  // Memastikan package lokal ikut diproses saat build untuk production
+  build: {
+    commonjsOptions: {
+      include: [/@rutu\/shared/, /node_modules/],
+    },
+  },
 });
