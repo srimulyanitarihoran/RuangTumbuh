@@ -35,7 +35,8 @@
     "prisma": "^7.4.2",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "@rutu/shared": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^25.5.2",

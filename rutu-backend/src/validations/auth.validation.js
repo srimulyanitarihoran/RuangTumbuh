@@ -1,9 +1,8 @@
 const { z } = require("zod");
-// Sesuaikan path ini dengan lokasi folder shared Anda
 const {
   registerPayloadSchema,
   loginPayloadSchema,
-} = require("../../../packages/shared/validations/auth.schema");
+} = require("@rutu/shared/validations/auth.schema");
 
 const registerSchema = z.object({
   body: registerPayloadSchema,

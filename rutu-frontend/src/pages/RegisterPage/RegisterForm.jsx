@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { registerPayloadSchema } from "../../../../packages/shared/validations/auth.schema";
 import api from "@/utils/api";
 import styles from "./RegisterForm.module.css";
 import { FiUser, FiAtSign, FiLock } from "react-icons/fi";
@@ -11,6 +10,9 @@ import { MdCheckCircle } from "react-icons/md";
 import { Button } from "@components/Button/Button";
 import { Input } from "@components/Input/Input";
 import { Popup } from "@components/Popup/Popup";
+
+import * as authSchemas from "@rutu/shared/validations/auth.schema";
+const { registerPayloadSchema } = authSchemas;
 
 export const RegisterForm = () => {
   const navigate = useNavigate();

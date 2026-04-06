@@ -56,6 +56,20 @@ const getUserProfile = async (id) => {
   };
 };
 
+const updateUserProfile = async (id, updateData) => {
+  const user = await prisma.user.findUnique({ where: { id } });
+  if (!user) {
+    const error = new Error("User tidak ditemukan!");
+    error.statusCode = 404;
+    throw error;
+  }
+
+  return await prisma.user.update({
+    where: { id },
+    data: updateData,
+  });
+};
+
 const getDashboardStats = async (id) => {
   const now = new Date();
 
@@ -127,5 +141,5 @@ const getDashboardStats = async (id) => {
 module.exports = {
   getUserProfile,
   getDashboardStats,
-  updateUserProfile: require("./user.service").updateUserProfile,
+  updateUserProfile,
 };
