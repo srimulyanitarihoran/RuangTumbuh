@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import api from "@/utils/api";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./SchedulePage.module.css";
 import { useNavigate } from "react-router-dom";
@@ -38,14 +39,11 @@ const monthNames = [
 export default function SchedulePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  // State Utama
-  const [schedules, setSchedules] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  // State Kalender Dinamis
-  const [currentDate, setCurrentDate] = useState(new Date()); // Menyimpan bulan & tahun yang sedang dilihat
-  const [activeDate, setActiveDate] = useState(new Date().getDate().toString()); // Menyimpan tanggal yang di-klik
+  // State Kalender Dinamis (UI State)
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [activeDate, setActiveDate] = useState(new Date().getDate().toString());
   const [activeCategory, setActiveCategory] = useState("Semua");
 
   const year = currentDate.getFullYear();
@@ -54,46 +52,54 @@ export default function SchedulePage() {
   // Fungsi Pindah Bulan
   const handlePrevMonth = () => {
     setCurrentDate(new Date(year, month - 1, 1));
-    setActiveDate("1"); // Reset ke tanggal 1 saat ganti bulan
+    setActiveDate("1");
   };
 
   const handleNextMonth = () => {
     setCurrentDate(new Date(year, month + 1, 1));
-    setActiveDate("1"); // Reset ke tanggal 1 saat ganti bulan
+    setActiveDate("1");
   };
 
-  // Fetch Data dari Backend
-  useEffect(() => {
-    const fetchSchedules = async () => {
-      try {
-        if (!user?.id) return;
+  // SERVER STATE: Fetch Data Jadwal dengan React Query
+  const { data: schedules = [], isLoading: loading } = useQuery({
+    queryKey: ["schedules", user?.id],
+    queryFn: async () => {
+      const data = await api.get(`/schedules/${user.id}`);
+      return data.filter(
+        (s) => s.status !== "Menunggu Konfirmasi" && s.status !== "Pending",
+      );
+    },
+    enabled: !!user?.id,
+  });
 
-        const data = await api.get(`/schedules/${user.id}`);
-        const validSchedules = data.filter(
-          (s) => s.status !== "Menunggu Konfirmasi" && s.status !== "Pending",
-        );
-        setSchedules(validSchedules);
-      } catch (error) {
-        console.error("Gagal load jadwal:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSchedules();
-  }, [user]);
+  // SERVER STATE: Mutation untuk Hapus/Selesai
+  const deleteScheduleMutation = useMutation({
+    mutationFn: async (itemId) => {
+      return await api.delete(`/schedules/${itemId}`);
+    },
+    onSuccess: () => {
+      // Memaksa React Query untuk fetch ulang jadwal setelah dihapus
+      queryClient.invalidateQueries(["schedules", user?.id]);
+    },
+    onError: (error) => {
+      console.error("Error delete schedule:", error);
+      alert("Gagal menyelesaikan jadwal.");
+    },
+  });
 
-  // Filter jadwal bulan ini untuk memunculkan titik kuning/hijau di kalender
+  // Filter jadwal bulan ini untuk titik kuning/hijau di kalender
   const schedulesThisMonth = schedules.filter((s) => {
+    if (!s.date) return false;
     const d = new Date(s.date);
     return d.getFullYear() === year && d.getMonth() === month;
   });
 
-  // Menyimpan kumpulan tanggal yang punya jadwal (format string)
+  // Array tanggal yang punya jadwal
   const datesWithSchedules = schedulesThisMonth.map((s) =>
     new Date(s.date).getDate().toString(),
   );
 
-  // Filter jadwal untuk kolom sebelah Kanan (Agenda)
+  // Filter jadwal untuk Agenda di kanan
   const currentSchedules = schedulesThisMonth.filter((s) => {
     const d = new Date(s.date);
     const matchDate = d.getDate().toString() === activeDate;
@@ -102,9 +108,9 @@ export default function SchedulePage() {
     return matchDate && matchCat;
   });
 
-  // Logika Generator Susunan Hari Kalender
+  // Logika Generator Kalender
   const daysInMonthCount = new Date(year, month + 1, 0).getDate();
-  const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 (Sun) - 6 (Sat)
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
 
   const daysInMonth = Array.from({ length: daysInMonthCount }, (_, i) =>
     (i + 1).toString(),
@@ -128,16 +134,10 @@ export default function SchedulePage() {
     navigate("/add-schedule", { state: { editData: item } });
   };
 
-  // Fungsi Selesai & Hapus
-  const handleDelete = async (itemId) => {
+  // Fungsi Selesai (Trigger Mutation)
+  const handleDelete = (itemId) => {
     if (window.confirm("Apakah Anda yakin ingin menyelesaikan jadwal ini?")) {
-      try {
-        await api.delete(`/schedules/${itemId}`);
-        setSchedules((prev) => prev.filter((s) => s.id !== itemId));
-      } catch (error) {
-        console.error("Error delete schedule:", error);
-        alert("Gagal menyelesaikan jadwal.");
-      }
+      deleteScheduleMutation.mutate(itemId);
     }
   };
 
@@ -167,11 +167,8 @@ export default function SchedulePage() {
 
         {/* --- 50:50 LAYOUT GRID --- */}
         <div className={styles.splitLayout}>
-          {/* ========================================================= */}
-          {/* KOLOM KIRI: KALENDER & KATEGORI                             */}
-          {/* ========================================================= */}
+          {/* KOLOM KIRI */}
           <div className={styles.leftColumn}>
-            {/* BOX KALENDER */}
             <div className={styles.calendarCard}>
               <div className={styles.calendarHeader}>
                 <button className={styles.navBtn} onClick={handlePrevMonth}>
@@ -237,7 +234,6 @@ export default function SchedulePage() {
               </div>
             </div>
 
-            {/* BOX KATEGORI FILTER */}
             <div className={styles.neoBox}>
               <h4 className={styles.boxTitle}>Filter Kategori Sesi</h4>
               <div className={styles.categoryWrap}>
@@ -254,9 +250,7 @@ export default function SchedulePage() {
             </div>
           </div>
 
-          {/* ========================================================= */}
-          {/* KOLOM KANAN: TIMELINE AGENDA                                */}
-          {/* ========================================================= */}
+          {/* KOLOM KANAN */}
           <div className={styles.rightColumn}>
             <div className={styles.agendaBox}>
               <div className={styles.timelineHeader}>
@@ -264,7 +258,7 @@ export default function SchedulePage() {
                   Agenda: {activeDate} {monthNames[month]} {year}
                 </h3>
                 <span className={styles.eventCount}>
-                  {currentSchedules.length} Sesi
+                  {loading ? "..." : currentSchedules.length} Sesi
                 </span>
               </div>
 
@@ -278,7 +272,11 @@ export default function SchedulePage() {
                     exit={{ opacity: 0, y: -10 }}
                     className={styles.timelineList}
                   >
-                    {currentSchedules.length === 0 ? (
+                    {loading ? (
+                      <div className={styles.emptyState}>
+                        <p>Memuat jadwal...</p>
+                      </div>
+                    ) : currentSchedules.length === 0 ? (
                       <div className={styles.emptyState}>
                         <FiCalendar size={50} color="#999" />
                         <h4>Hari yang tenang!</h4>
@@ -303,14 +301,14 @@ export default function SchedulePage() {
                                 <div className={styles.timeBadgeInside}>
                                   <FiClock className={styles.timeIcon} />
                                   <span>
-                                    {item.time} - {item.endTime}
+                                    {item.time} - {item.endTime || "Selesai"}
                                   </span>
                                 </div>
 
                                 <div
                                   className={styles.statusBadge}
                                   style={{
-                                    backgroundColor: item.color,
+                                    backgroundColor: item.color || "#e2e8f0",
                                     color: "#000",
                                   }}
                                 >
@@ -326,7 +324,7 @@ export default function SchedulePage() {
 
                               <div className={styles.cardBody}>
                                 <span className={styles.catLabel}>
-                                  {item.category}
+                                  {item.category || "General"}
                                 </span>
                                 <h3 className={styles.courseTitle}>
                                   {item.title}
@@ -335,12 +333,13 @@ export default function SchedulePage() {
                                   <div className={styles.metaBadge}>
                                     <FiUser />{" "}
                                     <span>
-                                      {item.partner}{" "}
-                                      <small>({item.role})</small>
+                                      {item.partner || "Anonim"}{" "}
+                                      <small>({item.role || "User"})</small>
                                     </span>
                                   </div>
                                   <div className={styles.metaBadge}>
-                                    <FiVideo /> <span>{item.platform}</span>
+                                    <FiVideo />{" "}
+                                    <span>{item.platform || "Online"}</span>
                                   </div>
                                 </div>
                               </div>
@@ -349,6 +348,7 @@ export default function SchedulePage() {
                                 <button
                                   onClick={() => handleReschedule(item)}
                                   className={`${styles.actionBtn} ${styles.btnDetail}`}
+                                  disabled={deleteScheduleMutation.isPending}
                                 >
                                   Reschedule
                                 </button>
@@ -356,8 +356,12 @@ export default function SchedulePage() {
                                   <button
                                     onClick={() => handleDelete(item.id)}
                                     className={`${styles.actionBtn} ${styles.btnPrimary}`}
+                                    disabled={deleteScheduleMutation.isPending}
                                   >
-                                    Sudah Selesai
+                                    {deleteScheduleMutation.isPending &&
+                                    deleteScheduleMutation.variables === item.id
+                                      ? "Menyelesaikan..."
+                                      : "Sudah Selesai"}
                                   </button>
                                 )}
                               </div>

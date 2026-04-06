@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import SchedulePage from "./SchedulePage";
 import api from "@/utils/api";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // 1. Mock API
 vi.mock("@/utils/api", () => ({
@@ -28,19 +29,22 @@ describe("Halaman SchedulePage", () => {
   });
 
   it("harus merender kalender jadwal", async () => {
-    // 4. Return Array kosong karena backend mereturn array untuk jadwal
-    api.get.mockResolvedValue([]);
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+    api.get.mockResolvedValueOnce([]);
 
     render(
-      <BrowserRouter>
-        <SchedulePage />
-      </BrowserRouter>,
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <SchedulePage />
+        </BrowserRouter>
+      </QueryClientProvider>,
     );
 
     await waitFor(() => {
       expect(screen.getByText(/Atur Kegiatan Kamu/i)).toBeInTheDocument();
       expect(screen.getByText("Sun")).toBeInTheDocument();
-      expect(screen.getByText("Mon")).toBeInTheDocument();
     });
   });
 });

@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import api from "@/utils/api";
+import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import api from "@/utils/api";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./CourseDetailPage.module.css";
 import {
@@ -15,9 +16,8 @@ import {
   FiAlertCircle,
 } from "react-icons/fi";
 import { Popup } from "@/components/Popup/Popup";
-import api from "@/utils/api";
 
-// --- HELPER UNTUK EXTRAS (Sama dengan SearchPage) ---
+// --- HELPER UNTUK EXTRAS ---
 const getCourseExtras = (category) => {
   const mapping = {
     Frontend: {
@@ -89,87 +89,80 @@ export default function CourseDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("about");
-  const [courseData, setCourseData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [popup, setPopup] = useState({ isOpen: false });
 
-  useEffect(() => {
-    const fetchCourseDetail = async () => {
-      try {
-        const response = await api.get(`/course/${id}`);
-        const data = await response.json();
-
-        if (response.ok) {
-          const extras = getCourseExtras(data.kategori);
-          setCourseData({
-            id: data.id,
-            title: data.name,
-            category: data.kategori,
-            instructor: data.tutor,
-            instructorRole: "Expert Mentor",
-            rating: 5.0,
-            reviews: 0,
-            timePrice: data.durasi + " Menit",
-            color: extras.color,
-            description: data.deskripsi,
-            thumbnail: extras.image,
-            details: {
-              duration: data.durasi + " Menit",
-              modules: 5,
-              level: "Semua Level",
-              certificate: true,
-            },
-            syllabus:
-              data.modules && data.modules.length > 0
-                ? data.modules.map((m, idx) => ({
-                    id: idx + 1,
-                    title: m.title,
-                    duration: m.duration + " Menit",
-                    isFree: idx === 0, // Modul pertama kita buat gratis sebagai preview
-                  }))
-                : [
-                    {
-                      id: 1,
-                      title: "Pembukaan & Overview",
-                      duration: "10 Mnt",
-                      isFree: true,
-                    },
-                    {
-                      id: 2,
-                      title: "Materi Utama Bagian 1",
-                      duration: "30 Mnt",
-                      isFree: false,
-                    },
-                    {
-                      id: 3,
-                      title: "Materi Utama Bagian 2",
-                      duration: "45 Mnt",
-                      isFree: false,
-                    },
-                    {
-                      id: 4,
-                      title: "Sesi Diskusi & Tanya Jawab",
-                      duration: "25 Mnt",
-                      isFree: false,
-                    },
-                    {
-                      id: 5,
-                      title: "Penutup & Kesimpulan",
-                      duration: "10 Mnt",
-                      isFree: false,
-                    },
-                  ],
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching course detail:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCourseDetail();
-  }, [id]);
+  // 1. REACT QUERY: Fetch Course Data
+  const {
+    data: courseData,
+    isLoading: loading,
+    isError,
+  } = useQuery({
+    queryKey: ["courseDetail", id],
+    queryFn: async () => {
+      const data = await api.get(`/courses/${id}`);
+      const extras = getCourseExtras(data.kategori);
+      return {
+        id: data.id,
+        title: data.name,
+        category: data.kategori,
+        instructor: data.tutor,
+        instructorRole: "Expert Mentor",
+        rating: 5.0,
+        reviews: 0,
+        timePrice: data.durasi + " Menit",
+        color: extras.color,
+        description: data.deskripsi,
+        thumbnail: extras.image,
+        details: {
+          duration: data.durasi + " Menit",
+          modules: 5,
+          level: "Semua Level",
+          certificate: true,
+        },
+        syllabus:
+          data.modules && data.modules.length > 0
+            ? data.modules.map((m, idx) => ({
+                id: idx + 1,
+                title: m.title,
+                duration: m.duration + " Menit",
+                isFree: idx === 0,
+              }))
+            : [
+                {
+                  id: 1,
+                  title: "Pembukaan & Overview",
+                  duration: "10 Mnt",
+                  isFree: true,
+                },
+                {
+                  id: 2,
+                  title: "Materi Utama Bagian 1",
+                  duration: "30 Mnt",
+                  isFree: false,
+                },
+                {
+                  id: 3,
+                  title: "Materi Utama Bagian 2",
+                  duration: "45 Mnt",
+                  isFree: false,
+                },
+                {
+                  id: 4,
+                  title: "Sesi Diskusi & Tanya Jawab",
+                  duration: "25 Mnt",
+                  isFree: false,
+                },
+                {
+                  id: 5,
+                  title: "Penutup & Kesimpulan",
+                  duration: "10 Mnt",
+                  isFree: false,
+                },
+              ],
+      };
+    },
+    enabled: !!id,
+  });
 
   if (loading) {
     return (
@@ -181,7 +174,7 @@ export default function CourseDetailPage() {
     );
   }
 
-  if (!courseData) {
+  if (isError || !courseData) {
     return (
       <DashboardLayout title="Error">
         <div className={styles.loadingWrapper}>
@@ -233,7 +226,6 @@ export default function CourseDetailPage() {
 
         {/* --- CONTENT SPLIT LAYOUT --- */}
         <div className={styles.splitLayout}>
-          {/* KOLOM KIRI (Main Content) */}
           <div className={styles.mainContentCard}>
             <div className={styles.cardHeader}>
               <div className={styles.tabNav}>
@@ -266,7 +258,6 @@ export default function CourseDetailPage() {
                     exit={{ opacity: 0, y: -10 }}
                     className={styles.aboutSection}
                   >
-                    {/* Grid Detail Kelas */}
                     <div className={styles.detailsGrid}>
                       {[
                         {
@@ -301,7 +292,6 @@ export default function CourseDetailPage() {
                       ))}
                     </div>
 
-                    {/* Area Pendaftaran (CTA Box) */}
                     <div className={styles.ctaBox}>
                       <div className={styles.ctaPriceContainer}>
                         <p className={styles.ctaPriceLabel}>
@@ -328,7 +318,6 @@ export default function CourseDetailPage() {
                   </motion.div>
                 )}
 
-                {/* TAB: SILABUS */}
                 {activeTab === "syllabus" && (
                   <motion.div
                     key="syllabus"
@@ -363,16 +352,13 @@ export default function CourseDetailPage() {
             </div>
           </div>
 
-          {/* KOLOM KANAN (Informasi Mentor) */}
           <div className={styles.sidebarWrap}>
             <div className={styles.mentorCard}>
               <div className={styles.mentorHeader}>
                 <FiUser className={styles.mentorHeaderIcon} />
                 <h3 className={styles.mentorHeaderTitle}>Mentor Eksklusif</h3>
               </div>
-
               <div className={styles.mentorContent}>
-                {/* Bagian Atas: Profil Row (Avatar + Identitas) */}
                 <div className={styles.mentorProfileRow}>
                   <motion.div
                     whileHover={{ rotate: -5, scale: 1.05 }}
@@ -380,7 +366,6 @@ export default function CourseDetailPage() {
                   >
                     {courseData.instructor.charAt(0)}
                   </motion.div>
-
                   <div className={styles.mentorIdentity}>
                     <span className={styles.mentorRole}>
                       {courseData.instructorRole}
@@ -403,14 +388,11 @@ export default function CourseDetailPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* Bagian Bawah: Deskripsi Mentor */}
                 <p className={styles.mentorBio}>
                   Membantu Anda menguasai teknologi web modern dengan pendekatan
                   praktis, studi kasus dunia nyata, dan standar industri.
                 </p>
               </div>
-
               <div className={styles.mentorAction}>
                 <motion.button
                   whileHover={{

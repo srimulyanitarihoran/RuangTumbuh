@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import { RegisterForm } from "./RegisterForm";
 import api from "@/utils/api";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 vi.mock("@/utils/api", () => ({
   default: { post: vi.fn() },
@@ -24,11 +25,17 @@ describe("Komponen RegisterForm", () => {
     vi.clearAllMocks();
   });
 
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+
   const renderWithRouter = () => {
     return render(
-      <BrowserRouter>
-        <RegisterForm />
-      </BrowserRouter>,
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <RegisterForm />
+        </BrowserRouter>
+      </QueryClientProvider>,
     );
   };
 

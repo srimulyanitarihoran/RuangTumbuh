@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import SearchPage from "./SearchPage";
 import api from "@/utils/api";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // 1. Mock API (JANGAN GUNAKAN vi.mock("axios"))
 vi.mock("@/utils/api", () => ({
@@ -28,16 +29,17 @@ describe("Halaman SearchPage", () => {
   });
 
   it("harus merender input pencarian dan filter", async () => {
-    // 4. Return data mock yang sesuai
-    api.get.mockResolvedValue({
-      data: [],
-      meta: { totalPages: 1 },
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
     });
+    api.get.mockResolvedValue({ data: [], meta: { totalPages: 1 } });
 
     render(
-      <BrowserRouter>
-        <SearchPage />
-      </BrowserRouter>,
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <SearchPage />
+        </BrowserRouter>
+      </QueryClientProvider>,
     );
 
     await waitFor(() => {

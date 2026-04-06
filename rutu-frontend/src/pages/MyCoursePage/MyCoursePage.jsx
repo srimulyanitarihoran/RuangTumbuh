@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import api from "@/utils/api";
-import axios from "axios";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./MyCoursePage.module.css";
@@ -80,12 +80,9 @@ const completedCourses = [
 export default function MyCoursePage() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const [activeTab, setActiveTab] = useState("Kursus Saya");
-  const [myCreatedCourses, setMyCreatedCourses] = useState([]);
-  const [myBookings, setMyBookings] = useState([]);
-  const [incomingBookings, setIncomingBookings] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [popup, setPopup] = useState({
     isOpen: false,
     type: "success",
@@ -93,60 +90,69 @@ export default function MyCoursePage() {
     description: "",
   });
 
-
-  const fetchMyCreatedCourses = async () => {
-    try {
+  // React Query: Fetch My Created Courses
+  const {
+    data: myCreatedCourses = [],
+    isLoading: loadingCourses,
+    refetch: refetchCreatedCourses,
+  } = useQuery({
+    queryKey: ["createdCourses", user?.id],
+    queryFn: async () => {
       const result = await api.get(`/courses?tutorId=${user.id}`);
-      const coursesArray = result.data;
-      setMyCreatedCourses(Array.isArray(coursesArray) ? coursesArray : []);
-    } catch (error) {
-      console.error("Error fetching my courses:", error);
-    }
-  };
+      return Array.isArray(result.data) ? result.data : [];
+    },
+    enabled: !!user?.id,
+  });
 
-  const fetchMyBookings = async () => {
-    try {
-      if (!user.id) return;
+  // React Query: Fetch My Bookings (Student)
+  const { data: myBookings = [], isLoading: loadingBookings } = useQuery({
+    queryKey: ["myBookings", user?.id],
+    queryFn: async () => {
       const data = await api.get(`/bookings/student?studentId=${user.id}`);
-      setMyBookings(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Error fetching my bookings:", error);
-    }
-  };
+      return Array.isArray(data) ? data : [];
+    },
+    enabled: !!user?.id,
+  });
 
-  const fetchIncomingBookings = async () => {
-    try {
-      if (!user.id) return;
+  // React Query: Fetch Incoming Bookings (Tutor)
+  const { data: incomingBookings = [], isLoading: loadingIncoming } = useQuery({
+    queryKey: ["incomingBookings", user?.id],
+    queryFn: async () => {
       const data = await api.get(`/bookings/tutor?tutorId=${user.id}`);
-      setIncomingBookings(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Error fetching incoming bookings:", error);
-    }
-  };
+      return Array.isArray(data) ? data : [];
+    },
+    enabled: !!user?.id,
+  });
 
-  const handleStatusUpdate = async (bookingId, newStatus) => {
-    try {
-      const result = await api.patch(`/bookings/${bookingId}/status`, {
+  const loading = loadingCourses || loadingBookings || loadingIncoming;
+
+  // React Query: Mutation for updating booking status
+  const statusUpdateMutation = useMutation({
+    mutationFn: async ({ bookingId, newStatus }) => {
+      return await api.patch(`/bookings/${bookingId}/status`, {
         status: newStatus,
         tutorId: user.id,
       });
-      if (result.success) {
+    },
+    onSuccess: (result) => {
+      if (result.success !== false) {
         setPopup({
           isOpen: true,
           type: "success",
           title: "Berhasil",
-          description: result.message,
+          description: result.message || "Status berhasil diperbarui.",
         });
-        fetchIncomingBookings();
+        queryClient.invalidateQueries(["incomingBookings", user?.id]);
       } else {
         setPopup({
           isOpen: true,
           type: "danger",
           title: "Gagal",
-          description: result.message,
+          description: result.message || "Gagal memperbarui status.",
         });
       }
-    } catch (error) {
+    },
+    onError: (error) => {
       console.error("Error updating status:", error);
       setPopup({
         isOpen: true,
@@ -154,21 +160,12 @@ export default function MyCoursePage() {
         title: "Error",
         description: "Terjadi kesalahan koneksi.",
       });
-    }
-  };
+    },
+  });
 
-  useEffect(() => {
-    const loadAll = async () => {
-      setLoading(true);
-      await Promise.all([
-        fetchMyCreatedCourses(),
-        fetchMyBookings(),
-        fetchIncomingBookings(),
-      ]);
-      setLoading(false);
-    };
-    loadAll();
-  }, []);
+  const handleStatusUpdate = (bookingId, newStatus) => {
+    statusUpdateMutation.mutate({ bookingId, newStatus });
+  };
 
   const tabs = [
     {
@@ -278,7 +275,7 @@ export default function MyCoursePage() {
                     <MyCourseCard
                       key={course.id}
                       course={course}
-                      onRefresh={fetchMyCreatedCourses}
+                      onRefresh={refetchCreatedCourses}
                     />
                   ))
                 )}
@@ -459,6 +456,7 @@ export default function MyCoursePage() {
                               onClick={() =>
                                 handleStatusUpdate(booking.id, "REJECTED")
                               }
+                              disabled={statusUpdateMutation.isPending}
                             >
                               <FiX /> Tolak
                             </button>
@@ -467,6 +465,7 @@ export default function MyCoursePage() {
                               onClick={() =>
                                 handleStatusUpdate(booking.id, "ACCEPTED")
                               }
+                              disabled={statusUpdateMutation.isPending}
                             >
                               <FiCheck /> Terima
                             </button>

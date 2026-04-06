@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import api from "@/utils/api";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./CourseBookingPage.module.css";
 import { Popup } from "@/components/Popup/Popup";
@@ -10,9 +12,9 @@ import { FiCheckCircle, FiAlertCircle } from "react-icons/fi";
 export default function CourseBookingPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user: currentUser } = useAuth(); // Menggunakan useAuth agar lebih aman
+  const queryClient = useQueryClient();
 
-  const [course, setCourse] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     date: "",
     time: "",
@@ -26,45 +28,65 @@ export default function CourseBookingPage() {
     description: "",
   });
 
-  const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+  // 1. REACT QUERY: Ambil Data Kursus (Menggantikan useEffect)
+  const {
+    data: course,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["course", id],
+    queryFn: async () => {
+      // Axios langsung mengembalikan data, tidak butuh .json() atau ngecek response.ok
+      return await api.get(`/courses/${id}`);
+    },
+    enabled: !!id,
+  });
 
-  useEffect(() => {
-    const fetchCourse = async () => {
-      try {
-        const response = await api.get(`/courses/${id}`);
-        const data = await response.json();
-        if (response.ok) {
-          setCourse(data);
-        } else {
-          setPopup({
-            isOpen: true,
-            type: "danger",
-            title: "Error",
-            description: data.message || "Kursus tidak ditemukan",
-          });
-        }
-      } catch (error) {
-        console.error("Fetch error:", error);
-        setPopup({
-          isOpen: true,
-          type: "danger",
-          title: "Error",
-          description: "Gagal mengambil data kursus",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
+  // 2. REACT QUERY: Mutasi untuk Submit Booking
+  const bookingMutation = useMutation({
+    mutationFn: async (scheduledAt) => {
+      return await api.post("/bookings", {
+        courseId: parseInt(id),
+        studentId: currentUser.id,
+        studentName: currentUser.name,
+        scheduledAt: scheduledAt,
+        note: formData.note,
+      });
+    },
+    onSuccess: () => {
+      // Refresh data "Pengajuan Saya" di background
+      queryClient.invalidateQueries(["myBookings", currentUser?.id]);
 
-    fetchCourse();
-  }, [id]);
+      setPopup({
+        isOpen: true,
+        type: "success",
+        title: "Berhasil!",
+        description:
+          "Permintaan booking kamu berhasil diajukan! Silakan cek di menu My Courses.",
+      });
+      setTimeout(() => {
+        navigate("/mycourses");
+      }, 2500);
+    },
+    onError: (error) => {
+      console.error("Booking failed:", error);
+      setPopup({
+        isOpen: true,
+        type: "danger",
+        title: "Booking Gagal",
+        description:
+          error.response?.data?.message ||
+          "Terjadi kesalahan saat memproses booking.",
+      });
+    },
+  });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleBooking = async (e) => {
+  const handleBooking = (e) => {
     e.preventDefault();
 
     if (!formData.date || !formData.time) {
@@ -77,52 +99,16 @@ export default function CourseBookingPage() {
       return;
     }
 
-    try {
-      // Gabungkan date dan time menjadi ISO string
-      const scheduledAt = new Date(`${formData.date}T${formData.time}`);
+    // Gabungkan date dan time menjadi ISO string
+    const scheduledAt = new Date(
+      `${formData.date}T${formData.time}`,
+    ).toISOString();
 
-      const response = await api.post("/bookings", {
-        courseId: parseInt(id),
-        studentId: currentUser.id,
-        studentName: currentUser.name,
-        scheduledAt: scheduledAt.toISOString(),
-        note: formData.note,
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        setPopup({
-          isOpen: true,
-          type: "success",
-          title: "Berhasil!",
-          description:
-            "Permintaan booking kamu berhasil diajukan! Silakan cek di menu My Courses.",
-        });
-        setTimeout(() => {
-          navigate("/mycourses");
-        }, 2500);
-      } else {
-        setPopup({
-          isOpen: true,
-          type: "danger",
-          title: "Booking Gagal",
-          description:
-            result.message || "Terjadi kesalahan saat memproses booking.",
-        });
-      }
-    } catch (error) {
-      console.error("Booking failed:", error);
-      setPopup({
-        isOpen: true,
-        type: "danger",
-        title: "Error",
-        description: "Terjadi kesalahan koneksi.",
-      });
-    }
+    // Eksekusi API via Mutation
+    bookingMutation.mutate(scheduledAt);
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <DashboardLayout title="Memuat...">
         <div style={{ textAlign: "center", padding: "50px" }}>
@@ -132,11 +118,11 @@ export default function CourseBookingPage() {
     );
   }
 
-  if (!course) {
+  if (isError || !course) {
     return (
       <DashboardLayout title="Error">
-        <div style={{ textAlign: "center", padding: "50px" }}>
-          Kursus tidak ditemukan.
+        <div style={{ textAlign: "center", padding: "50px", color: "red" }}>
+          Terjadi kesalahan. Kursus tidak ditemukan.
         </div>
       </DashboardLayout>
     );
@@ -177,7 +163,7 @@ export default function CourseBookingPage() {
                 type="text"
                 placeholder="Your Name"
                 className={styles.input}
-                value={currentUser.name || ""}
+                value={currentUser?.name || ""}
                 readOnly
               />
             </div>
@@ -226,6 +212,7 @@ export default function CourseBookingPage() {
                 className={styles.backBtn}
                 onClick={() => navigate(-1)}
                 type="button"
+                disabled={bookingMutation.isPending}
               >
                 ←
               </motion.button>
@@ -235,8 +222,9 @@ export default function CourseBookingPage() {
                 className={styles.submitBtn}
                 onClick={handleBooking}
                 type="submit"
+                disabled={bookingMutation.isPending}
               >
-                Book Now 🚀
+                {bookingMutation.isPending ? "Memproses..." : "Book Now 🚀"}
               </motion.button>
             </div>
           </motion.div>

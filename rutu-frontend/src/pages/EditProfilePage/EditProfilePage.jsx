@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/utils/api";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -20,21 +21,19 @@ import {
   FiArrowLeft,
   FiType,
   FiPlus,
-  FiCheckCircle, // Icon untuk popup sukses
+  FiCheckCircle,
 } from "react-icons/fi";
 
 export default function EditProfilePage() {
   const navigate = useNavigate();
   const { user, updateUserData } = useAuth();
+  const queryClient = useQueryClient();
 
-  // State Utama
-  const [loading, setLoading] = useState(true);
-  const [userId, setUserId] = useState(null);
-
-  // State untuk Upload Foto
   const fileInputRef = useRef(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [newPassion, setNewPassion] = useState("");
+  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -47,8 +46,6 @@ export default function EditProfilePage() {
     avatar: "",
   });
 
-  const [newPassion, setNewPassion] = useState("");
-  const [error, setError] = useState("");
   const [popup, setPopup] = useState({
     isOpen: false,
     type: "success",
@@ -56,36 +53,62 @@ export default function EditProfilePage() {
     description: "",
   });
 
-  // 1. MENGAMBIL DATA DARI BACKEND SAAT HALAMAN DIMUAT
+  // REACT QUERY: Fetch data profil (Mengganti useEffect fetch)
+  const { data: profileData, isLoading } = useQuery({
+    queryKey: ["profile", user?.id],
+    queryFn: async () => {
+      return await api.get(`/users/${user.id}`);
+    },
+    enabled: !!user?.id,
+  });
+
+  // Saat data server ter-load, masukkan ke local UI Form State
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        if (!user?.id) return;
-        setUserId(user.id);
+    if (profileData) {
+      setFormData({
+        name: profileData.name || "",
+        email: profileData.email || "",
+        location: profileData.location || "",
+        birthday: profileData.birthday || "",
+        school: profileData.school || "",
+        description: profileData.description || "",
+        passions: profileData.passions || [],
+        avatar:
+          profileData.profilePicture ||
+          (profileData.name
+            ? profileData.name.substring(0, 2).toUpperCase()
+            : "US"),
+      });
+    }
+  }, [profileData]);
 
-        const data = await api.get(`/users/${user.id}`);
-        setFormData({
-          name: data.name || "",
-          email: data.email || "",
-          location: data.location || "",
-          birthday: data.birthday || "",
-          school: data.school || "",
-          description: data.description || "",
-          passions: data.passions || [],
-          avatar:
-            data.profilePicture ||
-            (data.name ? data.name.substring(0, 2).toUpperCase() : "US"),
-        });
-      } catch (error) {
-        console.error("Gagal load profil:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProfile();
-  }, [user, navigate]);
+  // REACT QUERY: Mutation untuk menyimpan profil
+  const updateProfileMutation = useMutation({
+    mutationFn: async (formDataToSend) => {
+      return await api.put(`/users/${user.id}`, formDataToSend);
+    },
+    onSuccess: (result) => {
+      // Update global context agar navbar berubah
+      updateUserData({
+        name: formData.name,
+        profilePicture: result.profilePicture || formData.avatar,
+      });
+      // Bersihkan cache profil
+      queryClient.invalidateQueries(["profile", user?.id]);
 
-  // Fungsi Form & Tags
+      setPopup({
+        isOpen: true,
+        type: "success",
+        title: "Profil Diperbarui!",
+        description: "Data diri Anda berhasil disimpan.",
+      });
+    },
+    onError: (error) => {
+      console.error("Error save profile:", error);
+      setError("Terjadi kesalahan koneksi ke server backend.");
+    },
+  });
+
   const handleInputChange = (e) => {
     if (error) setError("");
     const { name, value } = e.target;
@@ -94,11 +117,10 @@ export default function EditProfilePage() {
 
   const addPassion = () => {
     if (newPassion && !formData.passions.includes(newPassion)) {
-      // VALIDASI: Maksimal 10 Passion
-      if (formData.passions.length >= 10) {
-        setError("Maksimal hanya boleh menambahkan 10 keahlian/passion.");
-        return;
-      }
+      if (formData.passions.length >= 10)
+        return setError(
+          "Maksimal hanya boleh menambahkan 10 keahlian/passion.",
+        );
       setFormData((prev) => ({
         ...prev,
         passions: [...prev.passions, newPassion],
@@ -115,21 +137,15 @@ export default function EditProfilePage() {
     }));
   };
 
-  // Fungsi Upload File Visual
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // VALIDASI: Ukuran Maksimal 2MB
-      if (file.size > 2 * 1024 * 1024) {
-        setError("Ukuran foto terlalu besar! Maksimal 2MB.");
-        return;
-      }
-      // VALIDASI: Harus berupa file gambar
-      if (!file.type.startsWith("image/")) {
-        setError("Format file tidak didukung. Harap unggah gambar (JPG/PNG).");
-        return;
-      }
-
+      if (file.size > 2 * 1024 * 1024)
+        return setError("Ukuran foto terlalu besar! Maksimal 2MB.");
+      if (!file.type.startsWith("image/"))
+        return setError(
+          "Format file tidak didukung. Harap unggah gambar (JPG/PNG).",
+        );
       setError("");
       setSelectedFile(file);
       setPreviewImage(URL.createObjectURL(file));
@@ -140,13 +156,10 @@ export default function EditProfilePage() {
     fileInputRef.current.click();
   };
 
-  const handleSave = async () => {
-    if (!userId) return;
-    setError(""); // Reset error sebelumnya
-
+  const handleSave = () => {
+    setError("");
     const { name, location, birthday, school, description } = formData;
 
-    // 1. Validasi Nama
     if (name) {
       const nameRegex = /^[a-zA-Z\s]*$/;
       const nameWords = name.trim().split(/\s+/);
@@ -155,86 +168,45 @@ export default function EditProfilePage() {
         nameWords.length < 2 ||
         nameWords.length > 5
       ) {
-        setError(
+        return setError(
           "Nama lengkap harus terdiri dari 2-5 kata dan hanya berisi huruf.",
         );
-        return;
       }
     }
-
-    // 2. Validasi Tanggal Lahir (Masa Depan)
     if (birthday) {
       const selectedDate = new Date(birthday);
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Reset jam agar adil
-      if (selectedDate > today) {
-        setError(
-          "Hmm, sepertinya Anda belum lahir di tanggal tersebut. Mohon pilih tanggal yang valid.",
-        );
-        return;
-      }
+      today.setHours(0, 0, 0, 0);
+      if (selectedDate > today)
+        return setError("Mohon pilih tanggal yang valid.");
     }
-
-    // 3. Validasi Panjang Karakter (Bio, Lokasi, Sekolah)
-    if (description && description.length > 500) {
-      setError(
+    if (description && description.length > 500)
+      return setError(
         `Deskripsi terlalu panjang! Saat ini: ${description.length}/500 karakter.`,
       );
-      return;
-    }
-    if (location && location.length > 100) {
-      setError("Lokasi terlalu panjang (Maksimal 100 karakter).");
-      return;
-    }
-    if (school && school.length > 100) {
-      setError(
+    if (location && location.length > 100)
+      return setError("Lokasi terlalu panjang (Maksimal 100 karakter).");
+    if (school && school.length > 100)
+      return setError(
         "Nama institusi/sekolah terlalu panjang (Maksimal 100 karakter).",
       );
-      return;
-    }
 
-    try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("location", formData.location);
-      formDataToSend.append("birthday", formData.birthday);
-      formDataToSend.append("school", formData.school);
-      formDataToSend.append("description", formData.description);
-      formDataToSend.append("passions", JSON.stringify(formData.passions));
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("location", formData.location);
+    formDataToSend.append("birthday", formData.birthday);
+    formDataToSend.append("school", formData.school);
+    formDataToSend.append("description", formData.description);
+    formDataToSend.append("passions", JSON.stringify(formData.passions));
+    if (selectedFile) formDataToSend.append("profilePicture", selectedFile);
 
-      if (selectedFile) {
-        formDataToSend.append("avatar", selectedFile);
-      }
-
-      const result = await api.put(`/users/${userId}`, formDataToSend);
-
-      if (result.success) {
-        // Update data 'name' di localStorage agar Topbar & Sidebar ikut berubah
-        updateUserData({
-          name: formData.name,
-          profilePicture: result.profilePicture || formData.avatar,
-        });
-
-        setPopup({
-          isOpen: true,
-          type: "success",
-          title: "Profil Diperbarui!",
-          description: "Data diri Anda berhasil disimpan.",
-        });
-      } else {
-        setError(result.message || "Gagal memperbarui profil.");
-      }
-    } catch (error) {
-      console.error("Error save profile:", error);
-      setError("Terjadi kesalahan koneksi ke server backend.");
-    }
+    updateProfileMutation.mutate(formDataToSend);
   };
 
   const containerVariants = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.1 } },
   };
-
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     show: {
@@ -243,6 +215,16 @@ export default function EditProfilePage() {
       transition: { type: "spring", stiffness: 300, damping: 24 },
     },
   };
+
+  if (isLoading) {
+    return (
+      <DashboardLayout title="Pengaturan Profil">
+        <p style={{ padding: "40px", textAlign: "center" }}>
+          Memuat formulir profil Anda...
+        </p>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout title="Pengaturan Profil">
@@ -272,7 +254,6 @@ export default function EditProfilePage() {
                 style={{ overflow: "hidden" }}
               >
                 {previewImage ? (
-                  // Menampilkan preview jika user baru saja memilih gambar baru
                   <img
                     src={previewImage}
                     alt="Preview"
@@ -410,7 +391,6 @@ export default function EditProfilePage() {
               />
               <h3 className={styles.sectionTitle}>Passion & Keahlian</h3>
             </div>
-
             <div style={{ marginTop: "20px" }}>
               <div className={styles.passionInputWrapper}>
                 <div style={{ flex: 1 }}>
@@ -433,7 +413,6 @@ export default function EditProfilePage() {
                   <FiPlus />
                 </motion.button>
               </div>
-
               <div className={styles.passionWrapper}>
                 {formData.passions.map((passion, index) => (
                   <span key={index} className={styles.passionTag}>
@@ -464,7 +443,6 @@ export default function EditProfilePage() {
               Pastikan semua data sudah terisi dengan benar sebelum menyimpan.
             </p>
           </div>
-
           <div className={styles.actionButtons}>
             <motion.button
               whileHover={{
@@ -475,6 +453,7 @@ export default function EditProfilePage() {
               whileTap={{ y: 2, boxShadow: "0px 0px 0px #000" }}
               className={styles.cancelBtn}
               onClick={() => navigate("/profile")}
+              disabled={updateProfileMutation.isPending}
             >
               <FiX size={20} /> Batal
             </motion.button>
@@ -483,14 +462,17 @@ export default function EditProfilePage() {
               whileTap={{ y: 2, boxShadow: "0px 0px 0px #000" }}
               className={styles.saveBtn}
               onClick={handleSave}
+              disabled={updateProfileMutation.isPending}
             >
-              <FiSave size={20} /> Simpan Perubahan
+              <FiSave size={20} />{" "}
+              {updateProfileMutation.isPending
+                ? "Menyimpan..."
+                : "Simpan Perubahan"}
             </motion.button>
           </div>
         </motion.div>
       </motion.div>
 
-      {/* POPUP SUKSES */}
       <Popup
         isOpen={popup.isOpen}
         type={popup.type}

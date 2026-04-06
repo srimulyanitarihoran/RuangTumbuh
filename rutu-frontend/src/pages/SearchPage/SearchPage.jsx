@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "@/utils/api";
 import { motion, AnimatePresence } from "framer-motion";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./SearchPage.module.css";
 import CourseCard from "@/components/CourseCard/CourseCard";
@@ -88,84 +89,68 @@ const getCourseExtras = (category) => {
 };
 
 export default function SearchPage() {
-  const [allCourses, setAllCourses] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Semua");
-
-  // State Pagination
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
 
   // 1. Fitur Debouncing (Menunda pencarian 250ms agar server tidak spam saat ngetik)
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-      setPage(1); // Reset halaman jika search berubah
     }, 250);
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  // Reset halaman jika kategori berubah
-  useEffect(() => {
-    setPage(1);
-  }, [activeCategory]);
+  // 2. React Query: Infinite Fetching
+  const {
+    data,
+    isLoading: loading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage: loadingMore,
+  } = useInfiniteQuery({
+    queryKey: ["courses", debouncedSearch, activeCategory],
+    queryFn: async ({ pageParam = 1 }) => {
+      const queryParams = new URLSearchParams({
+        page: pageParam,
+        limit: 6,
+        search: debouncedSearch,
+        category: activeCategory,
+      });
+      const result = await api.get(`/courses?${queryParams}`);
 
-  // 2. Fetch API dengan Server-Side Filtering & Pagination
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        if (page === 1) setLoading(true);
-        else setLoadingMore(true);
+      // Kembalikan objek yang berisi data array dan nomor halaman berikutnya (jika ada)
+      return {
+        items: result.data,
+        nextPage:
+          pageParam < result.meta.totalPages ? pageParam + 1 : undefined,
+      };
+    },
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+  });
 
-        const queryParams = new URLSearchParams({
-          page: page,
-          limit: 6, // Maksimal 6 kursus per load
-          search: debouncedSearch,
-          category: activeCategory,
-        });
-
-        const result = await api.get(`/courses?${queryParams}`);
-
-        // Mapping DTO dari Backend ke format Frontend
-        const formattedData = result.data.map((item) => {
-          const extras = getCourseExtras(item.kategori);
-          return {
-            id: item.id,
-            title: item.name,
-            author: item.tutor,
-            category: item.kategori,
-            duration: item.durasi,
-            description: item.deskripsi,
-            date: new Date(item.createdAt).toLocaleDateString("id-ID", {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            }),
-            rating: 5,
-            ...extras,
-          };
-        });
-
-        if (page === 1) {
-          setAllCourses(formattedData); // Timpa jika pencarian baru
-        } else {
-          setAllCourses((prev) => [...prev, ...formattedData]); // Tambahkan ke bawah jika Load More
-        }
-
-        setTotalPages(result.meta.totalPages);
-      } catch (error) {
-        console.error("Error fetching courses:", error);
-      } finally {
-        setLoading(false);
-        setLoadingMore(false);
-      }
-    };
-
-    fetchCourses();
-  }, [page, debouncedSearch, activeCategory]);
+  // Ekstrak dan format semua kursus dari pages yang sudah diload
+  const allCourses =
+    data?.pages.flatMap((page) =>
+      page.items.map((item) => {
+        const extras = getCourseExtras(item.kategori);
+        return {
+          id: item.id,
+          title: item.name,
+          author: item.tutor,
+          category: item.kategori,
+          duration: item.durasi,
+          description: item.deskripsi,
+          date: new Date(item.createdAt).toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }),
+          rating: 5,
+          ...extras,
+        };
+      }),
+    ) || [];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -267,7 +252,7 @@ export default function SearchPage() {
             </motion.div>
 
             {/* TOMBOL LOAD MORE */}
-            {page < totalPages && (
+            {hasNextPage && (
               <div
                 style={{
                   display: "flex",
@@ -279,7 +264,7 @@ export default function SearchPage() {
                 <motion.button
                   whileHover={{ y: -3, boxShadow: "5px 5px 0px #000" }}
                   whileTap={{ y: 2, boxShadow: "0px 0px 0px #000" }}
-                  onClick={() => setPage((p) => p + 1)}
+                  onClick={() => fetchNextPage()}
                   disabled={loadingMore}
                   style={{
                     backgroundColor: "white",
