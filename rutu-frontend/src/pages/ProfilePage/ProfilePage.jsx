@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import api from "@/utils/api";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
@@ -37,13 +38,8 @@ export default function ProfilePage() {
           return;
         }
 
-        const response = await fetch(
-          `http://localhost:5001/api/users/${localUser.id}`,
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setUserProfile(data);
-        }
+        const data = await api.get(`/users/${localUser.id}`);
+        setUserProfile(data);
       } catch (error) {
         console.error("Gagal mengambil data profil:", error);
       } finally {

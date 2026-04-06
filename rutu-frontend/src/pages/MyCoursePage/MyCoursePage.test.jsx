@@ -2,12 +2,16 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import MyCoursePage from "./MyCoursePage";
-import axios from "axios";
+import api from "@/utils/api";
 
-// Mock Axios
-vi.mock("axios");
+vi.mock("@/utils/api", () => ({
+  default: { get: vi.fn(), patch: vi.fn() },
+}));
 
-// Mock Router
+vi.mock("@/contexts/AuthContext", () => ({
+  useAuth: () => ({ user: { id: "user-123", name: "Rafif Sava" } }),
+}));
+
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
   return { ...actual, useNavigate: () => vi.fn() };
@@ -27,8 +31,8 @@ describe("Halaman MyCoursePage", () => {
       json: async () => [],
     });
 
-    // PERBAIKAN: Mock Axios untuk API Course
-    axios.get.mockResolvedValue({
+    // PERBAIKAN: Mock API untuk API Course
+    api.get.mockResolvedValue({
       data: { data: [], meta: { totalItems: 0 } },
     });
   });

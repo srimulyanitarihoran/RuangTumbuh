@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import api from "@/utils/api";
 import { useNavigate, useLocation } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./AddSchedulePage.module.css";
@@ -122,37 +123,26 @@ export default function AddSchedulePage() {
       const localUser = JSON.parse(localStorage.getItem("user") || "{}");
       if (!localUser.id) return;
 
-      const endpoint = isEdit
-        ? `http://localhost:5001/api/schedules/${editData.id}`
-        : `http://localhost:5001/api/schedules`;
+      const payload = { studentId: user.id, ...formData };
 
-      const method = isEdit ? "PUT" : "POST";
+      if (isEdit) {
+        await api.put(`/schedules/${editData.id}`, payload);
+      } else {
+        await api.post("/schedules", payload);
+      }
 
-      const response = await fetch(endpoint, {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentId: localUser.id, ...formData }),
+      setPopup({
+        isOpen: true,
+        type: "success",
+        title: isEdit ? "Jadwal Diperbarui! 🔄" : "Jadwal Berhasil Dibuat! 📅",
+        description: isEdit
+          ? "Data kalender Anda berhasil di-reschedule."
+          : "Jadwal baru telah ditambahkan ke kalender Anda.",
       });
 
-      const result = await response.json();
-
-      if (response.ok) {
-        setPopup({
-          isOpen: true,
-          type: "success",
-          title: isEdit
-            ? "Jadwal Diperbarui! 🔄"
-            : "Jadwal Berhasil Dibuat! 📅",
-          description: isEdit
-            ? "Data kalender Anda berhasil di-reschedule."
-            : "Jadwal baru telah ditambahkan ke kalender Anda.",
-        });
-        setTimeout(() => {
-          navigate("/schedule");
-        }, 2000);
-      } else {
-        setError(result.message || "Gagal menyimpan jadwal.");
-      }
+      setTimeout(() => {
+        navigate("/schedule");
+      }, 2000);
     } catch (error) {
       console.error("Error submit schedule:", error);
       setError("Tidak dapat terhubung ke server. Periksa koneksi Anda.");

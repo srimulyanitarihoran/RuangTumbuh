@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import api from "@/utils/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
@@ -55,19 +56,15 @@ export default function DashboardPage() {
       try {
         if (!user?.id) return;
 
-        const response = await fetch(
-          `http://localhost:5001/api/users/${user?.id}/dashboard`,
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setDbStats({
-            timeBalance: data.timeBalance || 0,
-            learningMinutes: data.learningMinutes || 0,
-            upcomingSessions: data.upcomingSessions || 0,
-            completedSessions: data.completedSessions || 0,
-            mentoringSessions: data.mentoringSessions || [], // <-- Ambil data dari backend
-          });
-        }
+        const data = await api.get(`/users/${user.id}/dashboard`);
+
+        setDbStats({
+          timeBalance: data.timeBalance || 0,
+          learningMinutes: data.learningMinutes || 0,
+          upcomingSessions: data.upcomingSessions || 0,
+          completedSessions: data.completedSessions || 0,
+          mentoringSessions: data.mentoringSessions || [],
+        });
       } catch (error) {
         console.error("Gagal memuat statistik dashboard:", error);
       } finally {

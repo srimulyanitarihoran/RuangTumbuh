@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import api from "@/utils/api";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
@@ -62,24 +63,19 @@ export default function EditProfilePage() {
         if (!user?.id) return;
         setUserId(user.id);
 
-        const response = await fetch(
-          `http://localhost:5001/api/users/${user.id}`,
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setFormData({
-            name: data.name || "",
-            email: data.email || "",
-            location: data.location || "",
-            birthday: data.birthday || "",
-            school: data.school || "",
-            description: data.description || "",
-            passions: data.passions || [],
-            avatar:
-              data.profilePicture ||
-              (data.name ? data.name.substring(0, 2).toUpperCase() : "US"),
-          });
-        }
+        const data = await api.get(`/users/${user.id}`);
+        setFormData({
+          name: data.name || "",
+          email: data.email || "",
+          location: data.location || "",
+          birthday: data.birthday || "",
+          school: data.school || "",
+          description: data.description || "",
+          passions: data.passions || [],
+          avatar:
+            data.profilePicture ||
+            (data.name ? data.name.substring(0, 2).toUpperCase() : "US"),
+        });
       } catch (error) {
         console.error("Gagal load profil:", error);
       } finally {
@@ -87,7 +83,7 @@ export default function EditProfilePage() {
       }
     };
     fetchProfile();
-  }, [navigate]);
+  }, [user, navigate]);
 
   // Fungsi Form & Tags
   const handleInputChange = (e) => {
@@ -210,21 +206,14 @@ export default function EditProfilePage() {
         formDataToSend.append("avatar", selectedFile);
       }
 
-      const response = await fetch(
-        `http://localhost:5001/api/users/${userId}`,
-        {
-          method: "PUT",
-          body: formDataToSend,
-        },
-      );
+      const result = await api.put(`/users/${userId}`, formDataToSend);
 
-      const result = await response.json();
-
-      if (response.ok) {
+      if (result.success) {
         // Update data 'name' di localStorage agar Topbar & Sidebar ikut berubah
         updateUserData({
           name: formData.name,
-          profilePicture: result.profilePicture || formData.avatar,});
+          profilePicture: result.profilePicture || formData.avatar,
+        });
 
         setPopup({
           isOpen: true,

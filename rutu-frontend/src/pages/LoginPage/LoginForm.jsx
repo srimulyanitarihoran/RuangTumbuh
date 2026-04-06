@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import api from "@/utils/api";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import styles from "./LoginForm.module.css";
@@ -28,12 +29,8 @@ export const LoginForm = () => {
 
     try {
       setIsLoading(true);
-      const response = await axios.post(
-        "http://localhost:5001/api/auth/login",
-        formData,
-      );
-
-      login(response.data.user, response.data.token);
+      const result = await api.post("/auth/login", formData);
+      login(result.user, result.token);
 
       setShowPopup(true);
       setTimeout(() => {

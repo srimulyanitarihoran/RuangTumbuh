@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import api from "@/utils/api";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
@@ -14,61 +15,74 @@ import {
   FiAlertCircle,
 } from "react-icons/fi";
 import { Popup } from "@/components/Popup/Popup";
+import api from "@/utils/api";
 
 // --- HELPER UNTUK EXTRAS (Sama dengan SearchPage) ---
 const getCourseExtras = (category) => {
   const mapping = {
-    "Frontend": {
+    Frontend: {
       color: "#38BDF8",
       emoji: "👩‍💻",
-      image: "https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&q=80&w=600"
+      image:
+        "https://images.unsplash.com/photo-1547658719-da2b51169166?auto=format&fit=crop&q=80&w=600",
     },
-    "Backend": {
+    Backend: {
       color: "#F472B6",
       emoji: "⚙️",
-      image: "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&q=80&w=600"
+      image:
+        "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?auto=format&fit=crop&q=80&w=600",
     },
     "UI/UX Design": {
       color: "#FACC15",
       emoji: "🎨",
-      image: "https://images.unsplash.com/photo-1586717791821-3f44a563cc4c?auto=format&fit=crop&q=80&w=600"
+      image:
+        "https://images.unsplash.com/photo-1586717791821-3f44a563cc4c?auto=format&fit=crop&q=80&w=600",
     },
     "Mobile Dev": {
       color: "#10B981",
       emoji: "📱",
-      image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=600"
+      image:
+        "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&q=80&w=600",
     },
     "Data Science": {
       color: "#A78BFA",
       emoji: "📊",
-      image: "https://images.unsplash.com/photo-1551288049-bbbda536339a?auto=format&fit=crop&q=80&w=600"
+      image:
+        "https://images.unsplash.com/photo-1551288049-bbbda536339a?auto=format&fit=crop&q=80&w=600",
     },
-    "Matematika": {
+    Matematika: {
       color: "#FB923C",
       emoji: "📐",
-      image: "https://images.unsplash.com/photo-1509228468518-180dd482270b?auto=format&fit=crop&q=80&w=600"
+      image:
+        "https://images.unsplash.com/photo-1509228468518-180dd482270b?auto=format&fit=crop&q=80&w=600",
     },
     "Bahasa Inggris": {
       color: "#6366F1",
       emoji: "🇬🇧",
-      image: "https://images.unsplash.com/photo-1543165796-5426273eaab3?auto=format&fit=crop&q=80&w=600"
+      image:
+        "https://images.unsplash.com/photo-1543165796-5426273eaab3?auto=format&fit=crop&q=80&w=600",
     },
     "Bahasa Indonesia": {
       color: "#EF4444",
       emoji: "🇮🇩",
-      image: "https://images.unsplash.com/photo-1518173946687-a4c8a9b746f4?auto=format&fit=crop&q=80&w=600"
+      image:
+        "https://images.unsplash.com/photo-1518173946687-a4c8a9b746f4?auto=format&fit=crop&q=80&w=600",
     },
-    "Fisika": {
+    Fisika: {
       color: "#14B8A6",
       emoji: "⚛️",
-      image: "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&q=80&w=600"
+      image:
+        "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&q=80&w=600",
     },
   };
-  return mapping[category] || {
-    color: "#94A3B8",
-    emoji: "📚",
-    image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=600"
-  };
+  return (
+    mapping[category] || {
+      color: "#94A3B8",
+      emoji: "📚",
+      image:
+        "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&q=80&w=600",
+    }
+  );
 };
 
 export default function CourseDetailPage() {
@@ -82,7 +96,7 @@ export default function CourseDetailPage() {
   useEffect(() => {
     const fetchCourseDetail = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/course/${id}`);
+        const response = await api.get(`/course/${id}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -114,11 +128,36 @@ export default function CourseDetailPage() {
                     isFree: idx === 0, // Modul pertama kita buat gratis sebagai preview
                   }))
                 : [
-                    { id: 1, title: "Pembukaan & Overview", duration: "10 Mnt", isFree: true },
-                    { id: 2, title: "Materi Utama Bagian 1", duration: "30 Mnt", isFree: false },
-                    { id: 3, title: "Materi Utama Bagian 2", duration: "45 Mnt", isFree: false },
-                    { id: 4, title: "Sesi Diskusi & Tanya Jawab", duration: "25 Mnt", isFree: false },
-                    { id: 5, title: "Penutup & Kesimpulan", duration: "10 Mnt", isFree: false },
+                    {
+                      id: 1,
+                      title: "Pembukaan & Overview",
+                      duration: "10 Mnt",
+                      isFree: true,
+                    },
+                    {
+                      id: 2,
+                      title: "Materi Utama Bagian 1",
+                      duration: "30 Mnt",
+                      isFree: false,
+                    },
+                    {
+                      id: 3,
+                      title: "Materi Utama Bagian 2",
+                      duration: "45 Mnt",
+                      isFree: false,
+                    },
+                    {
+                      id: 4,
+                      title: "Sesi Diskusi & Tanya Jawab",
+                      duration: "25 Mnt",
+                      isFree: false,
+                    },
+                    {
+                      id: 5,
+                      title: "Penutup & Kesimpulan",
+                      duration: "10 Mnt",
+                      isFree: false,
+                    },
                   ],
           });
         }

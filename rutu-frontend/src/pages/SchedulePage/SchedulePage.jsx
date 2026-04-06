@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import api from "@/utils/api";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./SchedulePage.module.css";
 import { useNavigate } from "react-router-dom";
-
-const API_URL = "http://localhost:5001/api";
 
 // Icons
 import {
@@ -69,15 +68,11 @@ export default function SchedulePage() {
       try {
         if (!user?.id) return;
 
-        const response = await fetch(`${API_URL}/schedules/${user.id}`);
-
-        if (response.ok) {
-          const data = await response.json();
-          const validSchedules = data.filter(
-            (s) => s.status !== "Menunggu Konfirmasi" && s.status !== "Pending",
-          );
-          setSchedules(validSchedules);
-        }
+        const data = await api.get(`/schedules/${user.id}`);
+        const validSchedules = data.filter(
+          (s) => s.status !== "Menunggu Konfirmasi" && s.status !== "Pending",
+        );
+        setSchedules(validSchedules);
       } catch (error) {
         console.error("Gagal load jadwal:", error);
       } finally {
@@ -85,7 +80,7 @@ export default function SchedulePage() {
       }
     };
     fetchSchedules();
-  }, []);
+  }, [user]);
 
   // Filter jadwal bulan ini untuk memunculkan titik kuning/hijau di kalender
   const schedulesThisMonth = schedules.filter((s) => {
@@ -137,18 +132,11 @@ export default function SchedulePage() {
   const handleDelete = async (itemId) => {
     if (window.confirm("Apakah Anda yakin ingin menyelesaikan jadwal ini?")) {
       try {
-        // Endpoint DELETE di backend sudah menangani pemisahan prefix ini
-        const response = await fetch(`${API_URL}/schedules/${itemId}`, {
-          method: "DELETE",
-        });
-
-        if (response.ok) {
-          setSchedules((prev) => prev.filter((s) => s.id !== itemId));
-        } else {
-          alert("Gagal menyelesaikan jadwal.");
-        }
+        await api.delete(`/schedules/${itemId}`);
+        setSchedules((prev) => prev.filter((s) => s.id !== itemId));
       } catch (error) {
         console.error("Error delete schedule:", error);
+        alert("Gagal menyelesaikan jadwal.");
       }
     }
   };

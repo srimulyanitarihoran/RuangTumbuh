@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import api from "@/utils/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
@@ -148,11 +149,7 @@ export default function AddCoursePage() {
         modules: modules.map((m) => ({ title: m.title, duration: m.duration })),
       };
 
-      const response = await fetch("http://localhost:5001/api/courses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(courseData),
-      });
+      const response = await api.post("/courses", courseData);
 
       const result = await response.json();
 
@@ -186,7 +183,6 @@ export default function AddCoursePage() {
   return (
     <DashboardLayout title="Tambah Kursus Baru">
       <form onSubmit={handleSubmit} className={styles.container}>
-
         <div className={styles.splitLayout}>
           {/* KOLOM KIRI: Informasi Utama */}
           <div className={styles.mainCard}>

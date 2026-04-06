@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "@/utils/api";
 import axios from "axios";
 import styles from "./RegisterForm.module.css";
 import { FiUser, FiAtSign, FiLock } from "react-icons/fi";
@@ -39,10 +40,6 @@ export const RegisterForm = () => {
 
     const { name, email, password, confirmPassword } = formData;
 
-    // ==========================================
-    // 🛡️ VALIDASI FRONTEND (Tampil sebagai Teks Merah)
-    // ==========================================
-
     // 1. Validasi Password Match
     if (password !== confirmPassword) {
       setError("Password dan Konfirmasi Password harus sama persis.");
@@ -71,19 +68,13 @@ export const RegisterForm = () => {
       return;
     }
 
-    // ==========================================
-    // 🚀 KIRIM KE BACKEND
-    // ==========================================
-    setIsLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:5001/api/auth/register",
-        {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        },
-      );
+      setIsLoading(true);
+      await api.post("/auth/register", {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
 
       // Jika SUKSES, baru kita panggil Popup
       setPopup({
@@ -114,7 +105,14 @@ export const RegisterForm = () => {
       <form className={styles.registerForm} onSubmit={handleSubmit}>
         {/* TEMPAT MUNCULNYA TEKS ERROR MERAH */}
         {error && (
-          <p style={{ color: "red", fontWeight: "bold", marginBottom: "10px", marginTop: "-15px" }}>
+          <p
+            style={{
+              color: "red",
+              fontWeight: "bold",
+              marginBottom: "10px",
+              marginTop: "-15px",
+            }}
+          >
             {error}
           </p>
         )}
