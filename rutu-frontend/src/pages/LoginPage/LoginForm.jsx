@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useMutation } from "@tanstack/react-query";
 import api from "@/utils/api";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
 import styles from "./LoginForm.module.css";
 import { FiAtSign, FiLock } from "react-icons/fi";
 import { MdCheckCircle } from "react-icons/md";
@@ -13,35 +13,37 @@ import { Popup } from "@components/Popup/Popup";
 export const LoginForm = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
   const [showPopup, setShowPopup] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    try {
-      setIsLoading(true);
-      const result = await api.post("/auth/login", formData);
+  // REACT QUERY: Mutation Login
+  const loginMutation = useMutation({
+    mutationFn: async (credentials) => {
+      return await api.post("/auth/login", credentials);
+    },
+    onSuccess: (result) => {
       login(result.user, result.token);
-
       setShowPopup(true);
       setTimeout(() => {
         setShowPopup(false);
         navigate("/dashboard");
       }, 3000);
-    } catch (err) {
+    },
+    onError: (err) => {
       setError(err.response?.data?.message || "Email atau password salah!");
-    } finally {
-      setIsLoading(false);
-    }
+    },
+  });
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError("");
+    loginMutation.mutate(formData);
   };
 
   return (
@@ -93,7 +95,9 @@ export const LoginForm = () => {
           </div>
         </div>
 
-        <Button type="submit">{isLoading ? "Loading..." : "Login"}</Button>
+        <Button type="submit" disabled={loginMutation.isPending}>
+          {loginMutation.isPending ? "Loading..." : "Login"}
+        </Button>
       </form>
 
       {showPopup && (

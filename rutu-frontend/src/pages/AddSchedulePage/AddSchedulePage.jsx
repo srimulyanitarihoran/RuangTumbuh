@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import api from "@/utils/api";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/utils/api";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./AddSchedulePage.module.css";
 import { Popup } from "@/components/Popup/Popup";
@@ -25,13 +27,13 @@ import {
 export default function AddSchedulePage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useAuth(); // KUNCI PERBAIKAN: Ambil user dari Context
+  const queryClient = useQueryClient();
 
-  // Deteksi apakah sedang dalam Mode Edit
   const editData = location.state?.editData;
   const isEdit = !!editData;
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(""); // <-- Kotak Error Merah
+  const [error, setError] = useState("");
   const [popup, setPopup] = useState({
     isOpen: false,
     type: "success",
@@ -49,14 +51,12 @@ export default function AddSchedulePage() {
     partner: "",
   });
 
-  // Jika Mode Edit aktif, otomatis isi form dengan data lama
   useEffect(() => {
     if (isEdit && editData) {
       const d = new Date(editData.date);
       const yyyy = d.getFullYear();
       const mm = String(d.getMonth() + 1).padStart(2, "0");
       const dd = String(d.getDate()).padStart(2, "0");
-
       const formattedTime = editData.time.replace(".", ":");
 
       setFormData({
@@ -72,65 +72,20 @@ export default function AddSchedulePage() {
   }, [isEdit, editData]);
 
   const handleChange = (e) => {
-    if (error) setError(""); // Hilangkan error saat mengetik ulang
+    if (error) setError("");
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-
-    // ==========================================
-    // 🛡️ FRONTEND FORM VALIDATION
-    // ==========================================
-    const { title, date, time, platform, partner } = formData;
-
-    if (!title || title.length < 3 || title.length > 50) {
-      setError("Nama Kegiatan harus diisi antara 3 hingga 50 karakter.");
-      return;
-    }
-    if (!platform || platform.length < 3 || platform.length > 50) {
-      setError("Platform / Lokasi harus diisi antara 3 hingga 50 karakter.");
-      return;
-    }
-    if (!partner || partner.length < 3 || partner.length > 50) {
-      setError(
-        "Nama Partisipan / Rekan harus diisi antara 3 hingga 50 karakter.",
-      );
-      return;
-    }
-    if (!date || !time) {
-      setError("Harap isi Tanggal Pelaksanaan dan Waktu Mulai!");
-      return;
-    }
-
-    // Validasi Waktu Masa Lalu
-    const safeTime = time.replace(".", ":");
-    const scheduledAt = new Date(`${date}T${safeTime}:00`);
-    const now = new Date();
-
-    if (scheduledAt < now) {
-      setError(
-        "Pilihan tidak valid! Anda tidak bisa menjadwalkan kegiatan di waktu yang sudah lewat.",
-      );
-      return;
-    }
-    // ==========================================
-
-    setLoading(true);
-
-    try {
-      const localUser = JSON.parse(localStorage.getItem("user") || "{}");
-      if (!localUser.id) return;
-
-      const payload = { studentId: user.id, ...formData };
-
+  // REACT QUERY: Mutation untuk simpan jadwal
+  const saveScheduleMutation = useMutation({
+    mutationFn: async (payload) => {
       if (isEdit) {
-        await api.put(`/schedules/${editData.id}`, payload);
-      } else {
-        await api.post("/schedules", payload);
+        return await api.put(`/schedules/${editData.id}`, payload);
       }
-
+      return await api.post("/schedules", payload);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["schedules", user?.id]); // Auto-refresh kalender
       setPopup({
         isOpen: true,
         type: "success",
@@ -139,16 +94,38 @@ export default function AddSchedulePage() {
           ? "Data kalender Anda berhasil di-reschedule."
           : "Jadwal baru telah ditambahkan ke kalender Anda.",
       });
-
-      setTimeout(() => {
-        navigate("/schedule");
-      }, 2000);
-    } catch (error) {
-      console.error("Error submit schedule:", error);
+      setTimeout(() => navigate("/schedule"), 2000);
+    },
+    onError: (err) => {
+      console.error("Error submit schedule:", err);
       setError("Tidak dapat terhubung ke server. Periksa koneksi Anda.");
-    } finally {
-      setLoading(false);
-    }
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError("");
+
+    const { title, date, time, platform, partner } = formData;
+    if (!title || title.length < 3 || title.length > 50)
+      return setError("Nama Kegiatan harus 3-50 karakter.");
+    if (!platform || platform.length < 3 || platform.length > 50)
+      return setError("Platform / Lokasi harus 3-50 karakter.");
+    if (!partner || partner.length < 3 || partner.length > 50)
+      return setError("Nama Partisipan harus 3-50 karakter.");
+    if (!date || !time)
+      return setError("Harap isi Tanggal Pelaksanaan dan Waktu Mulai!");
+
+    const safeTime = time.replace(".", ":");
+    const scheduledAt = new Date(`${date}T${safeTime}:00`);
+    if (scheduledAt < new Date())
+      return setError(
+        "Tidak bisa menjadwalkan kegiatan di waktu yang sudah lewat.",
+      );
+
+    if (!user?.id) return;
+
+    saveScheduleMutation.mutate({ studentId: user.id, ...formData });
   };
 
   const containerVariants = {
@@ -373,7 +350,6 @@ export default function AddSchedulePage() {
             <h3>Sudah yakin? 🚀</h3>
             <p>Pastikan tanggal dan waktu sudah sesuai sebelum menyimpan.</p>
           </div>
-
           <div className={styles.actionButtons}>
             <motion.button
               type="button"
@@ -389,10 +365,10 @@ export default function AddSchedulePage() {
               whileHover={{ y: -4, boxShadow: "8px 8px 0px #000" }}
               whileTap={{ y: 2, boxShadow: "0px 0px 0px #000" }}
               className={styles.saveBtn}
-              disabled={loading}
+              disabled={saveScheduleMutation.isPending}
             >
               <FiSave size={20} />{" "}
-              {loading
+              {saveScheduleMutation.isPending
                 ? "Menyimpan..."
                 : isEdit
                   ? "Simpan Perubahan"
@@ -402,7 +378,6 @@ export default function AddSchedulePage() {
         </motion.div>
       </motion.form>
 
-      {/* POPUP HANYA UNTUK SUKSES */}
       <Popup
         isOpen={popup.isOpen}
         type={popup.type}

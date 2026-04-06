@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import api from "@/utils/api";
-import axios from "axios";
 import styles from "./RegisterForm.module.css";
 import { FiUser, FiAtSign, FiLock } from "react-icons/fi";
 import { MdCheckCircle } from "react-icons/md";
@@ -17,93 +17,77 @@ export const RegisterForm = () => {
     password: "",
     confirmPassword: "",
   });
-
-  const [error, setError] = useState(""); // <-- State untuk teks merah di atas form
-  const [isLoading, setIsLoading] = useState(false);
-
-  // Popup sekarang hanya digunakan khusus untuk SUKSES
+  const [error, setError] = useState("");
   const [popup, setPopup] = useState({
     isOpen: false,
     title: "",
     description: "",
   });
 
-  const handleChange = (e) => {
-    // Menghapus pesan error ketika user mulai mengetik ulang
-    if (error) setError("");
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(""); // Reset error setiap kali tombol submit ditekan
-
-    const { name, email, password, confirmPassword } = formData;
-
-    // 1. Validasi Password Match
-    if (password !== confirmPassword) {
-      setError("Password dan Konfirmasi Password harus sama persis.");
-      return;
-    }
-
-    // 2. Validasi Nama
-    const nameRegex = /^[a-zA-Z\s]*$/;
-    const nameWords = name.trim().split(/\s+/);
-
-    if (!nameRegex.test(name)) {
-      setError("Nama hanya boleh berisi huruf.");
-      return;
-    }
-    if (nameWords.length < 2 || nameWords.length > 5) {
-      setError("Nama lengkap harus terdiri dari 2 hingga 5 kata.");
-      return;
-    }
-
-    // 3. Validasi Kekuatan Password
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W]{8,32}$/;
-    if (!passwordRegex.test(password)) {
-      setError(
-        "Password harus 8-32 karakter dan mengandung kombinasi huruf besar, kecil, serta angka.",
-      );
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      await api.post("/auth/register", {
-        name: formData.name,
-        email: formData.email,
-        password: formData.password,
-      });
-
-      // Jika SUKSES, baru kita panggil Popup
+  // REACT QUERY: Mutation Register
+  const registerMutation = useMutation({
+    mutationFn: async (userData) => {
+      return await api.post("/auth/register", userData);
+    },
+    onSuccess: () => {
       setPopup({
         isOpen: true,
         title: "Akun Dibuat!",
         description:
           "Akun kamu berhasil dibuat. Mengalihkan ke halaman login...",
       });
-
       setTimeout(() => {
         setPopup({ ...popup, isOpen: false });
         navigate("/login");
       }, 3000);
-    } catch (err) {
+    },
+    onError: (err) => {
       console.error("Gagal register:", err);
-      // Jika GAGAL dari backend (misal: Email sudah dipakai), tampilkan error merah di atas input
       setError(
         err.response?.data?.message ||
           "Terjadi kesalahan saat registrasi. Coba lagi nanti.",
       );
-    } finally {
-      setIsLoading(false);
+    },
+  });
+
+  const handleChange = (e) => {
+    if (error) setError("");
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError("");
+
+    const { name, email, password, confirmPassword } = formData;
+
+    if (password !== confirmPassword)
+      return setError("Password dan Konfirmasi Password harus sama persis.");
+
+    const nameRegex = /^[a-zA-Z\s]*$/;
+    const nameWords = name.trim().split(/\s+/);
+    if (!nameRegex.test(name))
+      return setError("Nama hanya boleh berisi huruf.");
+    if (nameWords.length < 2 || nameWords.length > 5)
+      return setError("Nama lengkap harus terdiri dari 2 hingga 5 kata.");
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d\W]{8,32}$/;
+    if (!passwordRegex.test(password)) {
+      return setError(
+        "Password harus 8-32 karakter dan mengandung kombinasi huruf besar, kecil, serta angka.",
+      );
     }
+
+    registerMutation.mutate({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+    });
   };
 
   return (
     <>
       <form className={styles.registerForm} onSubmit={handleSubmit}>
-        {/* TEMPAT MUNCULNYA TEKS ERROR MERAH */}
         {error && (
           <p
             style={{
@@ -167,12 +151,11 @@ export const RegisterForm = () => {
           </div>
         </div>
 
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? "Loading..." : "Register"}
+        <Button type="submit" disabled={registerMutation.isPending}>
+          {registerMutation.isPending ? "Loading..." : "Register"}
         </Button>
       </form>
 
-      {/* POPUP HANYA UNTUK SUKSES */}
       <Popup
         isOpen={popup.isOpen}
         type="success"

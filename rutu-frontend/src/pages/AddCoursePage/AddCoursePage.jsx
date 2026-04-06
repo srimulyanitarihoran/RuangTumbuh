@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from "react";
-import api from "@/utils/api";
-import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "@/utils/api";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./AddCoursePage.module.css";
 import { Popup } from "@/components/Popup/Popup";
-
-// --- Import Komponen & Style Input dari halaman Auth ---
 import { Input } from "@/components/Input/Input";
 import inputStyles from "@/components/Input/Input.module.css";
-
 import {
   FiPlus,
   FiTrash2,
@@ -20,11 +18,11 @@ import {
   FiVideo,
   FiChevronDown,
   FiCheckCircle,
-  FiAlertCircle,
 } from "react-icons/fi";
 
 export default function AddCoursePage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState({
     title: "",
@@ -33,22 +31,18 @@ export default function AddCoursePage() {
     description: "",
     tutorId: "",
   });
-
   const [modules, setModules] = useState([
     { id: Date.now(), title: "", duration: "" },
   ]);
 
-  // State untuk UX & Notifikasi
-  const [error, setError] = useState(""); // <-- Kotak Error Merah
+  const [error, setError] = useState("");
   const [popup, setPopup] = useState({
     isOpen: false,
     type: "success",
     title: "",
     description: "",
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Get current user as tutor
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     if (user.id) {
@@ -58,133 +52,102 @@ export default function AddCoursePage() {
     }
   }, [navigate]);
 
+  // REACT QUERY: Mutation untuk menyimpan kursus
+  const saveCourseMutation = useMutation({
+    mutationFn: async (courseData) => {
+      return await api.post("/courses", courseData);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(["createdCourses"]); // Refresh cache kelas di MyCourse
+      setPopup({
+        isOpen: true,
+        type: "success",
+        title: "Kursus Diterbitkan! 🚀",
+        description:
+          "Kursus baru Anda berhasil ditambahkan ke Pusat Course! Mengalihkan ke dashboard...",
+      });
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 2000);
+    },
+    onError: (err) => {
+      setError(
+        err.response?.data?.message ||
+          "Terjadi kesalahan saat menambahkan kursus.",
+      );
+    },
+  });
+
   const handleInputChange = (e) => {
-    if (error) setError(""); // Hapus error saat mengetik ulang
+    if (error) setError("");
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const addModule = () => {
-    if (modules.length >= 20) {
-      setError(
+    if (modules.length >= 20)
+      return setError(
         "Batas maksimal tercapai! Anda hanya dapat menambahkan 20 modul.",
       );
-      return;
-    }
     setModules([...modules, { id: Date.now(), title: "", duration: "" }]);
   };
 
   const removeModule = (id) => {
-    if (modules.length > 1) {
-      setModules(modules.filter((m) => m.id !== id));
-    }
+    if (modules.length > 1) setModules(modules.filter((m) => m.id !== id));
   };
 
   const updateModule = (id, field, value) => {
-    if (error) setError(""); // Hapus error saat memodifikasi modul
+    if (error) setError("");
     setModules(
       modules.map((m) => (m.id === id ? { ...m, [field]: value } : m)),
     );
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError(""); // Reset error setiap submit
+    setError("");
 
-    // ==========================================
-    // 🛡️ FRONTEND FORM VALIDATION
-    // ==========================================
+    // Validasi
     const { title, category, duration, description } = formData;
-
-    if (!title || title.length < 5 || title.length > 100) {
-      setError("Judul kursus harus diisi antara 5 hingga 100 karakter.");
-      return;
-    }
-    if (!category) {
-      setError("Kategori kursus wajib dipilih.");
-      return;
-    }
-    if (!duration || isNaN(duration) || parseInt(duration) <= 0) {
-      setError(
+    if (!title || title.length < 5 || title.length > 100)
+      return setError("Judul kursus harus diisi antara 5 hingga 100 karakter.");
+    if (!category) return setError("Kategori kursus wajib dipilih.");
+    if (!duration || isNaN(duration) || parseInt(duration) <= 0)
+      return setError(
         "Durasi kursus wajib diisi dengan angka positif (lebih dari 0).",
       );
-      return;
-    }
-    if (!description || description.length < 20 || description.length > 1000) {
-      setError(
+    if (!description || description.length < 20 || description.length > 1000)
+      return setError(
         "Deskripsi kursus harus jelas dan informatif (antara 20 - 1000 karakter).",
       );
-      return;
-    }
-
-    // Validasi Modul
-    if (modules.length === 0) {
-      setError("Anda harus menambahkan minimal 1 modul materi.");
-      return;
-    }
+    if (modules.length === 0)
+      return setError("Anda harus menambahkan minimal 1 modul materi.");
 
     for (let i = 0; i < modules.length; i++) {
       const m = modules[i];
-      if (!m.title || m.title.trim() === "") {
-        setError(`Judul materi pada modul ke-${i + 1} tidak boleh kosong.`);
-        return;
-      }
-      if (!m.duration || isNaN(m.duration) || parseInt(m.duration) <= 0) {
-        setError(
-          `Durasi materi pada modul ke-${i + 1} harus valid (lebih dari 0).`,
+      if (!m.title || m.title.trim() === "")
+        return setError(
+          `Judul materi pada modul ke-${i + 1} tidak boleh kosong.`,
         );
-        return;
-      }
+      if (!m.duration || isNaN(m.duration) || parseInt(m.duration) <= 0)
+        return setError(`Durasi materi pada modul ke-${i + 1} harus valid.`);
     }
-    // ==========================================
 
-    setIsSubmitting(true);
-    try {
-      const courseData = {
-        name: title,
-        tutorId: formData.tutorId,
-        kategori: category,
-        durasi: duration,
-        deskripsi: description,
-        modules: modules.map((m) => ({ title: m.title, duration: m.duration })),
-      };
-
-      const response = await api.post("/courses", courseData);
-
-      const result = await response.json();
-
-      if (response.ok) {
-        setPopup({
-          isOpen: true,
-          type: "success",
-          title: "Kursus Diterbitkan! 🚀",
-          description:
-            "Kursus baru Anda berhasil ditambahkan ke Pusat Course! Mengalihkan ke dashboard...",
-        });
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 2000);
-      } else {
-        // Tampilkan pesan error dari backend
-        setError(
-          result.message || "Terjadi kesalahan saat menambahkan kursus.",
-        );
-      }
-    } catch (error) {
-      console.error("Submit error:", error);
-      setError(
-        "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+    saveCourseMutation.mutate({
+      name: title,
+      tutorId: formData.tutorId,
+      kategori: category,
+      durasi: duration,
+      deskripsi: description,
+      modules: modules.map((m) => ({ title: m.title, duration: m.duration })),
+    });
   };
 
   return (
     <DashboardLayout title="Tambah Kursus Baru">
       <form onSubmit={handleSubmit} className={styles.container}>
         <div className={styles.splitLayout}>
-          {/* KOLOM KIRI: Informasi Utama */}
+          {/* KOLOM KIRI */}
           <div className={styles.mainCard}>
             <div className={styles.cardHeader}>
               <div
@@ -257,7 +220,6 @@ export default function AddCoursePage() {
                   <FiChevronDown className={inputStyles.inputIcon} />
                 </div>
               </div>
-
               <div style={{ marginBottom: "-1rem" }}>
                 <Input
                   type="number"
@@ -297,7 +259,7 @@ export default function AddCoursePage() {
             </div>
           </div>
 
-          {/* KOLOM KANAN: Modul / Silabus */}
+          {/* KOLOM KANAN */}
           <div className={styles.modulesCard}>
             <div className={styles.cardHeader}>
               <div
@@ -308,12 +270,10 @@ export default function AddCoursePage() {
               </div>
               <h3>Daftar Modul</h3>
             </div>
-
             <p className={styles.moduleDesc}>
               Tambahkan silabus atau materi yang akan dipelajari dalam kursus
               ini secara berurutan.
             </p>
-
             <div className={styles.moduleList}>
               <AnimatePresence>
                 {modules.map((module, index) => (
@@ -326,7 +286,6 @@ export default function AddCoursePage() {
                     transition={{ duration: 0.2 }}
                   >
                     <div className={styles.moduleNumber}>{index + 1}</div>
-
                     <div className={styles.moduleInputs}>
                       <div style={{ marginBottom: "-1rem" }}>
                         <Input
@@ -355,7 +314,6 @@ export default function AddCoursePage() {
                         />
                       </div>
                     </div>
-
                     <button
                       type="button"
                       className={styles.trashBtn}
@@ -368,7 +326,6 @@ export default function AddCoursePage() {
                 ))}
               </AnimatePresence>
             </div>
-
             <button
               type="button"
               className={styles.addModuleBtn}
@@ -379,7 +336,7 @@ export default function AddCoursePage() {
           </div>
         </div>
 
-        {/* --- BOTTOM ACTION BAR --- */}
+        {/* BOTTOM ACTION BAR */}
         <motion.div
           className={styles.actionBar}
           initial={{ y: 50, opacity: 0 }}
@@ -396,15 +353,14 @@ export default function AddCoursePage() {
           <button
             type="submit"
             className={styles.saveBtn}
-            disabled={isSubmitting}
+            disabled={saveCourseMutation.isPending}
           >
             <FiSave size={20} />{" "}
-            {isSubmitting ? "Menyimpan..." : "Terbitkan Kursus"}
+            {saveCourseMutation.isPending ? "Menyimpan..." : "Terbitkan Kursus"}
           </button>
         </motion.div>
       </form>
 
-      {/* POPUP SUKSES */}
       <Popup
         isOpen={popup.isOpen}
         type={popup.type}

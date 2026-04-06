@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import api from "@/utils/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./DashboardPage.module.css";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 import {
   FiClock,
@@ -28,14 +29,21 @@ export default function DashboardPage() {
   const userName = user ? user.name : "Pengguna";
   const firstName = userName.split(" ")[0];
 
-  const [dbStats, setDbStats] = useState({
-    timeBalance: 0,
-    learningMinutes: 0,
-    upcomingSessions: 0,
-    completedSessions: 0,
-    mentoringSessions: [],
+  // SERVER STATE: Menarik data statistik menggunakan TanStack Query
+  const { data: dbStats, isLoading } = useQuery({
+    queryKey: ["dashboard", user?.id],
+    queryFn: async () => {
+      const data = await api.get(`/users/${user.id}/dashboard`);
+      return {
+        timeBalance: data.timeBalance || 0,
+        learningMinutes: data.learningMinutes || 0,
+        upcomingSessions: data.upcomingSessions || 0,
+        completedSessions: data.completedSessions || 0,
+        mentoringSessions: data.mentoringSessions || [],
+      };
+    },
+    enabled: !!user?.id, // Hanya jalan jika user ID ada
   });
-  const [loading, setLoading] = useState(true);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -51,31 +59,6 @@ export default function DashboardPage() {
     },
   };
 
-  useEffect(() => {
-    const fetchDashboardData = async () => {
-      try {
-        if (!user?.id) return;
-
-        const data = await api.get(`/users/${user.id}/dashboard`);
-
-        setDbStats({
-          timeBalance: data.timeBalance || 0,
-          learningMinutes: data.learningMinutes || 0,
-          upcomingSessions: data.upcomingSessions || 0,
-          completedSessions: data.completedSessions || 0,
-          mentoringSessions: data.mentoringSessions || [],
-        });
-      } catch (error) {
-        console.error("Gagal memuat statistik dashboard:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchDashboardData();
-  }, []);
-
-  // Fungsi untuk memformat tanggal database menjadi teks yang rapi
   const formatScheduleTime = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
@@ -90,14 +73,22 @@ export default function DashboardPage() {
     );
   };
 
-  // Daftar tema warna agar list jadwal berwarna-warni
   const colorThemes = [
     { bg: "var(--primary-yellow)", badge: "#fde68a" },
     { bg: "var(--primary-blue)", badge: "#bfdbfe" },
-    { bg: "var(--primary-green)", badge: "#86efac" }, // Hijau lembut
+    { bg: "var(--primary-green)", badge: "#86efac" },
   ];
 
-  // Mapping data stat kotak-kotak
+  if (isLoading) {
+    return (
+      <DashboardLayout title="Dashboard">
+        <div style={{ padding: "40px", textAlign: "center" }}>
+          Memuat dashboard...
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   const stats = [
     {
       label: "Dompet Waktu",
@@ -221,9 +212,7 @@ export default function DashboardPage() {
               </div>
             ) : (
               dbStats.mentoringSessions.map((session, index) => {
-                // Ambil warna tema secara berurutan
                 const theme = colorThemes[index % colorThemes.length];
-
                 return (
                   <div
                     key={session.id}

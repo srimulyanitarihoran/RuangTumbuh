@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import api from "@/utils/api";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./ProfilePage.module.css";
+import { useQuery } from "@tanstack/react-query";
 import {
   FiEdit3,
   FiMail,
@@ -18,40 +19,17 @@ import {
 } from "react-icons/fi";
 
 export default function ProfilePage() {
-  const { user: localUser, logout } = useAuth();
+  const { user: localUser } = useAuth();
   const navigate = useNavigate();
 
-  const [userProfile, setUserProfile] = useState({
-    name: "",
-    email: "",
-    passions: [],
-    stats: { learningMinutes: 0, teachingSessions: 0 },
+  // SERVER STATE
+  const { data: userProfile, isLoading } = useQuery({
+    queryKey: ["profile", localUser?.id],
+    queryFn: async () => {
+      return await api.get(`/users/${localUser.id}`);
+    },
+    enabled: !!localUser?.id,
   });
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        if (!localUser.id) {
-          navigate("/login");
-          return;
-        }
-
-        const data = await api.get(`/users/${localUser.id}`);
-        setUserProfile(data);
-      } catch (error) {
-        console.error("Gagal mengambil data profil:", error);
-      } finally {
-        setLoading(false); // 2. PERBAIKAN: Matikan loading di blok finally
-      }
-    };
-    fetchProfile();
-  }, [navigate]);
-
-  const handleLogout = () => {
-    logout();
-  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "Belum diatur";
@@ -62,7 +40,6 @@ export default function ProfilePage() {
     });
   };
 
-  // 3. PERBAIKAN: Gunakan Optional Chaining (?.) agar tidak crash jika name belum ada
   const initials = userProfile?.name
     ? userProfile.name
         .split(" ")
@@ -86,8 +63,16 @@ export default function ProfilePage() {
     },
   };
 
-  // 4. PERBAIKAN: Hilangkan interupsi loading screen.
-  // Langsung return layout utamanya saja.
+  if (isLoading) {
+    return (
+      <DashboardLayout title="Profil Saya">
+        <div style={{ padding: "40px", textAlign: "center" }}>
+          Memuat profil...
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout title="Profil Saya">
       <motion.div
@@ -140,9 +125,7 @@ export default function ProfilePage() {
                   initials
                 )}
               </div>
-              <h1 className={styles.userName}>
-                {userProfile?.name || "Memuat..."}
-              </h1>
+              <h1 className={styles.userName}>{userProfile?.name}</h1>
               <div className={styles.userDetails}>
                 <span className={styles.detailItem}>
                   <FiUser /> Siswa
@@ -153,8 +136,7 @@ export default function ProfilePage() {
                 </span>
                 <span className={styles.detailDot}>•</span>
                 <span className={styles.detailItem}>
-                  <FiCalendar /> Bergabung Pada{" "}
-                  {formatDate(userProfile?.createdAt)}
+                  <FiCalendar /> Bergabung {formatDate(userProfile?.createdAt)}
                 </span>
               </div>
             </div>
@@ -199,9 +181,7 @@ export default function ProfilePage() {
                     </div>
                     <div className={styles.infoItemText}>
                       <p className={styles.infoLabel}>Kontak Email</p>
-                      <p className={styles.infoValue}>
-                        {userProfile?.email || "..."}
-                      </p>
+                      <p className={styles.infoValue}>{userProfile?.email}</p>
                     </div>
                   </div>
                   <div className={styles.infoItem}>
@@ -264,7 +244,6 @@ export default function ProfilePage() {
                 </motion.button>
               </div>
             </motion.div>
-            {/* Action Card tetap sama */}
           </div>
         </div>
       </motion.div>

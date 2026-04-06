@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import { LoginForm } from "./LoginForm"; // (Atau RegisterForm)
 import api from "@/utils/api";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 vi.mock("@/utils/api", () => ({
   default: { post: vi.fn() },
@@ -25,12 +26,17 @@ describe("Komponen LoginForm", () => {
     vi.clearAllMocks(); // Bersihkan memori mock sebelum tiap test mulai
   });
 
-  // Fungsi pembantu agar tidak capek menulis BrowserRouter terus
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+
   const renderWithRouter = () => {
     return render(
-      <BrowserRouter>
-        <LoginForm />
-      </BrowserRouter>,
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <LoginForm /> {/* ATAU <RegisterForm /> */}
+        </BrowserRouter>
+      </QueryClientProvider>,
     );
   };
 

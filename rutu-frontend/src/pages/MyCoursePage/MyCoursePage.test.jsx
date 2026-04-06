@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import MyCoursePage from "./MyCoursePage";
 import api from "@/utils/api";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 vi.mock("@/utils/api", () => ({
   default: { get: vi.fn(), patch: vi.fn() },
@@ -38,15 +39,21 @@ describe("Halaman MyCoursePage", () => {
   });
 
   it("harus merender tab kelas saya tanpa error jaringan", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+
     render(
-      <BrowserRouter>
-        <MyCoursePage />
-      </BrowserRouter>,
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <MyCoursePage />
+        </BrowserRouter>
+      </QueryClientProvider>,
     );
 
     await waitFor(() => {
       const elements = screen.getAllByText(/Kursus Saya/i);
-      expect(elements.length).toBeGreaterThan(0); // Pastikan minimal ada 1 yang dirender
+      expect(elements.length).toBeGreaterThan(0);
     });
   });
 });

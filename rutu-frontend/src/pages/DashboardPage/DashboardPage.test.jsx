@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import DashboardPage from "./DashboardPage";
 import api from "@/utils/api";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 vi.mock("@/utils/api", () => ({
   default: { get: vi.fn() },
@@ -25,6 +26,10 @@ describe("Halaman DashboardPage", () => {
   });
 
   it("harus merender statistik dashboard tanpa error", async () => {
+    const queryClient = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    });
+
     api.get.mockResolvedValueOnce({
       timeBalance: 100,
       learningMinutes: 300,
@@ -33,9 +38,11 @@ describe("Halaman DashboardPage", () => {
     });
 
     render(
-      <BrowserRouter>
-        <DashboardPage />
-      </BrowserRouter>,
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <DashboardPage />
+        </BrowserRouter>
+      </QueryClientProvider>,
     );
 
     await waitFor(() => {

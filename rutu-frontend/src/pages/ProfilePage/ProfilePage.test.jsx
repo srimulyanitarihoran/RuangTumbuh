@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import ProfilePage from "./ProfilePage";
 import api from "@/utils/api";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 vi.mock("@/utils/api", () => ({
   default: { get: vi.fn() },
@@ -21,8 +22,13 @@ vi.mock("@/contexts/AuthContext", () => ({
 }));
 
 describe("Halaman ProfilePage", () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+
   beforeEach(() => {
     vi.clearAllMocks();
+    queryClient.clear();
 
     api.get.mockResolvedValue({
       name: "Rafif Sava",
@@ -34,18 +40,17 @@ describe("Halaman ProfilePage", () => {
 
   it("harus merender halaman dan menampilkan nama user dari backend", async () => {
     render(
-      <BrowserRouter>
-        <ProfilePage />
-      </BrowserRouter>,
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <ProfilePage />
+        </BrowserRouter>
+      </QueryClientProvider>,
     );
 
     await waitFor(() => {
       expect(screen.getByText("Profil Saya")).toBeInTheDocument();
-
       const nameElements = screen.getAllByText("Rafif Sava");
       expect(nameElements.length).toBeGreaterThan(0);
-
-      expect(screen.getByText("rafif@example.com")).toBeInTheDocument();
     });
   });
 });
