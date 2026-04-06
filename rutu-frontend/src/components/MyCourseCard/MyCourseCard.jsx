@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "@/utils/api";
 import styles from "./MyCourseCard.module.css";
 import { Popup } from "../Popup/Popup";
 import {
@@ -16,13 +17,16 @@ import {
 export default function MyCourseCard({ course, onRefresh }) {
   const navigate = useNavigate();
   const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [popup, setPopup] = useState({ isOpen: false, type: "success", title: "", description: "" });
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    description: "",
+  });
 
   const handleDelete = async () => {
     try {
-      const response = await fetch(`http://localhost:5001/api/course/${course.id}`, {
-        method: "DELETE",
-      });
+      const response = await api.delete(`/course/${course.id}`);
 
       if (response.ok) {
         setShowDeletePopup(false);
@@ -34,7 +38,8 @@ export default function MyCourseCard({ course, onRefresh }) {
           isOpen: true,
           type: "danger",
           title: "Gagal Menghapus",
-          description: result.message || "Terjadi kesalahan saat menghapus kursus.",
+          description:
+            result.message || "Terjadi kesalahan saat menghapus kursus.",
         });
       }
     } catch (error) {
@@ -44,7 +49,8 @@ export default function MyCourseCard({ course, onRefresh }) {
         isOpen: true,
         type: "danger",
         title: "Kesalahan Koneksi",
-        description: "Terjadi kesalahan saat menghapus kursus. Periksa koneksi Anda.",
+        description:
+          "Terjadi kesalahan saat menghapus kursus. Periksa koneksi Anda.",
       });
     }
   };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import api from "@/utils/api";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./SearchPage.module.css";
@@ -126,11 +127,7 @@ export default function SearchPage() {
           category: activeCategory,
         });
 
-        // Ingat, kita ganti ke alamat plural: /api/courses
-        const response = await fetch(
-          `http://localhost:5001/api/courses?${queryParams}`,
-        );
-        const result = await response.json();
+        const result = await api.get(`/courses?${queryParams}`);
 
         // Mapping DTO dari Backend ke format Frontend
         const formattedData = result.data.map((item) => {

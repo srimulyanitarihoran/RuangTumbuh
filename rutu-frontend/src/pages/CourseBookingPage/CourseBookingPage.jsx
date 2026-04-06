@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import api from "@/utils/api";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
@@ -30,7 +31,7 @@ export default function CourseBookingPage() {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/courses/${id}`);
+        const response = await api.get(`/courses/${id}`);
         const data = await response.json();
         if (response.ok) {
           setCourse(data);
@@ -80,18 +81,12 @@ export default function CourseBookingPage() {
       // Gabungkan date dan time menjadi ISO string
       const scheduledAt = new Date(`${formData.date}T${formData.time}`);
 
-      const response = await fetch("http://localhost:5001/api/bookings", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          courseId: parseInt(id),
-          studentId: currentUser.id,
-          studentName: currentUser.name,
-          scheduledAt: scheduledAt.toISOString(),
-          note: formData.note,
-        }),
+      const response = await api.post("/bookings", {
+        courseId: parseInt(id),
+        studentId: currentUser.id,
+        studentName: currentUser.name,
+        scheduledAt: scheduledAt.toISOString(),
+        note: formData.note,
       });
 
       const result = await response.json();

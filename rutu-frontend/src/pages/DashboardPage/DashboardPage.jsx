@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import api from "@/utils/api";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./DashboardPage.module.css";
@@ -21,9 +23,8 @@ import shape13 from "@/assets/shape13.svg";
 
 export default function DashboardPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  const userString = localStorage.getItem("user");
-  const user = userString ? JSON.parse(userString) : null;
   const userName = user ? user.name : "Pengguna";
   const firstName = userName.split(" ")[0];
 
@@ -53,22 +54,17 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const localUser = JSON.parse(localStorage.getItem("user") || "{}");
-        if (!localUser.id) return;
+        if (!user?.id) return;
 
-        const response = await fetch(
-          `http://localhost:5001/api/users/${localUser.id}/dashboard`,
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setDbStats({
-            timeBalance: data.timeBalance || 0,
-            learningMinutes: data.learningMinutes || 0,
-            upcomingSessions: data.upcomingSessions || 0,
-            completedSessions: data.completedSessions || 0,
-            mentoringSessions: data.mentoringSessions || [], // <-- Ambil data dari backend
-          });
-        }
+        const data = await api.get(`/users/${user.id}/dashboard`);
+
+        setDbStats({
+          timeBalance: data.timeBalance || 0,
+          learningMinutes: data.learningMinutes || 0,
+          upcomingSessions: data.upcomingSessions || 0,
+          completedSessions: data.completedSessions || 0,
+          mentoringSessions: data.mentoringSessions || [],
+        });
       } catch (error) {
         console.error("Gagal memuat statistik dashboard:", error);
       } finally {

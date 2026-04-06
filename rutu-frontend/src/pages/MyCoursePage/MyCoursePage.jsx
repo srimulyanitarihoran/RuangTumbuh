@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import api from "@/utils/api";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
@@ -14,9 +16,7 @@ import {
   FiBookOpen,
   FiStar,
   FiCalendar,
-  FiVideo,
   FiMessageCircle,
-  FiMoreHorizontal,
   FiBell,
   FiPlayCircle,
   FiCheckCircle,
@@ -79,6 +79,8 @@ const completedCourses = [
 
 export default function MyCoursePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [activeTab, setActiveTab] = useState("Kursus Saya");
   const [myCreatedCourses, setMyCreatedCourses] = useState([]);
   const [myBookings, setMyBookings] = useState([]);
@@ -91,21 +93,12 @@ export default function MyCoursePage() {
     description: "",
   });
 
-  const user = JSON.parse(localStorage.getItem("user") || "{}");
-  const API_URL = "http://localhost:5001/api";
 
   const fetchMyCreatedCourses = async () => {
     try {
-      const response = await axios.get(`${API_URL}/courses?tutorId=${user.id}`);
-
-      const coursesArray = response.data.data;
-
-      if (Array.isArray(coursesArray)) {
-        setMyCreatedCourses(coursesArray);
-      } else {
-        console.error("Data yang diterima bukan array:", coursesArray);
-        setMyCreatedCourses([]);
-      }
+      const result = await api.get(`/courses?tutorId=${user.id}`);
+      const coursesArray = result.data;
+      setMyCreatedCourses(Array.isArray(coursesArray) ? coursesArray : []);
     } catch (error) {
       console.error("Error fetching my courses:", error);
     }
@@ -114,22 +107,17 @@ export default function MyCoursePage() {
   const fetchMyBookings = async () => {
     try {
       if (!user.id) return;
-      const response = await fetch(
-        `${API_URL}/bookings/student?studentId=${user.id}`,
-      );
-      const data = await response.json();
-      setIncomingBookings(Array.isArray(data) ? data : []);
+      const data = await api.get(`/bookings/student?studentId=${user.id}`);
+      setMyBookings(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching my bookings:", error);
     }
   };
+
   const fetchIncomingBookings = async () => {
     try {
       if (!user.id) return;
-      const response = await fetch(
-        `${API_URL}/bookings/tutor?tutorId=${user.id}`,
-      );
-      const data = await response.json();
+      const data = await api.get(`/bookings/tutor?tutorId=${user.id}`);
       setIncomingBookings(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching incoming bookings:", error);
@@ -138,16 +126,11 @@ export default function MyCoursePage() {
 
   const handleStatusUpdate = async (bookingId, newStatus) => {
     try {
-      const response = await fetch(
-        `http://localhost:5001/api/bookings/${bookingId}/status`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: newStatus, tutorId: user.id }),
-        },
-      );
-      const result = await response.json();
-      if (response.ok) {
+      const result = await api.patch(`/bookings/${bookingId}/status`, {
+        status: newStatus,
+        tutorId: user.id,
+      });
+      if (result.success) {
         setPopup({
           isOpen: true,
           type: "success",

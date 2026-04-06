@@ -1,21 +1,23 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { BrowserRouter } from "react-router-dom"; // Wajib karena LoginForm pakai useNavigate dan Link
-import { LoginForm } from "./LoginForm";
-import axios from "axios";
+import { BrowserRouter } from "react-router-dom";
+import { LoginForm } from "./LoginForm"; // (Atau RegisterForm)
+import api from "@/utils/api";
 
-// 1. MOCKING (Meniru fungsi eksternal)
-vi.mock("axios"); // Meniru axios agar tidak menembak API asli
+vi.mock("@/utils/api", () => ({
+  default: { post: vi.fn() },
+}));
+
 const mockNavigate = vi.fn();
-
-// Meniru react-router-dom untuk mengambil kendali navigasi
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
+  return { ...actual, useNavigate: () => mockNavigate };
 });
+
+const mockLogin = vi.fn();
+vi.mock("@/contexts/AuthContext", () => ({
+  useAuth: () => ({ login: mockLogin }),
+}));
 
 describe("Komponen LoginForm", () => {
   // 2. SETUP SEBELUM TIAP TEST
@@ -45,7 +47,7 @@ describe("Komponen LoginForm", () => {
     // 3. SKENARIO API GAGAL
     // Kita atur agar axios.post selalu mengembalikan error
     const errorMessage = "Email atau password salah!";
-    axios.post.mockRejectedValueOnce({
+    api.post.mockRejectedValueOnce({
       response: { data: { message: errorMessage } },
     });
 
@@ -71,7 +73,7 @@ describe("Komponen LoginForm", () => {
 
   it("harus menampilkan popup sukses dan redirect jika API login berhasil", async () => {
     // 5. SKENARIO API BERHASIL
-    axios.post.mockResolvedValueOnce({
+    api.post.mockResolvedValueOnce({
       data: { token: "fake-token", user: { id: 1, name: "Budi" } },
     });
 

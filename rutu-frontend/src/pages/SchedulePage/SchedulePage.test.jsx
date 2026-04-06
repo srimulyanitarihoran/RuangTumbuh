@@ -2,25 +2,34 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { BrowserRouter } from "react-router-dom";
 import SchedulePage from "./SchedulePage";
+import api from "@/utils/api";
 
+// 1. Mock API
+vi.mock("@/utils/api", () => ({
+  default: { get: vi.fn(), delete: vi.fn() },
+}));
+
+// 2. Mock Router
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual("react-router-dom");
   return { ...actual, useNavigate: () => vi.fn() };
 });
-global.fetch = vi.fn();
+
+// 3. Mock AuthContext
+vi.mock("@/contexts/AuthContext", () => ({
+  useAuth: () => ({
+    user: { id: "user-123", name: "Rafif Sava", email: "rafif@example.com" },
+  }),
+}));
 
 describe("Halaman SchedulePage", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    Storage.prototype.getItem = vi.fn(() => JSON.stringify({ id: "user-123" }));
   });
 
   it("harus merender kalender jadwal", async () => {
-    // Tirukan balikan list jadwal kosong
-    global.fetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => [],
-    });
+    // 4. Return Array kosong karena backend mereturn array untuk jadwal
+    api.get.mockResolvedValue([]);
 
     render(
       <BrowserRouter>
@@ -29,9 +38,7 @@ describe("Halaman SchedulePage", () => {
     );
 
     await waitFor(() => {
-      // Cek tulisan dari banner Jadwal Belajar
       expect(screen.getByText(/Atur Kegiatan Kamu/i)).toBeInTheDocument();
-      // Pastikan kalender muncul dengan mengecek keberadaan hari
       expect(screen.getByText("Sun")).toBeInTheDocument();
       expect(screen.getByText("Mon")).toBeInTheDocument();
     });

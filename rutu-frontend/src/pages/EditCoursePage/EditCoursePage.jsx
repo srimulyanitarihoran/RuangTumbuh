@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-
+import api from "@/utils/api";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
@@ -22,6 +22,7 @@ import {
   FiCheckCircle,
   FiAlertCircle,
 } from "react-icons/fi";
+import api from "@/utils/api";
 
 export default function EditCoursePage() {
   const navigate = useNavigate();
@@ -39,13 +40,18 @@ export default function EditCoursePage() {
   ]);
 
   const [loading, setLoading] = useState(true);
-  const [popup, setPopup] = useState({ isOpen: false, type: "success", title: "", description: "" });
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    description: "",
+  });
 
   // Fetch existing course data
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/course/${id}`);
+        const response = await api.get(`/courses/${id}`);
         const data = await response.json();
 
         if (response.ok) {
@@ -62,7 +68,7 @@ export default function EditCoursePage() {
                 id: idx + Date.now(),
                 title: m.title || "",
                 duration: m.duration || "",
-              }))
+              })),
             );
           }
         } else {
@@ -106,7 +112,7 @@ export default function EditCoursePage() {
 
   const updateModule = (moduleId, field, value) => {
     setModules(
-      modules.map((m) => (m.id === moduleId ? { ...m, [field]: value } : m))
+      modules.map((m) => (m.id === moduleId ? { ...m, [field]: value } : m)),
     );
   };
 
@@ -147,11 +153,7 @@ export default function EditCoursePage() {
         modules: modules.map((m) => ({ title: m.title, duration: m.duration })),
       };
 
-      const response = await fetch(`http://localhost:5001/api/course/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(courseData),
-      });
+      const response = await api.put(`/courses/${id}`, courseData);
 
       const result = await response.json();
 
@@ -160,7 +162,8 @@ export default function EditCoursePage() {
           isOpen: true,
           type: "success",
           title: "Kursus Berhasil Diperbarui! 🎉",
-          description: "Data kursus telah berhasil disimpan. Mengalihkan ke halaman kursus...",
+          description:
+            "Data kursus telah berhasil disimpan. Mengalihkan ke halaman kursus...",
         });
         setTimeout(() => {
           navigate("/mycourses");
@@ -170,7 +173,8 @@ export default function EditCoursePage() {
           isOpen: true,
           type: "danger",
           title: "Gagal Menyimpan",
-          description: result.message || "Terjadi kesalahan saat menyimpan data.",
+          description:
+            result.message || "Terjadi kesalahan saat menyimpan data.",
         });
       }
     } catch (error) {
@@ -187,7 +191,14 @@ export default function EditCoursePage() {
   if (loading) {
     return (
       <DashboardLayout title="Edit Kursus">
-        <div style={{ textAlign: "center", padding: "80px 0", color: "#888", fontWeight: 600 }}>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "80px 0",
+            color: "#888",
+            fontWeight: 600,
+          }}
+        >
           Memuat data kursus...
         </div>
       </DashboardLayout>
@@ -313,7 +324,8 @@ export default function EditCoursePage() {
             </div>
 
             <p className={styles.moduleDesc}>
-              Edit daftar video atau materi yang akan dipelajari dalam kursus ini.
+              Edit daftar video atau materi yang akan dipelajari dalam kursus
+              ini.
             </p>
 
             <div className={styles.moduleList}>
@@ -390,7 +402,8 @@ export default function EditCoursePage() {
           <div className={styles.actionText}>
             <h3>Simpan Perubahan? ✏️</h3>
             <p>
-              Pastikan semua data sudah diperbarui dengan benar sebelum menyimpan.
+              Pastikan semua data sudah diperbarui dengan benar sebelum
+              menyimpan.
             </p>
           </div>
           <button type="submit" className={styles.saveBtn}>
