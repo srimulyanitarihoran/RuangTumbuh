@@ -2,28 +2,27 @@ const logger = require("../utils/logger");
 
 const validate = (schema) => (req, res, next) => {
   try {
-    // Zod akan mengecek apakah data dari request sesuai dengan schema
     schema.parse({
       body: req.body,
       query: req.query,
       params: req.params,
     });
-
-    next(); // Lanjut ke controller jika validasi sukses
+    next();
   } catch (err) {
-    // Jika gagal, tangkap error dari Zod dan rapikan formatnya
-    logger.warn(
-      `[Validation Error] Pengecekan input gagal di path: ${req.originalUrl}`,
-    );
+    // Jika ada error dari Zod, format menjadi pesan yang rapi
+    let errorMessage = "Validasi gagal";
+    if (err.errors) {
+      errorMessage = err.errors.map((e) => e.message).join(", ");
+    } else {
+      errorMessage = err.message;
+    }
 
-    const formattedErrors = err.errors.map((e) => ({
-      field: e.path[1], // Mengambil nama field yang error (misal: "password")
-      message: e.message,
-    }));
+    logger.warn(`[Validation Error] ${errorMessage}`);
 
+    // Kembalikan status 400 (Client Error), BUKAN 500 (Server Error)
     return res.status(400).json({
-      message: "Validasi data gagal!",
-      errors: formattedErrors,
+      success: false,
+      message: errorMessage,
     });
   }
 };
