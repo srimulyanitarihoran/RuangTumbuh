@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
-import styles from "./AddSchedulePage.module.css";
+import styles from "./AddCoursePage.module.css";
 import inputStyles from "@/components/Input/Input.module.css";
 import { Popup } from "@/components/Popup/Popup";
 import { Input } from "@/components/Input/Input";
