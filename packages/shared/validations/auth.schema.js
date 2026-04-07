@@ -33,4 +33,3 @@ const registerPayloadSchema = z
   });
 
 module.exports = { loginPayloadSchema, registerPayloadSchema };
-module.exports.default = module.exports;
