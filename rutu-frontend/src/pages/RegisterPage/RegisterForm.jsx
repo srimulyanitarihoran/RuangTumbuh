@@ -11,7 +11,8 @@ import { Button } from "@components/Button/Button";
 import { Input } from "@components/Input/Input";
 import { Popup } from "@components/Popup/Popup";
 
-import { registerPayloadSchema } from "@rutu/shared";
+import authSchemas from "@rutu/shared";
+const { registerPayloadSchema } = authSchemas;
 
 export const RegisterForm = () => {
   const navigate = useNavigate();

@@ -12,7 +12,8 @@ import { Button } from "@components/Button/Button";
 import { Input } from "@components/Input/Input";
 import { Popup } from "@components/Popup/Popup";
 
-import { loginPayloadSchema } from "@rutu/shared";
+import authSchemas from "@rutu/shared";
+const { loginPayloadSchema } = authSchemas;
 
 export const LoginForm = () => {
   const navigate = useNavigate();
