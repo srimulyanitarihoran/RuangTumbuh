@@ -99,7 +99,13 @@ export default function MyCoursePage() {
                 className={`${styles.tabBtn} ${activeTab === tab.id ? styles.activeTab : ""}`}
                 onClick={() => setActiveTab(tab.id)}
               >
-                {tab.icon} <span>{tab.label}</span>
+                {/* Bungkus icon agar mudah disembunyikan di CSS mobile */}
+                <span className={styles.tabIcon}>{tab.icon}</span>
+
+                {/* Teks Label */}
+                <span className={styles.tabLabel}>{tab.label}</span>
+
+                {/* Badge Count rendering di akhir, posisi diatur CSS */}
                 {counts[tab.id] > 0 && (
                   <span className={styles.badge}>{counts[tab.id]}</span>
                 )}
