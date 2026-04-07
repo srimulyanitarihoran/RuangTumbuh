@@ -7,7 +7,6 @@ import { useProfile } from "@/hooks/useProfile";
 import { getImageUrl } from "@/utils/imageHelper";
 import {
   FiEdit3,
-  FiMail,
   FiUser,
   FiMapPin,
   FiBookOpen,
@@ -145,7 +144,21 @@ export default function ProfilePage() {
                       className={styles.infoItemIcon}
                       style={{ backgroundColor: "var(--primary-yellow)" }}
                     >
-                      <FiMail />
+                      <FiBookOpen />
+                    </div>
+                    <div className={styles.infoItemText}>
+                      <p className={styles.infoLabel}>Tanggal Lahir</p>
+                      <p className={styles.infoValue}>
+                        {userProfile?.birthDate ? formatDate(userProfile.birthDate) : "-"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className={styles.infoItem}>
+                    <div
+                      className={styles.infoItemIcon}
+                      style={{ backgroundColor: "var(--primary-blue)" }}
+                    >
+                      <FiCalendar />
                     </div>
                     <div className={styles.infoItemText}>
                       <p className={styles.infoLabel}>Kontak Email</p>
