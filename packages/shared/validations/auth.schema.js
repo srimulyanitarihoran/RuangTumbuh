@@ -31,4 +31,8 @@ const registerPayloadSchema = z
   });
 
 // Export CommonJS biasa untuk melayani Backend
-module.exports = { loginPayloadSchema, registerPayloadSchema };
+module.exports = {
+  loginPayloadSchema,
+  registerPayloadSchema,
+  default: { loginPayloadSchema, registerPayloadSchema },
+};

@@ -1,5 +1,9 @@
-// Import seluruh objek dari file CommonJS
-import authSchemas from "./auth.schema.js";
+// Import seluruh objek dari CJS
+import * as authSchemas from "./auth.schema.js";
 
-// Export ulang secara spesifik (Named Exports) untuk melayani Vite/Rollup di Frontend
-export { loginPayloadSchema, registerPayloadSchema } from "./auth.schema.js";
+// Ambil skema dengan aman, entah Rollup membungkusnya di .default atau langsung
+const schemas = authSchemas.default || authSchemas;
+
+// Export ulang secara Named Exports untuk Frontend
+export const loginPayloadSchema = schemas.loginPayloadSchema;
+export const registerPayloadSchema = schemas.registerPayloadSchema;
