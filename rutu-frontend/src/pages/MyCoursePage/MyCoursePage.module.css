@@ -65,58 +65,78 @@
 ========================================= */
 .tabsContainer {
   display: flex;
-  justify-content: space-between;
+  width: 100%;
+  background-color: #fff; 
+  border: 4px solid #000; 
+  border-radius: 50px;
+  overflow: hidden;
+  box-shadow: 6px 6px 0px #000;
   scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 .tabsContainer::-webkit-scrollbar {
   display: none;
 }
 
 .tabBtn {
+  flex: 1; 
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
-  padding: 12px 28px;
-  background-color: #fff;
-  border: 3px solid #000;
-  border-radius: 20px;
+  padding: 17px 10px;
+  background-color: transparent;
+  border: none;
   font-family: "plus-jakarta", sans-serif;
   font-weight: 800;
   font-size: 1rem;
   color: #555;
   cursor: pointer;
-  box-shadow: 3px 3px 0px #000;
-  transition: all 0.2s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: none;
+  transform: none;
   white-space: nowrap;
+  position: relative; 
 }
 
-.tabBtn:hover {
-  background-color: var(--primary-yellow);
-  transform: translateY(-2px);
-  box-shadow: 5px 5px 0px #000;
+.tabBtn:hover:not(.activeTab) {
+  background-color: #e5e7eb;
   color: #000;
 }
 
 .activeTab {
-  background-color: var(--primary-yellow);
-  color: #000;
-  box-shadow: 5px 5px 0px #000;
-  transform: translateY(-2px);
+  background-color: var(--primary-yellow); 
+  color: #000; 
 }
 
 .badge {
+  position: absolute;
+  top: 5px;
+  right: 20px;
   background-color: #000;
   color: #fff;
-  font-size: 0.8rem;
-  padding: 2px 8px;
-  border-radius: 10px;
+  font-size: 0.7rem;
+  padding: 2px 7px;
+  border-radius: 20px;
   font-weight: 800;
+  border: 1px solid #fff;
 }
 
 .activeTab .badge {
-  background-color: #000;
-  color: #fff;
+  background-color: var(--primary-yellow);
+  color: #000;
+  border: 1px solid #000;
 }
+
+.tabBtn:nth-child(2):not(.activeTab) {
+  color: #38bdf8;
+} 
+.tabBtn:nth-child(3):not(.activeTab) {
+  color: #ef4444;
+}
+.tabBtn:nth-child(4):not(.activeTab) {
+  color: var(--primary-green);
+} 
 
 /* =========================================
    TAB CONTENT AREA & GRID
@@ -126,8 +146,9 @@
 }
 
 .emptyState {
+  grid-column: 1 / -1;
   width: 100%;
-  padding: 60px 20px;
+  padding: 140px 20px;
   text-align: center;
   background-color: #f7f7f7;
   border: 4px dashed #000;
@@ -484,5 +505,19 @@
   }
   .neoCardFooter {
     flex-direction: column;
+  }
+
+  .tabsContainer {
+    overflow-x: auto;
+    border-radius: 20px;
+    gap: 2px;
+  }
+  .tabBtn {
+    flex: none; 
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+  .tabBtn span {
+    display: none;
   }
 }

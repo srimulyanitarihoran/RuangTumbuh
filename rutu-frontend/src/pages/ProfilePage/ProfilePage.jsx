@@ -15,6 +15,9 @@ import {
   FiCalendar,
   FiClock,
   FiZap,
+  FiSettings,
+  FiLogOut,
+  FiTrash2,
 } from "react-icons/fi";
 
 export default function ProfilePage() {
@@ -203,6 +206,39 @@ export default function ProfilePage() {
                   onClick={() => navigate("/help")}
                 >
                   <FiZap /> Isi Saldo ⚡
+                </motion.button>
+              </div>
+            </motion.div>
+            <motion.div variants={itemVariants} className={styles.actionCard}>
+              <div className={styles.cardHeader}>
+                <FiSettings
+                  className={styles.cardIcon}
+                  style={{ color: "#666" }}
+                />
+                <h2 className={styles.cardTitle}>Pengaturan Akun</h2>
+              </div>
+
+              <div className={styles.actionList}>
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  className={`${styles.actionBtn} ${styles.logoutBtn}`}
+                  onClick={() => {
+                    // TODO: Tambahkan fungsi logout di sini
+                    console.log("Keluar akun diklik");
+                  }}
+                >
+                  <FiLogOut /> Keluar Akun
+                </motion.button>
+
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  className={`${styles.actionBtn} ${styles.deleteBtn}`}
+                  onClick={() => {
+                    // TODO: Tambahkan fungsi hapus akun di sini
+                    console.log("Hapus akun diklik");
+                  }}
+                >
+                  <FiTrash2 /> Hapus Akun
                 </motion.button>
               </div>
             </motion.div>
