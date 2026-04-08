@@ -92,7 +92,6 @@
   transition: all 0.2s ease;
 }
 
-/* Efek saat sedang mengetik */
 .searchContainer:focus-within {
   transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0px #000;

@@ -26,6 +26,8 @@ export default function MessageDetailPage() {
   const socketRef = useRef(null);
   const scrollRef = useRef(null);
 
+  const [chatPartner, setChatPartner] = useState(null);
+
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const token = localStorage.getItem("token");
 
@@ -60,10 +62,13 @@ export default function MessageDetailPage() {
             headers: { Authorization: `Bearer ${token}` },
           },
         );
-        const result = await response.json();
+        const result = await response.json(); 
+
+        // Cek sukses di tempat yang benar
         if (result.success) {
           setRoomInfo(result.data.room);
           setMessages(result.data.messages);
+          setChatPartner(result.data.chatPartner); // Simpan data lawan bicara
         }
       } catch (error) {
         console.error("Gagal mengambil riwayat pesan:", error);
@@ -124,17 +129,35 @@ export default function MessageDetailPage() {
               <div className={styles.avatarWrap}>
                 <div
                   className={styles.avatar}
-                  style={{ backgroundColor: "#38BDF8" }}
+                  style={{
+                    backgroundColor: roomInfo.isGroup ? "#38BDF8" : "#FB923C",
+                  }}
                 >
-                  R
+                  {roomInfo.isGroup
+                    ? roomInfo.name
+                      ? roomInfo.name.charAt(0)
+                      : "G"
+                    : chatPartner
+                      ? chatPartner.name.charAt(0).toUpperCase()
+                      : "?"}
                 </div>
                 <div className={styles.onlineDot}></div>
               </div>
               <div className={styles.userDetails}>
                 <h2 className={styles.userName}>
-                  {roomInfo.name || "Chat Pribadi"}
+                  {roomInfo.isGroup
+                    ? roomInfo.name
+                    : chatPartner
+                      ? chatPartner.name
+                      : "Memuat..."}
                 </h2>
-                <span className={styles.status}>Online</span>
+                <span className={styles.status}>
+                  {roomInfo.isGroup
+                    ? "Komunitas"
+                    : chatPartner
+                      ? chatPartner.description || "Siswa"
+                      : "Online"}
+                </span>
               </div>
             </div>
           </div>

@@ -26,11 +26,25 @@ exports.getChatRooms = catchAsync(async (req, res) => {
 // Ambil riwayat chat lengkap dalam satu room
 exports.getMessages = catchAsync(async (req, res) => {
   const { roomId } = req.params;
+  const currentUserId = req.user.id;
 
-  // Cari detail nama komunitasnya
+  // Ambil detail room beserta pesertanya
   const room = await prisma.chatRoom.findUnique({
     where: { id: roomId },
-    select: { id: true, name: true, isGroup: true },
+    include: {
+      participants: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              profilePicture: true,
+              description: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!room) {
@@ -39,7 +53,16 @@ exports.getMessages = catchAsync(async (req, res) => {
       .json({ success: false, message: "Room tidak ditemukan" });
   }
 
-  // Ambil semua riwayat pesannya
+  // Jika ini chat personal, cari siapa lawan bicaranya
+  let chatPartner = null;
+  if (!room.isGroup) {
+    const partnerData = room.participants.find(
+      (p) => p.userId !== currentUserId,
+    );
+    chatPartner = partnerData ? partnerData.user : null;
+  }
+
+  // Ambil riwayat pesan
   const messages = await prisma.message.findMany({
     where: { roomId },
     orderBy: { createdAt: "asc" },
@@ -48,8 +71,14 @@ exports.getMessages = catchAsync(async (req, res) => {
     },
   });
 
-  // 3. Kirim KEDUANYA ke Frontend
-  res.status(200).json({ success: true, data: { room, messages } });
+  res.status(200).json({
+    success: true,
+    data: {
+      room,
+      messages,
+      chatPartner,
+    },
+  });
 });
 
 exports.getOrCreatePrivateRoom = catchAsync(async (req, res) => {

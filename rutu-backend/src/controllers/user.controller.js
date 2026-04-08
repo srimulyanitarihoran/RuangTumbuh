@@ -2,6 +2,8 @@ const logger = require("../utils/logger");
 const userService = require("../services/user.service");
 const catchAsync = require("../utils/catchAsync");
 
+const prisma = require("../config/db");
+
 const getProfile = catchAsync(async (req, res) => {
   const profile = await userService.getUserProfile(req.params.id);
   logger.info(`[User] Data profil berhasil dimuat untuk ID: ${req.params.id}`);
