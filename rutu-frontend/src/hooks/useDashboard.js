@@ -46,9 +46,9 @@ export const useDashboard = () => {
 
   // KONSTANTA: Tema warna untuk list mentoring
   const colorThemes = [
-    { bg: "var(--primary-yellow)", badge: "#fde68a" },
-    { bg: "var(--primary-blue)", badge: "#bfdbfe" },
-    { bg: "var(--primary-green)", badge: "#86efac" },
+    { bg: "var(--primary-yellow)", badge: "#fff" },
+    { bg: "var(--primary-blue)", badge: "#fff" },
+    { bg: "var(--primary-green)", badge: "#fff" },
   ];
 
   return {

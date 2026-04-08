@@ -69,24 +69,28 @@ export default function DashboardPage() {
       value: `${dbStats.timeBalance} Menit`,
       icon: <RiWalletLine />,
       color: "var(--primary-blue)",
+      iconBg: "#58FDF7",
     },
     {
       label: "Durasi Belajar",
       value: `${dbStats.learningMinutes} Menit`,
       icon: <FiBookOpen />,
       color: "var(--primary-green)",
+      iconBg: "#74EEB0", 
     },
     {
       label: "Sesi Mendatang",
       value: dbStats.upcomingSessions.toString(),
       icon: <FiCalendar />,
       color: "var(--primary-yellow)",
+      iconBg: "#FFEA79",
     },
     {
       label: "Sesi Selesai",
       value: dbStats.completedSessions.toString(),
       icon: <FiCheckCircle />,
       color: "#a78bfa",
+      iconBg: "#D2BCFF",
     },
   ];
 
@@ -144,8 +148,13 @@ export default function DashboardPage() {
               style={{ backgroundColor: card.color }}
             >
               <div className={styles.statHeader}>
-                <span>{card.label}</span>
-                {card.icon}
+                <span className={styles.statLabel}>{card.label}</span>
+                <div
+                  className={styles.statIcon}
+                  style={{ backgroundColor: card.iconBg }}
+                >
+                  {card.icon}
+                </div>
               </div>
               <div className={styles.statValue}>{card.value}</div>
             </div>
