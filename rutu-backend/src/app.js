@@ -6,7 +6,7 @@ const logger = require("./utils/logger");
 
 const { globalLimiter } = require("./middlewares/rateLimit.middleware");
 
-// Import semua routes
+// routes
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const courseRoutes = require("./routes/course.routes");
@@ -15,7 +15,6 @@ const scheduleRoutes = require("./routes/schedule.routes");
 
 const app = express();
 
-// MIDDLEWARE GLOBAL
 const corsOptions = {
   origin: [
     "http://localhost:5173",
@@ -25,38 +24,40 @@ const corsOptions = {
   credentials: true,
 };
 app.use(cors(corsOptions));
+
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-// LOGGING
+// logging
 const morganFormat = ":method :url :status :response-time ms";
 app.use(
   morgan(morganFormat, {
     stream: {
       write: (message) => logger.info(message.trim()),
     },
-  }),
+  })
 );
 
-// RATE LIMITER
+// limiter
 app.use("/api", globalLimiter);
 
-// DAFTARKAN ROUTES
+// routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/schedules", scheduleRoutes);
 
-// PENANGANAN URL TIDAK DITEMUKAN (404)
+// 404
 app.use((req, res) => {
   logger.warn(`Mencoba akses endpoint tidak valid: ${req.originalUrl}`);
-  res
-    .status(404)
-    .json({ success: false, message: "API Endpoint tidak ditemukan." });
+  res.status(404).json({
+    success: false,
+    message: "API Endpoint tidak ditemukan.",
+  });
 });
 
-// ERROR HANDLER GLOBAL (Paling Bawah)
+// error handler
 const errorHandler = require("./middlewares/error.middleware");
 app.use(errorHandler);
 
