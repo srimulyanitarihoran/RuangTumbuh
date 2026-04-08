@@ -7,6 +7,7 @@ const router = express.Router();
 // Proteksi semua jalur ini agar wajib login menggunakan verifyToken
 router.use(verifyToken);
 
+router.get("/search-groups", chatController.searchGroups);
 router.get("/rooms", chatController.getChatRooms);
 router.get("/:roomId/messages", chatController.getMessages);
 router.post("/private", chatController.getOrCreatePrivateRoom);

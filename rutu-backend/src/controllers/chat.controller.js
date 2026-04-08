@@ -83,3 +83,22 @@ exports.getOrCreatePrivateRoom = catchAsync(async (req, res) => {
 
   res.status(200).json({ success: true, data: room });
 });
+
+exports.searchGroups = catchAsync(async (req, res) => {
+  const { q } = req.query;
+
+  if (!q) return res.status(200).json({ success: true, data: [] });
+
+  const groups = await prisma.chatRoom.findMany({
+    where: {
+      isGroup: true,
+      name: {
+        contains: q,
+        mode: "insensitive", // Tidak peduli huruf besar/kecil
+      },
+    },
+    take: 10,
+  });
+
+  res.status(200).json({ success: true, data: groups });
+});

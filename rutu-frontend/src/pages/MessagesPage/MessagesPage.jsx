@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
@@ -82,10 +82,40 @@ const allMessages = [
 
 export default function MessagesPage() {
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   // PISAHKAN STATE PENCARIAN MENJADI DUA
   const [personalSearchQuery, setPersonalSearchQuery] = useState("");
   const [groupSearchQuery, setGroupSearchQuery] = useState("");
+
+  // STATE HASIL API
+  const [groupSearchResults, setGroupSearchResults] = useState([]);
+  const [isSearchingGroups, setIsSearchingGroups] = useState(false);
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(async () => {
+      if (groupSearchQuery.trim()) {
+        setIsSearchingGroups(true);
+        try {
+          const res = await fetch(
+            `${import.meta.env.VITE_API_URL}/chats/search-groups?q=${groupSearchQuery}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          );
+          const result = await res.json();
+          if (result.success) setGroupSearchResults(result.data);
+        } catch (error) {
+          console.error("Gagal mencari grup:", error);
+        }
+      } else {
+        setIsSearchingGroups(false);
+        setGroupSearchResults([]);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [groupSearchQuery, token]);
 
   // Filter khusus untuk Chat Personal
   const personalMessages = allMessages.filter(
@@ -95,13 +125,17 @@ export default function MessagesPage() {
         msg.text.toLowerCase().includes(personalSearchQuery.toLowerCase())),
   );
 
-  // Filter khusus untuk Grup Komunitas
-  const groupMessages = allMessages.filter(
-    (msg) =>
-      msg.type === "group" &&
-      (msg.name.toLowerCase().includes(groupSearchQuery.toLowerCase()) ||
-        msg.text.toLowerCase().includes(groupSearchQuery.toLowerCase())),
-  );
+  const displayGroups = isSearchingGroups
+    ? groupSearchResults.map((g) => ({
+        id: g.id,
+        name: g.name,
+        text: "Klik untuk bergabung ke komunitas",
+        color: "#38BDF8",
+        emoji: "🚀",
+        unread: 0,
+        time: "Global",
+      }))
+    : allMessages.filter((msg) => msg.type === "group");
 
   // Animasi untuk setiap kartu pesan
   const itemVariants = {
@@ -116,7 +150,7 @@ export default function MessagesPage() {
       initial="hidden"
       animate="show"
       className={`${styles.messageItem} ${msg.unread > 0 ? styles.unreadItem : ""}`}
-      onClick={() => navigate(`/message/${msg.id}`)}
+      onClick={() => navigate(`/messages/${msg.id}`)}
     >
       <div className={styles.avatar} style={{ backgroundColor: msg.color }}>
         {msg.emoji}
@@ -230,7 +264,7 @@ export default function MessagesPage() {
                 <FiUsers />
               </div>
               <h3>Grup Komunitas</h3>
-              <span className={styles.countBadge}>{groupMessages.length}</span>
+              <span className={styles.countBadge}>{displayGroups.length}</span>
             </div>
 
             {/* SEARCH BAR KHUSUS KOMUNITAS */}
@@ -252,12 +286,12 @@ export default function MessagesPage() {
 
             <div className={styles.messageList}>
               <AnimatePresence>
-                {groupMessages.length === 0 ? (
+                {displayGroups.length === 0 ? (
                   <div className={styles.emptyState}>
-                    <p>Tidak ada grup komunitas ditemukan.</p>
+                    <p>Grup tidak ditemukan.</p>
                   </div>
                 ) : (
-                  groupMessages.map((msg) => (
+                  displayGroups.map((msg) => (
                     <MessageCard key={msg.id} msg={msg} />
                   ))
                 )}
