@@ -13,7 +13,6 @@ import {
   FiUsers,
   FiVideo,
   FiSave,
-  FiX,
   FiArrowLeft,
   FiCheckCircle,
   FiChevronDown,
@@ -193,13 +192,6 @@ export default function AddSchedulePage() {
           </div>
           <div className={styles.actionButtons}>
             <button
-              type="button"
-              className={styles.cancelBtn}
-              onClick={() => navigate("/schedule")}
-            >
-              <FiX /> Batal
-            </button>
-            <button
               type="submit"
               className={styles.saveBtn}
               disabled={isPending}
@@ -208,8 +200,8 @@ export default function AddSchedulePage() {
               {isPending
                 ? "Menyimpan..."
                 : isEdit
-                  ? "Simpan Perubahan"
-                  : "Simpan Jadwal"}
+                  ? "Simpan Perubahan Jadwal"
+                  : "Simpan Jadwal Sekarang"}
             </button>
           </div>
         </div>

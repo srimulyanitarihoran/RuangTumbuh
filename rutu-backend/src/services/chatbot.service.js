@@ -3,7 +3,7 @@ const genAI = require("../config/gemini.config");
 exports.getChatbotReply = async (message) => {
   try {
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-flash-latest",
 
       // Ubah systemInstruction menjadi String biasa (lebih aman)
       systemInstruction: `Kamu adalah RuangTumbuh Bot, asisten virtual untuk platform edukasi RuangTumbuh.

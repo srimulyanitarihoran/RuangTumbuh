@@ -193,23 +193,6 @@
   white-space: nowrap;
 }
 
-.cancelBtn {
-  background-color: #fff;
-  color: #000;
-  border: 3px solid #000;
-  border-radius: 18px;
-  padding: 15px 30px;
-  font-family: "plus-jakarta", sans-serif;
-  font-weight: 800;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  box-shadow: 4px 4px 0px #000;
-  transition: all 0.2s ease;
-}
-
 /* =========================================
    RESPONSIVE
 ========================================= */
@@ -261,8 +244,7 @@
     flex-direction: column;
   }
 
-  .saveBtn,
-  .cancelBtn {
+  .saveBtn {
     width: 100%;
     justify-content: center;
   }
@@ -323,8 +305,7 @@
     padding: 20px;
   }
 
-  .saveBtn,
-  .cancelBtn {
+  .saveBtn {
     font-size: 0.95rem;
     padding: 14px 20px;
   }
