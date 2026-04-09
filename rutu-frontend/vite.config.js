@@ -24,25 +24,29 @@ export default defineConfig({
       "@components": path.resolve(__dirname, "./src/components"),
       "@assets": path.resolve(__dirname, "./src/assets"),
       "@layouts": path.resolve(__dirname, "./src/layouts"),
+      // PAKSA VITE PAKAI ENTRY POINT YANG BENAR UNTUK COOKIE
+      cookie: "cookie",
     },
   },
   test: {
     globals: true,
-    environment: "happy-dom", // Simulasi browser di terminal
+    environment: "happy-dom",
     setupFiles: "./src/setupTests.js",
   },
   esbuild: {
     drop: ["console", "debugger"],
   },
 
-  // Memaksa Vite mem-bundle package lokal yang menggunakan CommonJS (saat development)
   optimizeDeps: {
-    include: ["@rutu/shared"],
+    // TAMBAHKAN 'cookie' DI SINI
+    include: ["@rutu/shared", "cookie"],
   },
 
   build: {
     commonjsOptions: {
-      include: [/@rutu\/shared/],
+      // TAMBAHKAN /node_modules/ AGAR SEMUA LIBRARY COMMONJS TERDETEKSI
+      include: [/@rutu\/shared/, /node_modules/],
+      transformMixedEsModules: true,
     },
   },
 });
