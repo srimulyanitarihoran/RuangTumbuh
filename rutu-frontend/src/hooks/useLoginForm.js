@@ -20,16 +20,22 @@ export const useLoginForm = () => {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials) => {
+      // Axios interceptor kita (di api.js) sudah otomatis me-return 'response.data.data'
       return await api.post("/auth/login", credentials);
     },
-    onSuccess: (result) => {
-      login(result.user, result.token);
-      setShowPopup(true);
+    onSuccess: (data) => {
+      // Gunakan 'data.user' dan 'data.token' (karena ini sudah hasil ekstrak interceptor)
+      if (data && data.user && data.token) {
+        login(data.user, data.token);
+        setShowPopup(true);
 
-      setTimeout(() => {
-        setShowPopup(false);
-        navigate("/dashboard");
-      }, 3000);
+        setTimeout(() => {
+          setShowPopup(false);
+          navigate("/dashboard");
+        }, 3000);
+      } else {
+        setApiError("Format data dari server tidak sesuai.");
+      }
     },
     onError: (err) => {
       setApiError(err.response?.data?.message || "Email atau password salah!");

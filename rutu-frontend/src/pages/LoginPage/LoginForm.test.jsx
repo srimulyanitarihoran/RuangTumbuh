@@ -80,7 +80,8 @@ describe("Komponen LoginForm", () => {
   it("harus menampilkan popup sukses dan redirect jika API login berhasil", async () => {
     // 5. SKENARIO API BERHASIL
     api.post.mockResolvedValueOnce({
-      data: { token: "fake-token", user: { id: 1, name: "Budi" } },
+      user: { id: 1, name: "Test User", email: "test@example.com" },
+      token: "mock-token",
     });
 
     renderWithRouter();
