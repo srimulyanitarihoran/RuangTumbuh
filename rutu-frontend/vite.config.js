@@ -10,7 +10,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       "/api": {
-        target: "http://localhost:5001",
+        target: "https://ruangtumbuh-production.up.railway.app",
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/api/, "/api"),
@@ -42,7 +42,8 @@ export default defineConfig({
 
   build: {
     commonjsOptions: {
-      include: [/@rutu\/shared/],
+      include: [/@rutu\/shared/, /node_modules/],
+      exclude: [/node_modules\/cookie/],
     },
   },
 });
