@@ -5,7 +5,6 @@ import FlowCard from "./FlowCard";
 import styles from "./FlowSection.module.css";
 
 export default function FlowSection() {
-  // Panggil tracking scroll menggunakan hook yang sudah Anda buat sebelumnya
   const { scrollRef, scrollYProgress } = useSequentialScroll();
 
   return (

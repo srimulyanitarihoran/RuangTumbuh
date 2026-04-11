@@ -7,9 +7,15 @@ export default function FlowCard({ item, index, scrollYProgress }) {
   const { y, opacity, scale } = useFlowAnimation(scrollYProgress, index);
 
   return (
-    // 1. motion.div sekarang HANYA bertugas mengurus animasi saat di-scroll
-    <motion.div className={styles.cardWrapper} style={{ y, opacity, scale }}>
-      {/* 2. Kartu asli diletakkan di dalam agar bebas menggunakan efek CSS Hover */}
+    <motion.div
+      className={styles.cardWrapper}
+      style={{ y, opacity, scale }}
+      transition={{
+        type: "spring",
+        stiffness: 120,
+        damping: 20,
+      }}
+    >
       <div className={styles.card}>
         <div
           className={styles.semiCircle}
