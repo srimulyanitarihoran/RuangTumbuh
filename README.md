@@ -36,7 +36,7 @@ Untuk pengujian dan *review*, silakan akses tautan berikut:
 
 **Arsitektur Monorepo:** Dikendalikan menggunakan `pnpm workspaces`.
 
-- **Frontend (Client):** React.js 19, Vite, React Router DOM, React-Bootstrap, Framer Motion (Animasi), Zustand/Hooks, Axios.
+- **Frontend (Client):** React.js 1, Vite, React Router DOM, React-Bootstrap, Framer Motion (Animasi), Zustand/Hooks, Axios.
 - **Backend (API Server):** Node.js, Express.js, Prisma ORM, PostgreSQL, Socket.io, Google Generative AI (@google/generative-ai), JWT, Winston (Logging).
 - **DevOps & Tooling:** Docker & Docker Compose, GitHub Actions (CI/CD), Husky (Pre-commit hooks), ESLint.
 - **Testing:** Vitest & React Testing Library (Frontend), Jest & Supertest (Backend).
