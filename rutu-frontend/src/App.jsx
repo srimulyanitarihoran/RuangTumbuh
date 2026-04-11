@@ -7,6 +7,7 @@ import PublicRoute from "./routes/PublicRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+const NotFoundPage = lazy(() => import("@pages/NotFoundPage/NotFoundPage"));
 const HomePage = lazy(() => import("@pages/HomePage/HomePage"));
 const Login = lazy(() => import("@pages/LoginPage/LoginPage"));
 const Register = lazy(() => import("@pages/RegisterPage/RegisterPage"));
@@ -89,6 +90,7 @@ export default function App() {
                 <Route path="/edit-profile" element={<EditProfilePage />} />
                 <Route path="/edit-course/:id" element={<AddCoursePage />} />
               </Route>
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>
