@@ -1,22 +1,37 @@
 {
   "info": {
     "name": "RuangTumbuh API Documentation",
-    "description": "Dokumentasi RESTful API untuk platform RuangTumbuh (Booking Tutor & AI Assistant).",
+    "description": "Dokumentasi RESTful API komprehensif untuk platform RuangTumbuh mencakup Auth, User, Course, Booking, dan AI Assistant.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "Authentication",
+      "name": "1. Authentication",
       "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Siswa RuangTumbuh\",\n    \"email\": \"siswa@ruangtumbuh.com\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
         {
           "name": "Login User",
           "request": {
             "method": "POST",
-            "header": [],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n}",
-              "options": { "raw": { "language": "json" } }
+              "raw": "{\n    \"email\": \"siswa@ruangtumbuh.com\",\n    \"password\": \"password123\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/auth/login",
@@ -28,34 +43,52 @@
       ]
     },
     {
-      "name": "Courses",
+      "name": "2. Users",
+      "item": [
+        {
+          "name": "Get Profile Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/users/USER_ID_HERE",
+              "host": ["{{base_url}}"],
+              "path": ["api", "users", "USER_ID_HERE"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Courses",
       "item": [
         {
           "name": "Get All Courses",
           "request": {
             "method": "GET",
+            "header": [],
             "url": {
-              "raw": "{{base_url}}/api/courses",
+              "raw": "{{base_url}}/api/courses?page=1&limit=10",
               "host": ["{{base_url}}"],
-              "path": ["api", "courses"]
+              "path": ["api", "courses"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
             }
           }
         },
         {
-          "name": "Create Course",
+          "name": "Create Course (Tutor Only)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}",
-                "type": "text"
-              }
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"title\": \"React for Senior\",\n    \"description\": \"Advanced React patterns\",\n    \"price\": 120,\n    \"kategori\": front-end\n}",
-              "options": { "raw": { "language": "json" } }
+              "raw": "{\n    \"name\": \"Mastering React & NestJS\",\n    \"tutorId\": \"UUID_TUTOR_HERE\",\n    \"kategori\": \"Programming\",\n    \"durasi\": 120,\n    \"deskripsi\": \"Pelajari ekosistem full-stack modern dengan React dan NestJS dari dasar hingga mahir.\",\n    \"modules\": [\n        { \"title\": \"Pengenalan\", \"content\": \"Setup environment\" }\n    ]\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/courses",
@@ -67,16 +100,33 @@
       ]
     },
     {
-      "name": "AI Assistant",
+      "name": "4. Bookings",
       "item": [
         {
-          "name": "Chatbot Query",
+          "name": "Get My Bookings (Student)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{base_url}}/api/bookings/student",
+              "host": ["{{base_url}}"],
+              "path": ["api", "bookings", "student"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. AI Assistant",
+      "item": [
+        {
+          "name": "Chatbot Query (Gemini)",
           "request": {
             "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"message\": \"Bagaimana cara memesan tutor di RuangTumbuh?\"\n}",
-              "options": { "raw": { "language": "json" } }
+              "raw": "{\n    \"message\": \"Bagaimana cara memesan jadwal tutor pemrograman di RuangTumbuh?\"\n}"
             },
             "url": {
               "raw": "{{base_url}}/api/chatbot",
@@ -95,7 +145,7 @@
     }
   ],
   "variable": [
-    { "key": "base_url", "value": "http://localhost:5000" },
-    { "key": "token", "value": "" }
+    { "key": "base_url", "value": "http://localhost:5000", "type": "string" },
+    { "key": "token", "value": "PASTE_JWT_TOKEN_HERE", "type": "string" }
   ]
 }
