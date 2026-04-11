@@ -1,57 +1,45 @@
 # 🌟 RuangTumbuh (TimeBank System) 🌟
 
-![React](https://img.shields.io/badge/REACT-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Express.js](https://img.shields.io/badge/EXPRESS.JS-000000?style=for-the-badge&logo=express&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/POSTGRESQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
-![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)
-![E-Learning](https://img.shields.io/badge/E--Learning--Platform-FF5733?style=for-the-badge&logo=google-classroom&logoColor=white)
+[![CI/CD Pipeline](https://github.com/adyvka31/ruangtumbuh/actions/workflows/main.yaml/badge.svg)](https://github.com/adyvka31/ruangtumbuh/actions)
+[![Frontend Deploy](https://img.shields.io/badge/Vercel-Deployed-success?logo=vercel)](#)
+[![Backend Deploy](https://img.shields.io/badge/Railway-Deployed-success?logo=railway)](#)
+
+RuangTumbuh adalah aplikasi web *Full-Stack* berbasis *monorepo* yang memfasilitasi siswa untuk mencari, memesan (*booking*), dan mengelola jadwal kursus dengan tutor secara efisien. Proyek ini dibangun menggunakan arsitektur *workspace* (`pnpm`) untuk memisahkan *frontend*, *backend*, dan *shared library*, serta dilengkapi dengan kecerdasan buatan dan fitur *real-time*.
 
 ---
 
-## 📖 Apa itu RuangTumbuh?
+## 🚀 Live Demo & Panduan Pengguna
 
-Bosen gak sih kalau mau pinter harus keluar duit terus buat les privat? **RuangTumbuh** hadir buat ngebongkar hambatan itu! Kita adalah platform **Time Banking (Bank Waktu)** pertama yang didesain khusus buat pelajar. 🎓
+Untuk pengujian dan *review*, silakan akses tautan berikut:
 
-Di sini, mata uang kita bukan Rupiah, tapi **WAKTU**. Konsepnya simpel: Lo jago Matematika tapi pengen belajar Desain Grafis? Ajari temen lo Matematika selama satu jam, lo bakal dapet saldo "1 Jam" di dompet digitalmu. Saldo itu bisa lo pake buat "bayar" temen lain yang jago Desain buat ngajarin lo. Adil, inklusif, dan pastinya seru banget! ⚡
+- **🌍 Aplikasi Frontend (Live)**: [https://ruang-tumbuh.vercel.app/](https://ruang-tumbuh.vercel.app/)
+- **⚙️ RESTful API Backend**: [https://ruangtumbuh-production.up.railway.app/](https://ruangtumbuh-production.up.railway.app/)
+- **📖 Panduan Penggunaan (User Guide)**: [Google Drive - Panduan User](https://drive.google.com/drive/folders/1UoOZBxEGZPellOZMP9FGa5bEmSK3l_DZ?usp=sharing)
 
 ---
 
 ## ✨ Keunggulan Utama
 
-> [!IMPORTANT]
 > Kami percaya bahwa 1 jam belajar desain grafis memiliki nilai yang setara dengan 1 jam belajar fisika. Semua ilmu itu berharga!
 
-- 🎨 **Neubrutalism UI**: Desain yang berani, kontras tinggi, dan *fresh* biar lo gak bosen pas lagi belajar.
-- ⏳ **Time Wallet System**: Sistem "Dompet Waktu" yang transparan untuk mencatat saldo jam belajar lo.
-- 🤝 **Egalitarian Learning**: Demokratisasi akses bimbingan belajar tanpa hambatan ekonomi.
-- 🛡️ **Session Validation**: Keamanan terjamin dengan sistem upload bukti belajar sebelum saldo waktu ditransfer.
+- ⏳ **Time Wallet System**: Sistem "Dompet Waktu" yang transparan untuk mencatat saldo jam belajar.
+- 💻 **Sistem Booking & Penjadwalan:** Pemesanan kursus dan manajemen kalender yang dinamis.
+- 🗓️ **Integrated Calendar**: Sistem booking sesi belajar yang terintegrasi langsung dengan kalender aplikasi.
+- 💬 **Real-time Messaging:** Fitur obrolan langsung antar siswa dan tutor menggunakan *Socket.io*.
+- 🤝 **Manajemen Komunitas & Kehadiran:** Sistem pelacakan presensi dan interaksi komunitas pembelajaran.
+- 🛡️ **Session Validation:** Keamanan terjamin dengan sistem upload bukti belajar sebelum saldo waktu ditransfer.
+- 🤖 **AI Chatbot Assistant:** Integrasi cerdas menggunakan **Google Generative AI (Gemini)** untuk membantu menjawab pertanyaan pengguna secara otomatis.
 
 ---
 
-## 🛠️ Fitur-Fitur Andalan
+## 🛠️ Teknologi & Arsitektur
 
-### 👤 Personal Hub & Analytics
-- **Smart Dashboard**: Pantau saldo "Dompet Waktu", riwayat transaksi pembelajaran, dan statistik pencapaianmu.
-- **Skill-Based Profile**: Kustomisasi profil lengkap dengan minat, keahlian, dan tingkat pendidikanmu.
+**Arsitektur Monorepo:** Dikendalikan menggunakan `pnpm workspaces`.
 
-### 📅 Smart Collaboration
-- **Integrated Calendar**: Sistem *booking* sesi belajar yang terintegrasi langsung dengan kalender aplikasi.
-- **Auto Notifications**: Pengingat otomatis menjelang sesi dimulai biar tingkat kehadiran tetep 100%.
-
-### 💬 Community & Interaction
-- **In-App Chat**: Ngobrol langsung dengan calon mentor atau student untuk diskusi materi sebelum sesi dimulai.
-- **Forum Komunitas**: Ruang tanya jawab (Q&A) publik untuk berbagi tips atau melempar pertanyaan terbuka.
-
----
-
-## 💻 Tech Stack
-
-- **Frontend**: [React.js](https://reactjs.org/) (Vite)
-- **Styling**: CSS
-- **Backend**: [Express.js](https://expressjs.com/)
-- **Database**: [PostgreSQL](https://www.postgresql.org/)
-- **Networking**: [Axios](https://axios-http.com/)
-- **Real-time**: WebSockets (untuk Chat & Reminder)
+- **Frontend (Client):** React.js 19, Vite, React Router DOM, React-Bootstrap, Framer Motion (Animasi), Zustand/Hooks, Axios.
+- **Backend (API Server):** Node.js, Express.js, Prisma ORM, PostgreSQL, Socket.io, Google Generative AI (@google/generative-ai), JWT, Winston (Logging).
+- **DevOps & Tooling:** Docker & Docker Compose, GitHub Actions (CI/CD), Husky (Pre-commit hooks), ESLint.
+- **Testing:** Vitest & React Testing Library (Frontend), Jest & Supertest (Backend).
 
 ---
 
@@ -59,29 +47,29 @@ Di sini, mata uang kita bukan Rupiah, tapi **WAKTU**. Konsepnya simpel: Lo jago 
 
 RuangTumbuh dikembangkan dengan ❤️ oleh tim **Full Stack** berbakat:
 
-| Nama | Peran & Spesialisasi |
-| :--- | :--- |
-| **Rafif Sava Adyvka Pratama** | **Project Manager & Lead Back-End** (Server Architect & Time Wallet Logic) |
-| **Faiz Faishal Nugroho** | **UI/UX & Front-End** (Interactive UI & User-Centered Design) |
-| **Sri Mulyani Tarihoran** | **Lead Front-End** (React Architecture & State Management) |
-| **Pelangi Pagi** | **UI/UX & Full Stack** (Figma Designer & Component Slicing) |
-| **Emiliana Olivia Carlene** | **Full Stack & Logic** (Notification System & Flow Validation) |
+| Nama                          | Peran & Spesialisasi                                                       |
+| :---------------------------- | :------------------------------------------------------------------------- |
+| **Rafif Sava Adyvka Pratama** | **Project Manager & Full Stack Lead** (Server Architect & Time Wallet Logic) |
+| **Faiz Faishal Nugroho**      | **Full Stack Developer** (Interactive UI & User-Centered Design)              |
+| **Sri Mulyani Tarihoran**     | **Backend Developer** (React Architecture & State Management)                 |
+| **Pelangi Pagi**              | **UI/UX Designer & Frontend Developer** (Figma Designer & Component Slicing)                |
+| **Emiliana Olivia Carlene**   | **Frontend & Logic Developer** (Notification System & Flow Validation)             |
 
 ---
 
 ## 📅 Roadmap Project (2026)
 
-| Estimasi Waktu | Aktivitas |
-| :--- | :--- |
-| **09 - 15 Mar** | Tahap Perencanaan & Design UI/UX (Figma) |
-| **16 - 22 Mar** | Development Dashboard & Sistem Kalender |
-| **23 - 29 Mar** | Development Real-time Chat, Forum, & Logic TimeBank |
-| **30 Mar - 05 Apr** | Reviewing, Bug Fixing, & Finishing |
-| **05 - 11 Apr** | Deployment & Dokumentasi Akhir |
+| Estimasi Waktu      | Aktivitas                                           |
+| :------------------ | :-------------------------------------------------- |
+| **09 - 15 Mar**     | Planning - Perancangan arsitektur sistem            |
+| **16 - 22 Mar**     | Development — Implementasi ui/ux & frontend         |
+| **23 - 29 Mar**     | Development — Implementasi backend & database       |
+| **30 Mar - 05 Apr** | Testing — Bug fixing, dan user acceptance testing   |
+| **05 - 11 Apr**     | Deployment — Launching, monitoring, dan finishing   |
 
 ---
 
-## 🚀 Cara Menjalankan Project
+## 🚀 Cara Menjalankan Project Lokal
 
 1. **Clone Repository**
    ```bash
@@ -95,8 +83,9 @@ RuangTumbuh dikembangkan dengan ❤️ oleh tim **Full Stack** berbakat:
    ```bash
    pnpm run dev
    ```
+
 ---
 
 <div align="center">
-  <p><b>© 2026 Coding Camp - Tim CC26-PS050. All Rights Reserved.</b></p>
+  <p><b>© 2026 RuangTumbuh. All Rights Reserved.</b></p>
 </div>
