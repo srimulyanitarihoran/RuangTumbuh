@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./DashboardPage.module.css";
 import { useDashboard } from "@/hooks/useDashboard";
+import { Skeleton } from "@/components/Skeleton/Skeleton"; // [TAMBAHAN] Import Skeleton
 import {
   FiClock,
   FiVideo,
@@ -44,14 +45,8 @@ export default function DashboardPage() {
     },
   };
 
-  if (isPending)
-    return (
-      <DashboardLayout title="Dashboard">
-        <div className={styles.loading}>Memuat dashboard...</div>
-      </DashboardLayout>
-    );
-
-  if (isError || !dbStats)
+  // [PERBAIKAN] Hapus early return untuk isPending agar layout utama tetap di-render
+  if (isError)
     return (
       <DashboardLayout title="Dashboard">
         <div className={styles.errorWrapper}>
@@ -76,7 +71,7 @@ export default function DashboardPage() {
       value: `${dbStats.learningMinutes} Menit`,
       icon: <FiBookOpen />,
       color: "var(--primary-green)",
-      iconBg: "#74EEB0", 
+      iconBg: "#74EEB0",
     },
     {
       label: "Sesi Mendatang",
@@ -102,11 +97,21 @@ export default function DashboardPage() {
         initial="hidden"
         animate="show"
       >
-        {/* BANNER UTAMA */}
+        {/* --- BANNER UTAMA --- */}
         <motion.section variants={itemVariants} className={styles.banner}>
           <div className={styles.bannerContent}>
             <h2 className={styles.bannerTitle}>
-              Halo, {firstName} <span className={styles.waveEmoji}>👋</span>
+              Halo,{" "}
+              {isPending ? (
+                <Skeleton
+                  width="140px"
+                  height="36px"
+                  style={{ display: "inline-block", verticalAlign: "middle" }}
+                />
+              ) : (
+                firstName
+              )}{" "}
+              <span className={styles.waveEmoji}>👋</span>
             </h2>
             <p className={styles.bannerSub}>
               Siap untuk belajar, berkembang, dan menjelajah hari ini?
@@ -115,12 +120,14 @@ export default function DashboardPage() {
               <button
                 className={styles.bannerBtn}
                 onClick={() => navigate("/search")}
+                disabled={isPending}
               >
                 <FiBook /> Mulai Belajar
               </button>
               <button
                 className={`${styles.bannerBtn} ${styles.btnSecondary}`}
                 onClick={() => navigate("/add-course")}
+                disabled={isPending}
               >
                 <FiVideo /> Buka Sesi Mengajar
               </button>
@@ -139,7 +146,7 @@ export default function DashboardPage() {
           </div>
         </motion.section>
 
-        {/* STATS CARDS */}
+        {/* --- STATS CARDS --- */}
         <motion.section variants={itemVariants} className={styles.statsGrid}>
           {stats.map((card, idx) => (
             <div
@@ -156,12 +163,18 @@ export default function DashboardPage() {
                   {card.icon}
                 </div>
               </div>
-              <div className={styles.statValue}>{card.value}</div>
+              <div className={styles.statValue}>
+                {isPending ? (
+                  <Skeleton width="70%" height="32px" />
+                ) : (
+                  card.value
+                )}
+              </div>
             </div>
           ))}
         </motion.section>
 
-        {/* MENTORING SESSIONS LIST */}
+        {/* --- MENTORING SESSIONS LIST --- */}
         <motion.section
           variants={itemVariants}
           className={styles.mentoringSection}
@@ -177,7 +190,45 @@ export default function DashboardPage() {
           </div>
 
           <div className={styles.mentoringList}>
-            {dbStats.mentoringSessions.length === 0 ? (
+            {isPending ? (
+              /* [SKELETON UNTUK LIST JADWAL] */
+              Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={`skeleton-session-${index}`}
+                  className={styles.mentoringItem}
+                  style={{ backgroundColor: "#f1f5f9" }}
+                >
+                  <div className={styles.itemContent}>
+                    <div
+                      className={styles.itemIcon}
+                      style={{ backgroundColor: "#e2e8f0" }}
+                    >
+                      <Skeleton variant="circle" width="28px" height="28px" />
+                    </div>
+                    <div className={styles.itemText}>
+                      <Skeleton
+                        width="180px"
+                        height="20px"
+                        style={{ marginBottom: "8px" }}
+                      />
+                      <div className={styles.itemMeta}>
+                        <Skeleton width="120px" height="14px" />
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    className={styles.statusBadge}
+                    style={{ backgroundColor: "transparent", padding: 0 }}
+                  >
+                    <Skeleton
+                      width="80px"
+                      height="28px"
+                      style={{ borderRadius: "14px" }}
+                    />
+                  </div>
+                </div>
+              ))
+            ) : dbStats.mentoringSessions.length === 0 ? (
               <div className={styles.emptyState}>
                 <h3>Belum Ada Jadwal</h3>
                 <p>Cari dan daftar kelas sekarang!</p>

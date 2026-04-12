@@ -5,6 +5,7 @@ import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./MessagesPage.module.css";
 import { FiSearch, FiUsers, FiUser } from "react-icons/fi";
 import { BsCheckAll } from "react-icons/bs";
+import { Skeleton } from "@/components/Skeleton/Skeleton"; // [TAMBAHAN] Import Skeleton
 
 // URL Backend API
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5001";
@@ -16,20 +17,24 @@ export default function MessagesPage() {
 
   // --- STATE RIWAYAT CHAT ---
   const [historyRooms, setHistoryRooms] = useState([]);
+  const [isLoadingRooms, setIsLoadingRooms] = useState(true); // [TAMBAHAN] State loading
 
   // --- STATE PENCARIAN PERSONAL ---
   const [personalSearchQuery, setPersonalSearchQuery] = useState("");
   const [personalSearchResults, setPersonalSearchResults] = useState([]);
   const [isSearchingPersonal, setIsSearchingPersonal] = useState(false);
+  const [isPersonalLoading, setIsPersonalLoading] = useState(false); // [TAMBAHAN] State loading pencarian
 
   // --- STATE PENCARIAN GRUP ---
   const [groupSearchQuery, setGroupSearchQuery] = useState("");
   const [groupSearchResults, setGroupSearchResults] = useState([]);
   const [isSearchingGroups, setIsSearchingGroups] = useState(false);
+  const [isGroupLoading, setIsGroupLoading] = useState(false); // [TAMBAHAN] State loading pencarian
 
   // 1. AMBIL RIWAYAT CHAT SAAT HALAMAN DIMUAT
   useEffect(() => {
     const fetchRooms = async () => {
+      setIsLoadingRooms(true);
       try {
         const res = await fetch(`${BASE_URL}/api/chats/rooms`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -38,6 +43,8 @@ export default function MessagesPage() {
         if (result.success) setHistoryRooms(result.data);
       } catch (error) {
         console.error("Gagal memuat riwayat:", error);
+      } finally {
+        setIsLoadingRooms(false);
       }
     };
     if (token) fetchRooms();
@@ -48,6 +55,7 @@ export default function MessagesPage() {
     const delayDebounce = setTimeout(async () => {
       if (personalSearchQuery.trim()) {
         setIsSearchingPersonal(true);
+        setIsPersonalLoading(true);
         try {
           const res = await fetch(
             `${BASE_URL}/api/users/search?q=${personalSearchQuery}`,
@@ -59,6 +67,8 @@ export default function MessagesPage() {
           if (result.success) setPersonalSearchResults(result.data);
         } catch (error) {
           console.error("Gagal mencari user:", error);
+        } finally {
+          setIsPersonalLoading(false);
         }
       } else {
         setIsSearchingPersonal(false);
@@ -74,6 +84,7 @@ export default function MessagesPage() {
     const delayDebounce = setTimeout(async () => {
       if (groupSearchQuery.trim()) {
         setIsSearchingGroups(true);
+        setIsGroupLoading(true);
         try {
           const res = await fetch(
             `${BASE_URL}/api/chats/search-groups?q=${groupSearchQuery}`,
@@ -85,6 +96,8 @@ export default function MessagesPage() {
           if (result.success) setGroupSearchResults(result.data);
         } catch (error) {
           console.error("Gagal mencari grup:", error);
+        } finally {
+          setIsGroupLoading(false);
         }
       } else {
         setIsSearchingGroups(false);
@@ -102,7 +115,6 @@ export default function MessagesPage() {
       return;
     }
 
-    // Jika belum ada room (hasil dari pencarian user), BUAT via API
     try {
       const res = await fetch(`${BASE_URL}/api/chats/private`, {
         method: "POST",
@@ -147,7 +159,7 @@ export default function MessagesPage() {
             isExisting: true,
             type: "personal",
             name: otherUser ? otherUser.name : "Unknown",
-            text: room.messages[0].text, // Sudah pasti ada karena difilter
+            text: room.messages[0].text,
             color: "#FB923C",
             emoji: otherUser ? otherUser.name.charAt(0).toUpperCase() : "👤",
             unread: 0,
@@ -190,13 +202,11 @@ export default function MessagesPage() {
           }),
         }));
 
-  // Animasi untuk setiap kartu pesan
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     show: { y: 0, opacity: 1, transition: { type: "spring", bounce: 0.4 } },
   };
 
-  // Komponen reusable untuk Kartu Pesan
   const MessageCard = ({ msg }) => (
     <motion.div
       variants={itemVariants}
@@ -232,6 +242,33 @@ export default function MessagesPage() {
         ) : (
           <BsCheckAll className={styles.readIcon} />
         )}
+      </div>
+    </motion.div>
+  );
+
+  // [TAMBAHAN] Komponen Skeleton yang menyerupai MessageCard
+  const MessageSkeleton = () => (
+    <motion.div
+      variants={itemVariants}
+      initial="hidden"
+      animate="show"
+      className={styles.messageItem}
+      style={{ cursor: "default", backgroundColor: "#fff" }} // Hindari hover effect
+    >
+      <div
+        className={styles.avatar}
+        style={{ backgroundColor: "transparent", border: "none" }}
+      >
+        <Skeleton variant="circle" width="48px" height="48px" />
+      </div>
+
+      <div className={styles.textGroup} style={{ gap: "6px" }}>
+        <Skeleton width="120px" height="18px" />
+        <Skeleton width="200px" height="14px" />
+      </div>
+
+      <div className={styles.metaGroup}>
+        <Skeleton width="40px" height="14px" />
       </div>
     </motion.div>
   );
@@ -273,7 +310,9 @@ export default function MessagesPage() {
                 {isSearchingPersonal ? "Hasil Pencarian" : "Chat Personal"}
               </h3>
               <span className={styles.countBadge}>
-                {displayPersonal.length}
+                {isLoadingRooms || isPersonalLoading
+                  ? "..."
+                  : displayPersonal.length}
               </span>
             </div>
 
@@ -295,7 +334,12 @@ export default function MessagesPage() {
 
             <div className={styles.messageList}>
               <AnimatePresence>
-                {displayPersonal.length === 0 ? (
+                {isLoadingRooms || isPersonalLoading ? (
+                  // Tampilkan Skeleton jika sedang loading rooms atau sedang mencari user
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <MessageSkeleton key={`personal-skeleton-${index}`} />
+                  ))
+                ) : displayPersonal.length === 0 ? (
                   <div className={styles.emptyState}>
                     <p>
                       {isSearchingPersonal
@@ -324,7 +368,11 @@ export default function MessagesPage() {
               <h3>
                 {isSearchingGroups ? "Hasil Pencarian" : "Grup Komunitas"}
               </h3>
-              <span className={styles.countBadge}>{displayGroups.length}</span>
+              <span className={styles.countBadge}>
+                {isLoadingRooms || isGroupLoading
+                  ? "..."
+                  : displayGroups.length}
+              </span>
             </div>
 
             <div
@@ -345,7 +393,12 @@ export default function MessagesPage() {
 
             <div className={styles.messageList}>
               <AnimatePresence>
-                {displayGroups.length === 0 ? (
+                {isLoadingRooms || isGroupLoading ? (
+                  // Tampilkan Skeleton jika sedang loading rooms atau sedang mencari grup
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <MessageSkeleton key={`group-skeleton-${index}`} />
+                  ))
+                ) : displayGroups.length === 0 ? (
                   <div className={styles.emptyState}>
                     <p>
                       {isSearchingGroups

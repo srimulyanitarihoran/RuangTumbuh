@@ -8,6 +8,7 @@ import CourseCard from "@/components/CourseCard/CourseCard";
 import { Input } from "@/components/Input/Input";
 import { useMyCourses } from "@/hooks/useMyCourses";
 import { getCourseExtras, MY_COURSE_TABS } from "@/constants/courseData";
+import { CourseCardSkeleton } from "@/components/CourseCard/CourseCardSkeleton";
 import {
   FiCheck,
   FiX,
@@ -168,7 +169,9 @@ export default function MyCoursePage() {
                 className={styles.gridContainer}
               >
                 {loading ? (
-                  <div className={styles.emptyState}>Memuat kursus...</div>
+                  Array.from({ length: 6 }).map((_, index) => (
+                    <CourseCardSkeleton key={`skeleton-${index}`} />
+                  ))
                 ) : myCreatedCourses.length === 0 ? (
                   <div className={styles.emptyState}>Belum membuat kursus.</div>
                 ) : (
@@ -194,7 +197,11 @@ export default function MyCoursePage() {
                 exit="exit"
                 className={styles.gridContainer}
               >
-                {myBookings.length === 0 ? (
+                {loading ? (
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <CourseCardSkeleton key={`skeleton-book-${index}`} />
+                  ))
+                ) : myBookings.length === 0 ? (
                   <div className={styles.emptyState}>
                     Belum ada pengajuan. Cari kursus di Search!
                   </div>
@@ -377,7 +384,12 @@ export default function MyCoursePage() {
                 exit="exit"
                 className={styles.gridContainer}
               >
-                {incomingBookings.length === 0 ? (
+                {/* [TAMBAHAN SKELETON] */}
+                {loading ? (
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <CourseCardSkeleton key={`skeleton-req-${index}`} />
+                  ))
+                ) : incomingBookings.length === 0 ? (
                   <div className={styles.emptyState}>
                     Belum ada permintaan masuk dari siswa.
                   </div>
@@ -523,7 +535,12 @@ export default function MyCoursePage() {
                 exit="exit"
                 className={styles.gridContainer}
               >
-                {completedBookings.length === 0 ? (
+                {/* [TAMBAHAN SKELETON] */}
+                {loading ? (
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <CourseCardSkeleton key={`skeleton-done-${index}`} />
+                  ))
+                ) : completedBookings.length === 0 ? (
                   <div className={styles.emptyState}>
                     Belum ada riwayat kursus yang diselesaikan.
                   </div>

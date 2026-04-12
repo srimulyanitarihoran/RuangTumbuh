@@ -4,6 +4,7 @@ import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./SchedulePage.module.css";
 import { SCHEDULE_CATEGORIES, MONTH_NAMES } from "@/constants/scheduleData";
 import { useScheduleData } from "@/hooks/useScheduleData";
+import { Skeleton } from "@/components/Skeleton/Skeleton"; // [TAMBAHAN] Import Skeleton
 import {
   FiCalendar,
   FiClock,
@@ -181,9 +182,92 @@ export default function SchedulePage() {
                     className={styles.timelineList}
                   >
                     {isLoading ? (
-                      <div className={styles.emptyState}>
-                        <p>Memuat jadwal...</p>
-                      </div>
+                      /* [PERUBAHAN SKELETON LOADING] */
+                      Array.from({ length: 3 }).map((_, index) => (
+                        <motion.div
+                          key={`skeleton-${index}`}
+                          variants={itemVariants}
+                          className={styles.timelineItem}
+                        >
+                          <div className={styles.cardCol}>
+                            <div
+                              className={styles.scheduleCard}
+                              style={{
+                                backgroundColor: "#fff",
+                                border: "2px solid #e2e8f0",
+                                boxShadow: "none",
+                              }}
+                            >
+                              {/* Header Card Skeleton */}
+                              <div
+                                className={styles.cardHeader}
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "space-between",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <Skeleton
+                                  width="120px"
+                                  height="28px"
+                                  style={{ borderRadius: "20px" }}
+                                />
+                                <Skeleton
+                                  width="90px"
+                                  height="28px"
+                                  style={{ borderRadius: "20px" }}
+                                />
+                              </div>
+
+                              {/* Body Card Skeleton */}
+                              <div
+                                className={styles.cardBody}
+                                style={{ marginTop: "16px" }}
+                              >
+                                <Skeleton
+                                  width="80px"
+                                  height="20px"
+                                  style={{ marginBottom: "8px" }}
+                                />
+                                <Skeleton
+                                  width="80%"
+                                  height="24px"
+                                  style={{ marginBottom: "16px" }}
+                                />
+
+                                <div
+                                  className={styles.metaGrid}
+                                  style={{ display: "flex", gap: "10px" }}
+                                >
+                                  <Skeleton width="140px" height="20px" />
+                                  <Skeleton width="100px" height="20px" />
+                                </div>
+                              </div>
+
+                              {/* Footer Card Skeleton */}
+                              <div
+                                className={styles.cardFooter}
+                                style={{
+                                  display: "flex",
+                                  gap: "10px",
+                                  marginTop: "20px",
+                                }}
+                              >
+                                <Skeleton
+                                  width="100px"
+                                  height="38px"
+                                  style={{ borderRadius: "8px" }}
+                                />
+                                <Skeleton
+                                  width="120px"
+                                  height="38px"
+                                  style={{ borderRadius: "8px" }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))
                     ) : currentSchedules.length === 0 ? (
                       <div className={styles.emptyState}>
                         <FiCalendar size={50} color="#999" />
