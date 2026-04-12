@@ -26,7 +26,7 @@ const mainMenu = [
   },
   {
     id: 3,
-    label: "Materi & Sesi",
+    label: "Sesi & Kursus",
     link: "/search",
     icon: FiCalendar,
   },
