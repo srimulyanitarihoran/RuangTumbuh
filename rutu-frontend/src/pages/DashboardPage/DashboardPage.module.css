@@ -2,7 +2,6 @@
   display: flex;
   flex-direction: column;
   gap: 40px;
-  padding-bottom: 40px;
 }
 
 .banner {
@@ -141,7 +140,7 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 40px 20px;
+  padding: 50px 20px;
   background: #f8fafc;
   border: 4px dashed #000;
   border-radius: 20px;

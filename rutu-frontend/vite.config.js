@@ -1,11 +1,13 @@
+/// <reference types="vitest" />
 /* eslint-disable no-undef */
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
-import { viteCommonjs } from '@originjs/vite-plugin-commonjs';
+import { viteCommonjs } from "@originjs/vite-plugin-commonjs";
 
 export default defineConfig({
-  plugins: [react(), viteCommonjs()], 
+  plugins: [react(), viteCommonjs()],
+
   server: {
     port: 5173,
     proxy: {
@@ -17,6 +19,7 @@ export default defineConfig({
       },
     },
   },
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -26,13 +29,21 @@ export default defineConfig({
       "@layouts": path.resolve(__dirname, "./src/layouts"),
     },
   },
+
   optimizeDeps: {
     include: ["@rutu/shared", "cookie"],
   },
+
   build: {
     commonjsOptions: {
       include: [/@rutu\/shared/, /node_modules/],
       transformMixedEsModules: true,
     },
+  },
+
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: "./src/setupTests.js",
   },
 });

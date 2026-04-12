@@ -2,10 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/utils/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const useCourseBooking = (id, currentUser) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { updateUserData } = useAuth();
 
   const [formData, setFormData] = useState({
     date: "",
@@ -20,7 +22,7 @@ export const useCourseBooking = (id, currentUser) => {
     description: "",
   });
 
-  // Fetch data kursus dengan perbaikan interceptor Axios
+  // Fetch data kursus
   const {
     data: rawCourse,
     isLoading,
@@ -44,24 +46,31 @@ export const useCourseBooking = (id, currentUser) => {
         studentName: currentUser.name,
         scheduledAt,
         note: formData.note,
+        duration: course.durasi,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries(["myBookings", currentUser?.id]);
+
+      const requiredMinutes = course?.durasi ? parseInt(course.durasi) : 0;
+      const currentBalance = currentUser?.timeBalance
+        ? parseInt(currentUser.timeBalance)
+        : 0;
+      updateUserData({ timeBalance: currentBalance - requiredMinutes });
+
       setPopup({
         isOpen: true,
         type: "success",
         title: "Booking Berhasil!",
         description:
-          "Permintaan booking kamu berhasil diajukan! Silakan cek di menu My Courses.",
+          "Permintaan booking berhasil diajukan dan Saldo Waktu kamu telah dipotong.",
       });
-      // Tunggu user membaca popup sejenak sebelum diarahkan
       setTimeout(() => navigate("/mycourses"), 2500);
     },
     onError: (error) => {
       setPopup({
         isOpen: true,
-        type: "error", // Sesuaikan dengan tipe popup ("error" bukan "danger")
+        type: "error",
         title: "Booking Gagal",
         description:
           error.response?.data?.message ||
@@ -76,7 +85,7 @@ export const useCourseBooking = (id, currentUser) => {
   };
 
   const handleBooking = (e) => {
-    e.preventDefault(); // Mencegah reload halaman jika dipanggil dari tag <form>
+    e.preventDefault();
 
     if (!formData.date || !formData.time) {
       setPopup({
@@ -86,6 +95,23 @@ export const useCourseBooking = (id, currentUser) => {
         description: "Harap pilih tanggal dan waktu sesi kursus kamu!",
       });
       return;
+    }
+
+    // --- VALIDASI SALDO WAKTU ---
+    const requiredMinutes = course?.durasi ? parseInt(course.durasi) : 0;
+    const currentBalance = currentUser?.timeBalance
+      ? parseInt(currentUser.timeBalance)
+      : 0;
+
+    if (currentBalance < requiredMinutes) {
+      // Tampilkan popup jika saldo kurang
+      setPopup({
+        isOpen: true,
+        type: "error", // Gunakan tipe error agar muncul ikon peringatan
+        title: "Saldo Waktu Tidak Cukup",
+        description: `Sesi ini membutuhkan ${requiredMinutes} menit, tapi saldo kamu hanya ${currentBalance} menit. Yuk kumpulkan waktu dengan menjadi tutor!`,
+      });
+      return; // Hentikan proses booking
     }
 
     const scheduledAt = new Date(

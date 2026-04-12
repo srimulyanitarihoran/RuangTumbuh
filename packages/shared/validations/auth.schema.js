@@ -20,6 +20,6 @@ const registerPayloadSchema = z
   });
 
 module.exports = {
-  loginPayloadSchema,
   registerPayloadSchema,
+  loginPayloadSchema,
 };
