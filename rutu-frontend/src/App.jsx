@@ -7,12 +7,12 @@ import PublicRoute from "./routes/PublicRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+const NotFoundPage = lazy(() => import("@pages/NotFoundPage/NotFoundPage"));
 const HomePage = lazy(() => import("@pages/HomePage/HomePage"));
 const Login = lazy(() => import("@pages/LoginPage/LoginPage"));
 const Register = lazy(() => import("@pages/RegisterPage/RegisterPage"));
 const DashboardPage = lazy(() => import("@pages/DashboardPage/DashboardPage"));
 const SearchPage = lazy(() => import("@pages/SearchPage/SearchPage"));
-const BookmarksPage = lazy(() => import("@pages/BookmarksPage/BookmarksPage"));
 const MessagesPage = lazy(() => import("@pages/MessagesPage/MessagesPage"));
 const NotificationPage = lazy(
   () => import("@pages/NotificationPage/NotificationPage"),
@@ -30,7 +30,6 @@ const AddSchedulePage = lazy(
 );
 const AddCoursePage = lazy(() => import("@pages/AddCoursePage/AddCoursePage"));
 const ProfilePage = lazy(() => import("@pages/ProfilePage/ProfilePage"));
-const PresencePage = lazy(() => import("@pages/PresencePage/PresencePage"));
 const MessageDetailPage = lazy(
   () => import("@pages/MessageDetailPage/MessageDetailPage"),
 );
@@ -70,7 +69,6 @@ export default function App() {
               <Route element={<ProtectedRoute />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/search" element={<SearchPage />} />
-                <Route path="/bookmarks" element={<BookmarksPage />} />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationPage />} />
                 <Route path="/mycourses" element={<MyCoursePage />} />
@@ -83,12 +81,12 @@ export default function App() {
                 <Route path="/add-schedule" element={<AddSchedulePage />} />
                 <Route path="/add-course" element={<AddCoursePage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/presence" element={<PresencePage />} />
                 <Route path="/messages/:id" element={<MessageDetailPage />} />
                 <Route path="/help" element={<HelpCenterPage />} />
                 <Route path="/edit-profile" element={<EditProfilePage />} />
                 <Route path="/edit-course/:id" element={<AddCoursePage />} />
               </Route>
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </AuthProvider>
         </BrowserRouter>

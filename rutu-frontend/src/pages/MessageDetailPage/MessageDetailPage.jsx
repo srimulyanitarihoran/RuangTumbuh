@@ -4,6 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./MessageDetailPage.module.css";
 import { io } from "socket.io-client";
+import { Skeleton } from "@/components/Skeleton/Skeleton";
 import {
   FiSend,
   FiArrowLeft,
@@ -14,7 +15,6 @@ import {
   FiVideo,
 } from "react-icons/fi";
 
-// URL Backend
 const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:5001";
 
 export default function MessageDetailPage() {
@@ -22,16 +22,16 @@ export default function MessageDetailPage() {
   const navigate = useNavigate();
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState([]);
-  const [roomInfo, setRoomInfo] = useState({ name: "Memuat..." });
+  const [roomInfo, setRoomInfo] = useState({ name: "" });
+  const [chatPartner, setChatPartner] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
   const socketRef = useRef(null);
   const scrollRef = useRef(null);
-
-  const [chatPartner, setChatPartner] = useState(null);
 
   const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
   const token = localStorage.getItem("token");
 
-  // --- KONEKSI SOCKET.IO ---
   useEffect(() => {
     if (!token) return;
 
@@ -40,7 +40,6 @@ export default function MessageDetailPage() {
     });
 
     socketRef.current = newSocket;
-
     newSocket.emit("join_room", roomId);
 
     newSocket.on("receive_message", (newMessage) => {
@@ -52,9 +51,9 @@ export default function MessageDetailPage() {
     };
   }, [roomId, token]);
 
-  // --- AMBIL RIWAYAT CHAT LAMA (REST API) ---
   useEffect(() => {
     const fetchHistory = async () => {
+      setIsLoading(true);
       try {
         const response = await fetch(
           `${BASE_URL}/api/chats/${roomId}/messages`,
@@ -62,16 +61,17 @@ export default function MessageDetailPage() {
             headers: { Authorization: `Bearer ${token}` },
           },
         );
-        const result = await response.json(); 
+        const result = await response.json();
 
-        // Cek sukses di tempat yang benar
         if (result.success) {
           setRoomInfo(result.data.room);
           setMessages(result.data.messages);
-          setChatPartner(result.data.chatPartner); // Simpan data lawan bicara
+          setChatPartner(result.data.chatPartner);
         }
       } catch (error) {
         console.error("Gagal mengambil riwayat pesan:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -80,7 +80,6 @@ export default function MessageDetailPage() {
     }
   }, [roomId, token]);
 
-  // --- 3. AUTO SCROLL KE BAWAH ---
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
@@ -88,27 +87,26 @@ export default function MessageDetailPage() {
         behavior: "smooth",
       });
     }
-  }, [messages]);
+  }, [messages, isLoading]);
 
-  // --- 4. KIRIM PESAN BARU ---
   const handleSendMessage = (e) => {
     e.preventDefault();
     if (!inputText.trim() || !socketRef.current) return;
 
-    // Pancarkan ke backend menggunakan socketRef.current
     socketRef.current.emit("send_message", {
       roomId: roomId,
       text: inputText,
     });
 
-    setInputText(""); // Kosongkan input
+    setInputText("");
   };
 
-  // Helper untuk format jam (contoh: 14:30)
   const formatTime = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
+
+  const isInputValid = inputText.trim() && !isLoading;
 
   return (
     <DashboardLayout title="Detail Pesan">
@@ -127,37 +125,58 @@ export default function MessageDetailPage() {
 
             <div className={styles.userInfo}>
               <div className={styles.avatarWrap}>
-                <div
-                  className={styles.avatar}
-                  style={{
-                    backgroundColor: roomInfo.isGroup ? "#38BDF8" : "#FB923C",
-                  }}
-                >
-                  {roomInfo.isGroup
-                    ? roomInfo.name
-                      ? roomInfo.name.charAt(0)
-                      : "G"
-                    : chatPartner
-                      ? chatPartner.name.charAt(0).toUpperCase()
-                      : "?"}
-                </div>
-                <div className={styles.onlineDot}></div>
+                {isLoading ? (
+                  <Skeleton variant="circle" width="45px" height="45px" />
+                ) : (
+                  <>
+                    <div
+                      className={styles.avatar}
+                      style={{
+                        backgroundColor: roomInfo.isGroup
+                          ? "#38BDF8"
+                          : "#FB923C",
+                      }}
+                    >
+                      {roomInfo.isGroup
+                        ? roomInfo.name
+                          ? roomInfo.name.charAt(0)
+                          : "G"
+                        : chatPartner
+                          ? chatPartner.name.charAt(0).toUpperCase()
+                          : "?"}
+                    </div>
+                    <div className={styles.onlineDot}></div>
+                  </>
+                )}
               </div>
               <div className={styles.userDetails}>
-                <h2 className={styles.userName}>
-                  {roomInfo.isGroup
-                    ? roomInfo.name
-                    : chatPartner
-                      ? chatPartner.name
-                      : "Memuat..."}
-                </h2>
-                <span className={styles.status}>
-                  {roomInfo.isGroup
-                    ? "Komunitas"
-                    : chatPartner
-                      ? chatPartner.description || "Siswa"
-                      : "Online"}
-                </span>
+                {isLoading ? (
+                  <>
+                    <Skeleton
+                      className={styles.skeletonName}
+                      width="120px"
+                      height="20px"
+                    />
+                    <Skeleton width="60px" height="14px" />
+                  </>
+                ) : (
+                  <>
+                    <h2 className={styles.userName}>
+                      {roomInfo.isGroup
+                        ? roomInfo.name
+                        : chatPartner
+                          ? chatPartner.name
+                          : "Unknown"}
+                    </h2>
+                    <span className={styles.status}>
+                      {roomInfo.isGroup
+                        ? "Komunitas"
+                        : chatPartner
+                          ? chatPartner.description || "Siswa"
+                          : "Online"}
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -177,100 +196,145 @@ export default function MessageDetailPage() {
 
         {/* --- CHAT AREA --- */}
         <div className={styles.chatArea} ref={scrollRef}>
-          <AnimatePresence initial={false}>
-            {messages.map((msg, index) => {
-              // Cek apakah pesan ini milik kita atau orang lain
-              const isMe = msg.senderId === currentUser.id;
+          {isLoading ? (
+            <div className={styles.skeletonChatContainer}>
+              {/* Kiri */}
+              <div className={styles.skeletonRowLeft}>
+                <Skeleton
+                  variant="circle"
+                  width="36px"
+                  height="36px"
+                  className={styles.flexShrink0}
+                />
+                <div className={styles.skeletonBubbleCol}>
+                  <Skeleton
+                    width="100%"
+                    height="60px"
+                    className={styles.skeletonBubbleLeft}
+                  />
+                </div>
+              </div>
+              {/* Kanan */}
+              <div className={styles.skeletonRowRight}>
+                <div className={styles.skeletonBubbleColRight}>
+                  <Skeleton
+                    width="85%"
+                    height="50px"
+                    className={styles.skeletonBubbleRight}
+                  />
+                </div>
+              </div>
+              {/* Kiri */}
+              <div className={styles.skeletonRowLeft}>
+                <Skeleton
+                  variant="circle"
+                  width="36px"
+                  height="36px"
+                  className={styles.flexShrink0}
+                />
+                <div className={styles.skeletonBubbleCol}>
+                  <Skeleton
+                    width="60%"
+                    height="40px"
+                    className={styles.skeletonBubbleLeft}
+                  />
+                </div>
+              </div>
+            </div>
+          ) : messages.length === 0 ? (
+            <div className={styles.emptyChatState}>
+              <p>Belum ada pesan. Mulai sapa sekarang!</p>
+            </div>
+          ) : (
+            <AnimatePresence initial={false}>
+              {messages.map((msg, index) => {
+                const isMe = msg.senderId === currentUser.id;
+                const showAvatar =
+                  !isMe &&
+                  (index === 0 ||
+                    messages[index - 1].senderId !== msg.senderId);
 
-              // Tentukan apakah perlu menampilkan avatar (hanya untuk orang lain)
-              const showAvatar =
-                !isMe &&
-                (index === 0 || messages[index - 1].senderId !== msg.senderId);
-
-              return (
-                <motion.div
-                  key={msg.id}
-                  layout="position"
-                  initial={{ opacity: 0, y: 20, scale: 0.9 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                  className={`${styles.messageWrapper} ${isMe ? styles.me : styles.other}`}
-                >
-                  {/* Tampilkan Avatar Pengirim (Jika bukan pesan kita) */}
-                  {!isMe && (
-                    <div className={styles.chatAvatarBox}>
-                      {showAvatar ? (
-                        <div
-                          className={styles.chatAvatar}
-                          style={{ backgroundColor: "#FACC15" }}
-                        >
-                          {msg.sender?.name
-                            ? msg.sender.name.charAt(0).toUpperCase()
-                            : "?"}
-                        </div>
-                      ) : (
-                        <div className={styles.chatAvatarPlaceholder} />
-                      )}
-                    </div>
-                  )}
-
-                  <div className={styles.messageBubble}>
-                    {!isMe && showAvatar && (
-                      <span
-                        style={{
-                          fontSize: "0.75rem",
-                          fontWeight: "800",
-                          opacity: 0.7,
-                          marginBottom: "4px",
-                        }}
-                      >
-                        {msg.sender?.name}
-                      </span>
+                return (
+                  <motion.div
+                    key={msg.id}
+                    layout="position"
+                    initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                    className={`${styles.messageWrapper} ${isMe ? styles.me : styles.other}`}
+                  >
+                    {!isMe && (
+                      <div className={styles.chatAvatarBox}>
+                        {showAvatar ? (
+                          <div
+                            className={styles.chatAvatar}
+                            style={{ backgroundColor: "#FACC15" }}
+                          >
+                            {msg.sender?.name
+                              ? msg.sender.name.charAt(0).toUpperCase()
+                              : "?"}
+                          </div>
+                        ) : (
+                          <div className={styles.chatAvatarPlaceholder} />
+                        )}
+                      </div>
                     )}
-                    <p className={styles.messageText}>{msg.text}</p>
-                    <span className={styles.time}>
-                      {formatTime(msg.createdAt)}
-                    </span>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </AnimatePresence>
+
+                    <div className={styles.messageBubble}>
+                      {!isMe && showAvatar && (
+                        <span className={styles.senderNameLabel}>
+                          {msg.sender?.name}
+                        </span>
+                      )}
+                      <p className={styles.messageText}>{msg.text}</p>
+                      <span className={styles.time}>
+                        {formatTime(msg.createdAt)}
+                      </span>
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          )}
         </div>
 
         {/* --- INPUT AREA --- */}
         <div className={styles.inputContainer}>
           <form className={styles.inputForm} onSubmit={handleSendMessage}>
-            <button type="button" className={styles.attachBtn}>
+            <button
+              type="button"
+              className={styles.attachBtn}
+              disabled={isLoading}
+            >
               <FiPaperclip size={22} />
             </button>
 
             <div className={styles.inputWrapper}>
               <input
                 type="text"
-                placeholder="Ketik pesan komunitas..."
+                placeholder={isLoading ? "Menghubungkan..." : "Ketik pesan..."}
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 className={styles.input}
+                disabled={isLoading}
               />
-              <button type="button" className={styles.emojiBtn}>
+              <button
+                type="button"
+                className={styles.emojiBtn}
+                disabled={isLoading}
+              >
                 <FiSmile size={22} />
               </button>
             </div>
 
             <motion.button
               type="submit"
-              className={styles.sendButton}
-              style={{
-                backgroundColor: inputText.trim()
-                  ? "var(--primary-green, #4ade80)"
-                  : "#e5e7eb",
-              }}
-              whileHover={inputText.trim() ? { scale: 1.05, rotate: -10 } : {}}
-              whileTap={inputText.trim() ? { scale: 0.95 } : {}}
-              disabled={!inputText.trim()}
+              className={`${styles.sendButton} ${isInputValid ? styles.sendButtonActive : styles.sendButtonInactive}`}
+              whileHover={isInputValid ? { scale: 1.05, rotate: -10 } : {}}
+              whileTap={isInputValid ? { scale: 0.95 } : {}}
+              disabled={!isInputValid}
             >
-              <FiSend size={20} color={inputText.trim() ? "#000" : "#9ca3af"} />
+              <FiSend size={20} color={isInputValid ? "#000" : "#9ca3af"} />
             </motion.button>
           </form>
         </div>

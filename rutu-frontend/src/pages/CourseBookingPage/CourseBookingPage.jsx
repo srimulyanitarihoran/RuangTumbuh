@@ -5,6 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import { Popup } from "@/components/Popup/Popup";
 import { Input } from "@/components/Input/Input";
+import { Skeleton } from "@/components/Skeleton/Skeleton"; // [TAMBAHAN] Import Skeleton
 import {
   FiCheckCircle,
   FiAlertCircle,
@@ -38,10 +39,141 @@ export default function CourseBookingPage() {
     handleBooking,
   } = useCourseBooking(id, user);
 
+
   if (isLoading) {
     return (
-      <DashboardLayout title="Memuat Halaman Booking...">
-        <div className={styles.loadingState}>Memuat data kursus... ⏳</div>
+      <DashboardLayout title="Booking Session">
+        <div className={styles.container}>
+          <div className={styles.pageHeader}>
+            <Skeleton width="250px" height="40px" />
+            <Skeleton
+              width="120px"
+              height="45px"
+              style={{ borderRadius: "12px" }}
+            />
+          </div>
+
+          <div className={styles.bookingSection}>
+            {/* SKELETON KOLOM KIRI */}
+            <div
+              className={styles.courseSummaryCard}
+              style={{
+                backgroundColor: "#f8fafc",
+                border: "2px solid #e2e8f0",
+              }}
+            >
+              <Skeleton
+                width="100px"
+                height="28px"
+                style={{ borderRadius: "14px", marginBottom: "20px" }}
+              />
+              <Skeleton
+                width="85%"
+                height="36px"
+                style={{ marginBottom: "16px" }}
+              />
+              <div style={{ marginBottom: "24px" }}>
+                <Skeleton
+                  width="100%"
+                  height="16px"
+                  style={{ marginBottom: "8px" }}
+                />
+                <Skeleton
+                  width="100%"
+                  height="16px"
+                  style={{ marginBottom: "8px" }}
+                />
+                <Skeleton width="60%" height="16px" />
+              </div>
+              <div className={styles.courseMeta}>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className={styles.metaItem}>
+                    <Skeleton variant="circle" width="32px" height="32px" />
+                    <div style={{ marginLeft: "10px", flex: 1 }}>
+                      <Skeleton
+                        width="50px"
+                        height="12px"
+                        style={{ marginBottom: "6px" }}
+                      />
+                      <Skeleton width="80px" height="16px" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* SKELETON KOLOM KANAN */}
+            <div className={styles.formCard}>
+              <div className={styles.formHeader}>
+                <Skeleton
+                  width="180px"
+                  height="28px"
+                  style={{ marginBottom: "10px" }}
+                />
+                <Skeleton width="240px" height="16px" />
+              </div>
+              <div className={styles.formContent} style={{ marginTop: "20px" }}>
+                <div style={{ marginBottom: "20px" }}>
+                  <Skeleton
+                    width="100px"
+                    height="18px"
+                    style={{ marginBottom: "8px" }}
+                  />
+                  <Skeleton
+                    width="100%"
+                    height="50px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+                <div className={styles.rowGroup}>
+                  <div style={{ flex: 1 }}>
+                    <Skeleton
+                      width="100px"
+                      height="18px"
+                      style={{ marginBottom: "8px" }}
+                    />
+                    <Skeleton
+                      width="100%"
+                      height="50px"
+                      style={{ borderRadius: "12px" }}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <Skeleton
+                      width="100px"
+                      height="18px"
+                      style={{ marginBottom: "8px" }}
+                    />
+                    <Skeleton
+                      width="100%"
+                      height="50px"
+                      style={{ borderRadius: "12px" }}
+                    />
+                  </div>
+                </div>
+                <div style={{ marginTop: "20px" }}>
+                  <Skeleton
+                    width="150px"
+                    height="18px"
+                    style={{ marginBottom: "8px" }}
+                  />
+                  <Skeleton
+                    width="100%"
+                    height="100px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+                <div className={styles.actionRow} style={{ marginTop: "30px" }}>
+                  <Skeleton
+                    width="100%"
+                    height="55px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </DashboardLayout>
     );
   }
@@ -71,7 +203,7 @@ export default function CourseBookingPage() {
         </div>
 
         <div className={styles.bookingSection}>
-          {/* KOLOM KIRI: INFO KURSUS (Neo-Brutalism Card) */}
+          {/* KOLOM KIRI: INFO KURSUS */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -80,7 +212,8 @@ export default function CourseBookingPage() {
             style={{ backgroundColor: extras.color || "#facc15" }}
           >
             <span className={styles.ratingBadge}>
-              <FiStar /> {courseData.rating} ({courseData.reviews} ulasan)
+              <FiStar /> {courseData?.rating || 0} ({courseData?.reviews || 0}{" "}
+              ulasan)
             </span>
 
             <h2 className={styles.courseTitle}>{course.name}</h2>

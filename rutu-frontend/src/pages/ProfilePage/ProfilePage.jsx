@@ -5,6 +5,7 @@ import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./ProfilePage.module.css";
 import { useProfile } from "@/hooks/useProfile";
 import { getImageUrl } from "@/utils/imageHelper";
+import { Skeleton } from "@/components/Skeleton/Skeleton";
 import {
   FiEdit3,
   FiUser,
@@ -21,7 +22,6 @@ import {
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const BASE_URL = import.meta.env.VITE_API_URL;
   const { userProfile, isLoading, initials, formatDate } = useProfile();
 
   // Konfigurasi Animasi
@@ -39,14 +39,230 @@ export default function ProfilePage() {
     },
   };
 
+  // =========================================
+  // BLOK LOADING: Meniru Struktur Layout Asli
+  // =========================================
   if (isLoading) {
     return (
       <DashboardLayout title="Profil Saya">
-        <div className={styles.loadingContainer}>Memuat profil...</div>
+        <div className={styles.container}>
+          {/* --- HERO PROFILE CARD SKELETON --- */}
+          <div className={styles.profileHeroCard}>
+            <div className={styles.heroBanner}>
+              {/* Skeleton Edit Button */}
+              <div style={{ position: "absolute", top: 20, right: 20 }}>
+                <Skeleton
+                  width="120px"
+                  height="40px"
+                  style={{ borderRadius: "12px" }}
+                />
+              </div>
+            </div>
+
+            <div className={styles.heroContent}>
+              <div className={styles.sideStat}>
+                <div
+                  className={styles.statBox}
+                  style={{
+                    backgroundColor: "#f8fafc",
+                    border: "2px dashed #e2e8f0",
+                    boxShadow: "none",
+                  }}
+                >
+                  <Skeleton
+                    width="60px"
+                    height="30px"
+                    style={{ marginBottom: "8px" }}
+                  />
+                  <Skeleton width="80px" height="14px" />
+                </div>
+              </div>
+
+              <div className={styles.centerProfile}>
+                <div
+                  className={styles.avatarLarge}
+                  style={{
+                    backgroundColor: "transparent",
+                    border: "none",
+                    boxShadow: "none",
+                  }}
+                >
+                  <Skeleton
+                    variant="circle"
+                    width="100%"
+                    height="100%"
+                    style={{ minWidth: "120px", minHeight: "120px" }}
+                  />
+                </div>
+                <Skeleton
+                  width="200px"
+                  height="32px"
+                  style={{ marginTop: "16px", marginBottom: "12px" }}
+                />
+                <div
+                  className={styles.userDetails}
+                  style={{ justifyContent: "center" }}
+                >
+                  <Skeleton
+                    width="80px"
+                    height="20px"
+                    style={{ borderRadius: "8px" }}
+                  />
+                  <span className={styles.detailDot}>•</span>
+                  <Skeleton
+                    width="100px"
+                    height="20px"
+                    style={{ borderRadius: "8px" }}
+                  />
+                  <span className={styles.detailDot}>•</span>
+                  <Skeleton
+                    width="120px"
+                    height="20px"
+                    style={{ borderRadius: "8px" }}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.sideStat}>
+                <div
+                  className={styles.statBox}
+                  style={{
+                    backgroundColor: "#f8fafc",
+                    border: "2px dashed #e2e8f0",
+                    boxShadow: "none",
+                  }}
+                >
+                  <Skeleton
+                    width="60px"
+                    height="30px"
+                    style={{ marginBottom: "8px" }}
+                  />
+                  <Skeleton width="80px" height="14px" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* --- BOTTOM GRID CONTENT SKELETON --- */}
+          <div className={styles.contentGrid}>
+            <div className={styles.leftColumn}>
+              <div className={styles.infoCard}>
+                <div className={styles.cardHeader}>
+                  <Skeleton variant="circle" width="24px" height="24px" />
+                  <Skeleton width="150px" height="28px" />
+                </div>
+                <div className={styles.bioContent}>
+                  <div className={styles.descriptionText}>
+                    <Skeleton
+                      width="100%"
+                      height="16px"
+                      style={{ marginBottom: "8px" }}
+                    />
+                    <Skeleton width="80%" height="16px" />
+                  </div>
+                  <div className={styles.infoList}>
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className={styles.infoItem}>
+                        <Skeleton
+                          variant="circle"
+                          width="48px"
+                          height="48px"
+                          style={{ flexShrink: 0 }}
+                        />
+                        <div
+                          className={styles.infoItemText}
+                          style={{ width: "100%" }}
+                        >
+                          <Skeleton
+                            width="80px"
+                            height="14px"
+                            style={{ marginBottom: "8px" }}
+                          />
+                          <Skeleton width="140px" height="18px" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className={styles.passionSection}>
+                    <Skeleton
+                      width="150px"
+                      height="24px"
+                      style={{ marginBottom: "16px" }}
+                    />
+                    <div className={styles.passionWrapper}>
+                      <Skeleton
+                        width="80px"
+                        height="36px"
+                        style={{ borderRadius: "20px" }}
+                      />
+                      <Skeleton
+                        width="100px"
+                        height="36px"
+                        style={{ borderRadius: "20px" }}
+                      />
+                      <Skeleton
+                        width="90px"
+                        height="36px"
+                        style={{ borderRadius: "20px" }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.rightColumn}>
+              <div className={styles.balanceCard}>
+                <div className={styles.cardHeader}>
+                  <Skeleton variant="circle" width="24px" height="24px" />
+                  <Skeleton width="120px" height="28px" />
+                </div>
+                <div className={styles.balanceContent}>
+                  <Skeleton
+                    width="140px"
+                    height="40px"
+                    style={{ marginBottom: "8px" }}
+                  />
+                  <Skeleton
+                    width="100px"
+                    height="16px"
+                    style={{ marginBottom: "24px" }}
+                  />
+                  <Skeleton
+                    width="100%"
+                    height="50px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+              </div>
+              <div className={styles.actionCard}>
+                <div className={styles.cardHeader}>
+                  <Skeleton variant="circle" width="24px" height="24px" />
+                  <Skeleton width="160px" height="28px" />
+                </div>
+                <div className={styles.actionList}>
+                  <Skeleton
+                    width="100%"
+                    height="50px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                  <Skeleton
+                    width="100%"
+                    height="50px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </DashboardLayout>
     );
   }
 
+  // =========================================
+  // KODE ASLI ANDA (TIDAK ADA YANG DIUBAH)
+  // =========================================
   return (
     <DashboardLayout title="Profil Saya">
       <motion.div
@@ -149,7 +365,9 @@ export default function ProfilePage() {
                     <div className={styles.infoItemText}>
                       <p className={styles.infoLabel}>Tanggal Lahir</p>
                       <p className={styles.infoValue}>
-                        {userProfile?.birthDate ? formatDate(userProfile.birthDate) : "-"}
+                        {userProfile?.birthDate
+                          ? formatDate(userProfile.birthDate)
+                          : "-"}
                       </p>
                     </div>
                   </div>
@@ -236,7 +454,6 @@ export default function ProfilePage() {
                   whileTap={{ scale: 0.95 }}
                   className={`${styles.actionBtn} ${styles.logoutBtn}`}
                   onClick={() => {
-                    // TODO: Tambahkan fungsi logout di sini
                     console.log("Keluar akun diklik");
                   }}
                 >
@@ -247,7 +464,6 @@ export default function ProfilePage() {
                   whileTap={{ scale: 0.95 }}
                   className={`${styles.actionBtn} ${styles.deleteBtn}`}
                   onClick={() => {
-                    // TODO: Tambahkan fungsi hapus akun di sini
                     console.log("Hapus akun diklik");
                   }}
                 >

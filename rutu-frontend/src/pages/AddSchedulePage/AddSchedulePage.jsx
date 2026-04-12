@@ -6,6 +6,7 @@ import inputStyles from "@/components/Input/Input.module.css";
 import { Popup } from "@/components/Popup/Popup";
 import { Input } from "@/components/Input/Input";
 import { useAddSchedule } from "@/hooks/useAddSchedule";
+import { Skeleton } from "@/components/Skeleton/Skeleton"; // [TAMBAHAN] Import Skeleton
 import {
   FiCalendar,
   FiClock,
@@ -27,6 +28,7 @@ export default function AddSchedulePage() {
     popup,
     setPopup,
     isPending,
+    isLoadingData, 
     handleChange,
     handleSubmit,
     navigate,
@@ -40,6 +42,111 @@ export default function AddSchedulePage() {
       transition: { type: "spring", stiffness: 300, damping: 24 },
     },
   };
+
+  if (isLoadingData) {
+    return (
+      <DashboardLayout title="Memuat Halaman...">
+        <div className={styles.container}>
+          <div className={styles.pageHeader}>
+            <Skeleton width="250px" height="40px" />
+            <Skeleton
+              width="120px"
+              height="45px"
+              style={{ borderRadius: "12px" }}
+            />
+          </div>
+
+          <div className={styles.contentGrid}>
+            <div className={styles.mainCard}>
+              <div className={styles.cardHeader}>
+                <Skeleton variant="circle" width="40px" height="40px" />
+                <Skeleton
+                  width="180px"
+                  height="24px"
+                  style={{ marginLeft: "15px" }}
+                />
+              </div>
+              <div style={{ marginTop: "20px" }}>
+                <Skeleton
+                  width="100%"
+                  height="55px"
+                  style={{ marginBottom: "20px", borderRadius: "12px" }}
+                />
+                <div className={styles.rowGroup}>
+                  <Skeleton
+                    width="100%"
+                    height="55px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                  <Skeleton
+                    width="100%"
+                    height="55px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+                <div className={styles.rowGroup} style={{ marginTop: "20px" }}>
+                  <Skeleton
+                    width="100%"
+                    height="55px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                  <Skeleton
+                    width="100%"
+                    height="55px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className={styles.sidebarCard}>
+              <div className={styles.cardHeader}>
+                <Skeleton variant="circle" width="40px" height="40px" />
+                <Skeleton
+                  width="150px"
+                  height="24px"
+                  style={{ marginLeft: "15px" }}
+                />
+              </div>
+              <div style={{ marginTop: "20px" }}>
+                <Skeleton
+                  width="100%"
+                  height="55px"
+                  style={{ marginBottom: "20px", borderRadius: "12px" }}
+                />
+                <Skeleton
+                  width="100%"
+                  height="55px"
+                  style={{ marginBottom: "20px", borderRadius: "12px" }}
+                />
+                <Skeleton
+                  width="100%"
+                  height="60px"
+                  style={{ borderRadius: "12px" }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.actionBar}>
+            <div className={styles.actionText}>
+              <Skeleton
+                width="140px"
+                height="24px"
+                style={{ marginBottom: "8px" }}
+              />
+              <Skeleton width="200px" height="16px" />
+            </div>
+            <Skeleton
+              width="220px"
+              height="55px"
+              style={{ borderRadius: "12px" }}
+            />
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout title={isEdit ? "Reschedule Jadwal" : "Tambah Jadwal"}>

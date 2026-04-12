@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./SearchPage.module.css";
 import CourseCard from "@/components/CourseCard/CourseCard";
+import { CourseCardSkeleton } from "@/components/CourseCard/CourseCardSkeleton"; // [TAMBAHAN] Import Skeleton
 import { FiSearch, FiSliders, FiLoader } from "react-icons/fi";
 import { COURSE_CATEGORIES } from "@/constants/courseData";
 import { useSearchCourses } from "@/hooks/useSearchCourses";
@@ -89,19 +90,18 @@ export default function SearchPage() {
 
         {/* COURSE LIST AREA */}
         {isLoading ? (
-          <div
-            className={styles.loadingWrapper}
-            style={{ textAlign: "center", padding: "40px" }}
+          <motion.div
+            className={styles.courseGrid}
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
           >
-            <FiLoader
-              className="spin"
-              size={30}
-              style={{ color: "var(--primary-blue)" }}
-            />
-            <p style={{ marginTop: "10px", fontWeight: "bold" }}>
-              Mencari kursus...
-            </p>
-          </div>
+            {Array.from({ length: 6 }).map((_, index) => (
+              <motion.div key={`skeleton-${index}`} variants={itemVariants}>
+                <CourseCardSkeleton />
+              </motion.div>
+            ))}
+          </motion.div>
         ) : allCourses.length > 0 ? (
           <>
             <motion.div

@@ -2,6 +2,7 @@ import React from "react";
 import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import { Popup } from "@/components/Popup/Popup";
 import { Input } from "@/components/Input/Input";
+import { Skeleton } from "@/components/Skeleton/Skeleton"; // [TAMBAHAN] Import Skeleton
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FiPlus,
@@ -36,7 +37,7 @@ export default function AddCoursePage() {
     popup,
     mutation,
     isEditMode,
-    isFetching, // Ambil isEditMode dan isFetching
+    isFetching,
     setPopup,
     handleInputChange,
     addModule,
@@ -52,29 +53,149 @@ export default function AddCoursePage() {
     exit: { opacity: 0, scale: 0.9, height: 0, padding: 0, overflow: "hidden" },
   };
 
+  // =========================================
+  // VIEW LOADING: Meniru Struktur Layout Asli
+  // =========================================
   if (isFetching) {
     return (
-      <DashboardLayout title="Memuat Kursus...">
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            padding: "100px",
-            fontSize: "1.5rem",
-            fontWeight: "800",
-          }}
-        >
-          Mengambil data kursus... ⏳
+      <DashboardLayout title="Memuat Halaman...">
+        <div className={styles.container}>
+          <div className={styles.pageHeader}>
+            <Skeleton width="220px" height="40px" />
+            <Skeleton
+              width="110px"
+              height="45px"
+              style={{ borderRadius: "12px" }}
+            />
+          </div>
+
+          <div className={styles.splitLayout}>
+            {/* SKELETON KOLOM KIRI (Info Dasar) */}
+            <div
+              className={styles.mainCard}
+              style={{
+                backgroundColor: "#f8fafc",
+                border: "2px solid #e2e8f0",
+              }}
+            >
+              <div className={styles.cardHeader}>
+                <Skeleton variant="circle" width="40px" height="40px" />
+                <Skeleton
+                  width="150px"
+                  height="24px"
+                  style={{ marginLeft: "15px" }}
+                />
+              </div>
+              <div style={{ marginTop: "20px" }}>
+                <Skeleton
+                  width="100%"
+                  height="55px"
+                  style={{ marginBottom: "20px", borderRadius: "12px" }}
+                />
+                <div className={styles.rowGroup}>
+                  <Skeleton
+                    width="100%"
+                    height="55px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                  <Skeleton
+                    width="100%"
+                    height="55px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+                <Skeleton
+                  width="100%"
+                  height="120px"
+                  style={{ marginTop: "20px", borderRadius: "12px" }}
+                />
+                <Skeleton
+                  width="100%"
+                  height="150px"
+                  style={{ marginTop: "20px", borderRadius: "20px" }}
+                />
+              </div>
+            </div>
+
+            {/* SKELETON KOLOM KANAN (Modul) */}
+            <div
+              className={styles.modulesCard}
+              style={{
+                backgroundColor: "#f8fafc",
+                border: "2px solid #e2e8f0",
+              }}
+            >
+              <div className={styles.cardHeader}>
+                <Skeleton variant="circle" width="40px" height="40px" />
+                <Skeleton
+                  width="150px"
+                  height="24px"
+                  style={{ marginLeft: "15px" }}
+                />
+              </div>
+              <Skeleton
+                width="100%"
+                height="16px"
+                style={{ marginTop: "15px", marginBottom: "25px" }}
+              />
+              <div className={styles.moduleList}>
+                {[1, 2, 3].map((i) => (
+                  <div
+                    key={i}
+                    className={styles.moduleItem}
+                    style={{
+                      backgroundColor: "#fff",
+                      border: "2px solid #eee",
+                    }}
+                  >
+                    <Skeleton
+                      variant="circle"
+                      width="30px"
+                      height="30px"
+                      style={{ flexShrink: 0 }}
+                    />
+                    <div style={{ flex: 1, display: "flex", gap: "10px" }}>
+                      <Skeleton width="100%" height="50px" />
+                      <Skeleton width="60px" height="50px" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Skeleton
+                width="100%"
+                height="50px"
+                style={{ marginTop: "20px", borderRadius: "12px" }}
+              />
+            </div>
+          </div>
+
+          <div className={styles.actionBar}>
+            <div className={styles.actionText}>
+              <Skeleton
+                width="180px"
+                height="24px"
+                style={{ marginBottom: "8px" }}
+              />
+              <Skeleton width="250px" height="16px" />
+            </div>
+            <Skeleton
+              width="220px"
+              height="55px"
+              style={{ borderRadius: "12px" }}
+            />
+          </div>
         </div>
       </DashboardLayout>
     );
   }
 
+  // =========================================
+  // VIEW UTAMA (TIDAK ADA PERUBAHAN)
+  // =========================================
   return (
     <DashboardLayout title={isEditMode ? "Edit Kursus" : "Tambah Kursus Baru"}>
       <div className={styles.container}>
         <div className={styles.pageHeader}>
-          {/* Ubah title header */}
           <h1 className={styles.pageTitle}>
             {isEditMode ? "Edit Kursus" : "Buat Kursus Baru"}
           </h1>
@@ -107,20 +228,20 @@ export default function AddCoursePage() {
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  errorMessage={errors.title} // Memicu border merah jika kosong
+                  errorMessage={errors.title}
                 />
               </div>
 
               <div className={styles.rowGroup}>
                 <div className={styles.inputGroup}>
                   <Input
-                    isSelect // Mengubah input menjadi Dropdown
+                    isSelect
                     label="Kategori"
                     name="category"
                     value={formData.category}
                     onChange={handleInputChange}
                     options={CATEGORY_OPTIONS}
-                    errorMessage={errors.category} // Memicu border merah jika kosong
+                    errorMessage={errors.category}
                   />
                 </div>
                 <div className={styles.inputGroup}>
@@ -130,7 +251,7 @@ export default function AddCoursePage() {
                     type="number"
                     value={formData.duration}
                     onChange={handleInputChange}
-                    errorMessage={errors.duration} // Memicu border merah jika kosong
+                    errorMessage={errors.duration}
                   />
                 </div>
               </div>
@@ -143,11 +264,10 @@ export default function AddCoursePage() {
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={4}
-                  errorMessage={errors.description} // Memicu border merah jika kosong
+                  errorMessage={errors.description}
                 />
               </div>
 
-              {/* UPLOAD AREA */}
               <div className={styles.uploadContainer}>
                 <label className={styles.uploadLabel}>Thumbnail Kursus</label>
                 <div className={styles.uploadArea}>
@@ -176,7 +296,6 @@ export default function AddCoursePage() {
                 Tambahkan materi-materi yang akan diajarkan secara berurutan.
               </p>
 
-              {/* Pesan error khusus jika modul kosong/tidak valid */}
               {errors.modules && (
                 <div
                   style={{
@@ -201,7 +320,7 @@ export default function AddCoursePage() {
                       className={styles.moduleItem}
                       style={{
                         borderColor: errors.modules ? "#ef4444" : "#000",
-                      }} // Efek merah jika error
+                      }}
                     >
                       <div className={styles.moduleNumber}>{index + 1}</div>
 
@@ -248,7 +367,6 @@ export default function AddCoursePage() {
 
           <div className={styles.actionBar}>
             <div className={styles.actionText}>
-              {/* Ubah teks konfirmasi */}
               <h3>
                 {isEditMode ? "Simpan Perubahan?" : "Siap untuk dipublikasi?"}
               </h3>
@@ -259,7 +377,6 @@ export default function AddCoursePage() {
               className={styles.saveBtn}
               disabled={mutation.isPending}
             >
-              {/* Ubah teks tombol utama */}
               {mutation.isPending
                 ? "Menyimpan..."
                 : isEditMode

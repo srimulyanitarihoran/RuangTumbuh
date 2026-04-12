@@ -5,6 +5,7 @@ import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./EditProfilePage.module.css";
 import { Input } from "@/components/Input/Input";
 import { Popup } from "@/components/Popup/Popup";
+import { Skeleton } from "@/components/Skeleton/Skeleton"; // [TAMBAHAN] Import Skeleton
 import { useEditProfile } from "@/hooks/useEditProfile";
 import { getImageUrl } from "@/utils/imageHelper";
 import {
@@ -47,12 +48,151 @@ export default function EditProfilePage() {
     show: { opacity: 1, y: 0 },
   };
 
-  if (isLoading)
+  // =========================================
+  // VIEW LOADING: Meniru Struktur Layout Asli
+  // =========================================
+  if (isLoading) {
     return (
       <DashboardLayout title="Pengaturan Profil">
-        <p className={styles.loading}>Memuat formulir...</p>
+        <div className={styles.container}>
+          <div className={styles.pageHeader}>
+            <Skeleton width="220px" height="40px" />
+            <Skeleton
+              width="110px"
+              height="45px"
+              style={{ borderRadius: "12px" }}
+            />
+          </div>
+
+          <div className={styles.contentGrid}>
+            {/* SKELETON MAIN CARD */}
+            <div className={styles.mainCard}>
+              <div className={styles.avatarUploadSection}>
+                <Skeleton variant="circle" width="100px" height="100px" />
+                <div className={styles.uploadActions}>
+                  <Skeleton
+                    width="180px"
+                    height="14px"
+                    style={{ marginBottom: "12px" }}
+                  />
+                  <Skeleton
+                    width="140px"
+                    height="45px"
+                    style={{ borderRadius: "10px" }}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.formGrid} style={{ marginTop: "30px" }}>
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i}>
+                    <Skeleton
+                      width="100px"
+                      height="16px"
+                      style={{ marginBottom: "8px" }}
+                    />
+                    <Skeleton
+                      width="100%"
+                      height="50px"
+                      style={{ borderRadius: "12px" }}
+                    />
+                  </div>
+                ))}
+                <div className={styles.fullWidth}>
+                  <Skeleton
+                    width="100px"
+                    height="16px"
+                    style={{ marginBottom: "8px" }}
+                  />
+                  <Skeleton
+                    width="100%"
+                    height="50px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+                <div className={styles.fullWidth}>
+                  <Skeleton
+                    width="60px"
+                    height="16px"
+                    style={{ marginBottom: "8px" }}
+                  />
+                  <Skeleton
+                    width="100%"
+                    height="120px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* SKELETON SIDEBAR CARD */}
+            <div className={styles.sidebarCard}>
+              <div className={styles.sectionHeader}>
+                <Skeleton variant="circle" width="24px" height="24px" />
+                <Skeleton
+                  width="100px"
+                  height="24px"
+                  style={{ marginLeft: "10px" }}
+                />
+              </div>
+              <div
+                className={styles.passionInputWrapper}
+                style={{ marginTop: "20px" }}
+              >
+                <Skeleton
+                  width="100%"
+                  height="50px"
+                  style={{ borderRadius: "12px" }}
+                />
+                <Skeleton
+                  width="50px"
+                  height="50px"
+                  style={{ borderRadius: "12px", marginLeft: "10px" }}
+                />
+              </div>
+              <div
+                className={styles.passionWrapper}
+                style={{ marginTop: "20px", display: "flex", gap: "10px" }}
+              >
+                <Skeleton
+                  width="80px"
+                  height="35px"
+                  style={{ borderRadius: "20px" }}
+                />
+                <Skeleton
+                  width="100px"
+                  height="35px"
+                  style={{ borderRadius: "20px" }}
+                />
+                <Skeleton
+                  width="70px"
+                  height="35px"
+                  style={{ borderRadius: "20px" }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* SKELETON ACTION BAR */}
+          <div className={styles.actionBar}>
+            <div className={styles.actionText}>
+              <Skeleton
+                width="150px"
+                height="24px"
+                style={{ marginBottom: "8px" }}
+              />
+              <Skeleton width="250px" height="16px" />
+            </div>
+            <Skeleton
+              width="220px"
+              height="55px"
+              style={{ borderRadius: "12px" }}
+            />
+          </div>
+        </div>
       </DashboardLayout>
     );
+  }
 
   return (
     <DashboardLayout title="Pengaturan Profil">
