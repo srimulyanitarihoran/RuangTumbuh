@@ -1,0 +1,50 @@
+.container {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  background-color: #ffffff; /* Sesuaikan dengan tema RuangTumbuh */
+}
+
+.errorCode {
+  font-size: 8rem;
+  font-weight: 800;
+  margin: 0;
+  line-height: 1;
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2d3436;
+  margin-top: 1rem;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: #636e72;
+  max-width: 500px;
+  margin: 1rem 0 2rem 0;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .errorCode {
+    font-size: 5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+}

@@ -5,6 +5,7 @@ import DashboardLayout from "@/layouts/DashboardLayout/DashboardLayout";
 import styles from "./EditProfilePage.module.css";
 import { Input } from "@/components/Input/Input";
 import { Popup } from "@/components/Popup/Popup";
+import { Skeleton } from "@/components/Skeleton/Skeleton"; // [TAMBAHAN] Import Skeleton
 import { useEditProfile } from "@/hooks/useEditProfile";
 import { getImageUrl } from "@/utils/imageHelper";
 import {
@@ -20,6 +21,7 @@ import {
   FiType,
   FiPlus,
   FiCheckCircle,
+  FiSave,
 } from "react-icons/fi";
 
 export default function EditProfilePage() {
@@ -46,19 +48,159 @@ export default function EditProfilePage() {
     show: { opacity: 1, y: 0 },
   };
 
-  if (isLoading)
+  // =========================================
+  // VIEW LOADING: Meniru Struktur Layout Asli
+  // =========================================
+  if (isLoading) {
     return (
       <DashboardLayout title="Pengaturan Profil">
-        <p className={styles.loading}>Memuat formulir...</p>
+        <div className={styles.container}>
+          <div className={styles.pageHeader}>
+            <Skeleton width="220px" height="40px" />
+            <Skeleton
+              width="110px"
+              height="45px"
+              style={{ borderRadius: "12px" }}
+            />
+          </div>
+
+          <div className={styles.contentGrid}>
+            {/* SKELETON MAIN CARD */}
+            <div className={styles.mainCard}>
+              <div className={styles.avatarUploadSection}>
+                <Skeleton variant="circle" width="100px" height="100px" />
+                <div className={styles.uploadActions}>
+                  <Skeleton
+                    width="180px"
+                    height="14px"
+                    style={{ marginBottom: "12px" }}
+                  />
+                  <Skeleton
+                    width="140px"
+                    height="45px"
+                    style={{ borderRadius: "10px" }}
+                  />
+                </div>
+              </div>
+
+              <div className={styles.formGrid} style={{ marginTop: "30px" }}>
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i}>
+                    <Skeleton
+                      width="100px"
+                      height="16px"
+                      style={{ marginBottom: "8px" }}
+                    />
+                    <Skeleton
+                      width="100%"
+                      height="50px"
+                      style={{ borderRadius: "12px" }}
+                    />
+                  </div>
+                ))}
+                <div className={styles.fullWidth}>
+                  <Skeleton
+                    width="100px"
+                    height="16px"
+                    style={{ marginBottom: "8px" }}
+                  />
+                  <Skeleton
+                    width="100%"
+                    height="50px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+                <div className={styles.fullWidth}>
+                  <Skeleton
+                    width="60px"
+                    height="16px"
+                    style={{ marginBottom: "8px" }}
+                  />
+                  <Skeleton
+                    width="100%"
+                    height="120px"
+                    style={{ borderRadius: "12px" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* SKELETON SIDEBAR CARD */}
+            <div className={styles.sidebarCard}>
+              <div className={styles.sectionHeader}>
+                <Skeleton variant="circle" width="24px" height="24px" />
+                <Skeleton
+                  width="100px"
+                  height="24px"
+                  style={{ marginLeft: "10px" }}
+                />
+              </div>
+              <div
+                className={styles.passionInputWrapper}
+                style={{ marginTop: "20px" }}
+              >
+                <Skeleton
+                  width="100%"
+                  height="50px"
+                  style={{ borderRadius: "12px" }}
+                />
+                <Skeleton
+                  width="50px"
+                  height="50px"
+                  style={{ borderRadius: "12px", marginLeft: "10px" }}
+                />
+              </div>
+              <div
+                className={styles.passionWrapper}
+                style={{ marginTop: "20px", display: "flex", gap: "10px" }}
+              >
+                <Skeleton
+                  width="80px"
+                  height="35px"
+                  style={{ borderRadius: "20px" }}
+                />
+                <Skeleton
+                  width="100px"
+                  height="35px"
+                  style={{ borderRadius: "20px" }}
+                />
+                <Skeleton
+                  width="70px"
+                  height="35px"
+                  style={{ borderRadius: "20px" }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* SKELETON ACTION BAR */}
+          <div className={styles.actionBar}>
+            <div className={styles.actionText}>
+              <Skeleton
+                width="150px"
+                height="24px"
+                style={{ marginBottom: "8px" }}
+              />
+              <Skeleton width="250px" height="16px" />
+            </div>
+            <Skeleton
+              width="220px"
+              height="55px"
+              style={{ borderRadius: "12px" }}
+            />
+          </div>
+        </div>
       </DashboardLayout>
     );
+  }
 
   return (
     <DashboardLayout title="Pengaturan Profil">
       <motion.div className={styles.container} initial="hidden" animate="show">
         <div className={styles.pageHeader}>
-          <h1 className={styles.pageTitle}>Edit Profil Saya</h1>
+          <h1 className={styles.pageTitle}>Edit Profile Saya</h1>
           <button
+            type="button"
             className={styles.backBtn}
             onClick={() => navigate("/profile")}
           >
@@ -84,12 +226,18 @@ export default function EditProfilePage() {
                 onChange={handleFileChange}
                 style={{ display: "none" }}
               />
-              <button
-                className={styles.uploadBtn}
-                onClick={() => fileInputRef.current.click()}
-              >
-                <FiUploadCloud /> Unggah Foto
-              </button>
+              <div className={styles.uploadActions}>
+                <div className={styles.uploadInfo}>
+                  Format: JPG, PNG • Maks 2MB
+                </div>
+
+                <button
+                  className={styles.uploadBtn}
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  <FiUploadCloud /> Unggah Foto
+                </button>
+              </div>
             </div>
 
             {error && <p className={styles.errorText}>{error}</p>}
@@ -124,21 +272,25 @@ export default function EditProfilePage() {
                 value={formData.birthday}
                 onChange={handleInputChange}
               />
-              <Input
-                name="school"
-                label="Institusi"
-                icon={FiBookOpen}
-                value={formData.school}
-                onChange={handleInputChange}
-              />
-              <Input
-                name="description"
-                label="Bio"
-                isTextarea
-                icon={FiUser}
-                value={formData.description}
-                onChange={handleInputChange}
-              />
+              <div className={styles.fullWidth}>
+                <Input
+                  name="school"
+                  label="Institusi"
+                  icon={FiBookOpen}
+                  value={formData.school}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className={styles.fullWidth}>
+                <Input
+                  name="description"
+                  label="Bio"
+                  isTextarea
+                  icon={FiUser}
+                  value={formData.description}
+                  onChange={handleInputChange}
+                />
+              </div>
             </div>
           </motion.div>
 
@@ -168,13 +320,20 @@ export default function EditProfilePage() {
         </div>
 
         <div className={styles.actionBar}>
-          <button
-            className={styles.saveBtn}
-            onClick={handleSave}
-            disabled={isPending}
-          >
-            {isPending ? "Menyimpan..." : "Simpan Perubahan"}
-          </button>
+          <div className={styles.actionText}>
+            <h3>Sudah yakin? 🚀</h3>
+            <p>Pastikan semua data profile sudah benar.</p>
+          </div>
+          <div className={styles.actionButtons}>
+            <button
+              className={styles.saveBtn}
+              disabled={isPending}
+              onClick={handleSave}
+            >
+              <FiSave />{" "}
+              {isPending ? "Menyimpan..." : "Simpan Profile Sekarang"}
+            </button>
+          </div>
         </div>
       </motion.div>
 
